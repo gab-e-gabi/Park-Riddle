@@ -8,7 +8,9 @@ export default class abertura extends Phaser.Scene {
 
   preload () { }
 
-  create () { }
+  create () {
+    this.scene.start('fase1')
+  }
 
   update () { }
 }
