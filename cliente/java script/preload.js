@@ -23,6 +23,12 @@ export default class abertura extends Phaser.Scene {
         frameWidth: 64,
         frameHeight: 64
       })
+    this.load.image('grama', 'assets/mapa/grama.png')
+    this.load.image('sombras', 'assets/mapa/sombras.png')
+    this.load.image('itens', 'assets/mapa/itens.png')
+    this.load.image('plantas', 'assets/mapa/plantas.png')
+    this.load.image('sombras-plantas', 'assets/mapa/sombras-plantas.png')
+    this.load.image('tenda', 'assets/mapa/tenda.png')
   }
 
   create () {
