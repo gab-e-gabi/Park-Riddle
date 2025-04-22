@@ -1,4 +1,4 @@
-export default class abertura extends Phaser.Scene {
+export default class Abertura extends Phaser.Scene {
 
   constructor () {
     super('abertura')
@@ -6,15 +6,35 @@ export default class abertura extends Phaser.Scene {
 
   preload () {
     this.load.image('fundo', 'assets/abertura-fundo.png')
+    this.load.spritesheet('botao', 'assets/botao.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
   }
 
   create () {
     this.add.image(400, 225, 'fundo')
-      .setInteractive()
-      .on('pointerdown', () => {
-        this.scene.stop()
-        this.scene.start('preload')
-      })
+
+    this.botao = this.add.sprite(400, 400, 'botao')
+
+    this.anims.create({
+      key: 'botao',
+      frames: this.anims.generateFrameNumbers('botao', { start: 0, end: 7 }),
+      frameRate: 10
+    })
+
+    this.botao.setInteractive().on('pointerdown', () => {
+      this.botao.play('botao')
+
+      if ('vibrate' in navigator) {
+        navigator.vibrate(100)
+      }
+    })
+
+    this.botao.on('animationcomplete', () => {
+      this.scene.stop()
+      this.scene.start('preload')
+    })
   }
 
   update () { }

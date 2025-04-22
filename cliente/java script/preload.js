@@ -13,13 +13,16 @@ export default class abertura extends Phaser.Scene {
   }
 
   preload () {
-    this.load.setPath('assets/')
-    this.load.image('fundo', 'abertura-fundo.png')
-    this.load.spritesheet('Dan', 'Dan.png', {
+    this.load.spritesheet('botao', 'assets/botao.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.image('fundo', 'assets/abertura-fundo.png')
+    this.load.spritesheet('Dan', 'assets/Dan.png', {
       frameWidth: 64,
       frameHeight: 64
     }),
-      this.load.spritesheet('Ernesto', 'Ernesto.png', {
+      this.load.spritesheet('Ernesto', 'assets/Ernesto.png', {
         frameWidth: 64,
         frameHeight: 64
       })
