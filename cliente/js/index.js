@@ -16,9 +16,11 @@ class Game extends Phaser.Game {
     this.scene.add('fase1', fase1)
     this.scene.add('Win', Win)
     this.scene.add('GameOver', GameOver)
-    this.scene.start('abertura')
+    this.scene.start('fase1')
   }
 }
+
+
 
 window.onload = () => {
   window.game = new Game()
