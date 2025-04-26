@@ -1,7 +1,7 @@
 export default class abertura extends Phaser.Scene {
 
   constructor () {
-    super('fase1')
+    super('patio')
 
     this.threshold = 0.1
     this.speed = 75
@@ -11,36 +11,32 @@ export default class abertura extends Phaser.Scene {
   init() { }
 
   preload() {
-    this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa.json')
-    this.load.image('grama', 'assets/mapa/grama.png')
-    this.load.image('plantas', 'assets/mapa/plantas.png')
-    this.load.image('sombras-plantas', 'assets/mapa/sombras-plantas.png')
-    this.load.image('tenda', 'assets/mapa/tenda.png')
 
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
       frameHeight: 64
     })
 
-    this.load.spritesheet('botao', 'assets/botao.png', {
-      frameWidth: 64,
-      frameHeight: 64
-    })
+    this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
+    this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
+    this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
+    this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
+
     this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true)
   }
 
   create() {
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
-
+    // Da um nome prar cada Tileset
     this.tilesetGrama = this.tilemapMapa.addTilesetImage('grama')
-    this.tilesetPlantas = this.tilemapMapa.addTilesetImage('plantas')
-    this.tilesetSombrasPlantas = this.tilemapMapa.addTilesetImage('sombras-plantas')
-    this.tilesetTenda = this.tilemapMapa.addTilesetImage('tenda')
+    this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores-verdes')
+    this.tilesetPedras = this.tilemapMapa.addTilesetImage('pedras')
+    //
 
-    this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetGrama, this.tilesetTenda, this.tilesetPlantas, this.tilesetSombrasPlantas])
-    this.layerSombras = this.tilemapMapa.createLayer('sombras', [this.tilesetGrama, this.tilesetTenda, this.tilesetPlantas, this.tilesetSombrasPlantas])
-    this.layerTenda = this.tilemapMapa.createLayer('tenda', [this.tilesetGrama, this.tilesetTenda, this.tilesetPlantas, this.tilesetSombrasPlantas])
-    this.layerPlantas = this.tilemapMapa.createLayer('plantas', [this.tilesetGrama, this.tilesetTenda, this.tilesetPlantas, this.tilesetSombrasPlantas])
+    //Diz qual imagem esta em qual camada
+    this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetGrama, this.tilesetPedras])
+    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
+    //
 
     this.anims.create({
       key: 'botao',
@@ -48,21 +44,13 @@ export default class abertura extends Phaser.Scene {
       frameRate: 30
     })
 
-    this.personagemLocal = this.physics.add.sprite(200, 100, 'ernesto')
+    //Fisica do player
+    this.personagemLocal = this.physics.add.sprite(0, 400, 'ernesto')
+    this.layerObjetos.setCollisionByProperty({ collides: true })
+    this.physics.add.collider(this.personagemLocal, this.layerObjetos)
+    this.cameras.main.startFollow(this.personagemLocal)
+    //
 
-    //this.layerPlantas.setCollisionByProperty({ collides: true })
-    //this.layerTenda.setCollisionByProperty({ collides: true })
-    //this.physics.add.collider(this.personagemLocal, this.layerPlantas)
-
-    this.botao = this.physics.add.sprite(400, 400, 'botao')
-    this.botao
-      .setInteractive()
-      .on('pointerdown', () => {
-        this.botao.play('botao')
-      })
-      .on('pointerup', () => {
-        this.botao.setFrame(0)
-      })
     //Animacoes do personagem andando
     this.anims.create({
       key: 'personagem-andando-frente',

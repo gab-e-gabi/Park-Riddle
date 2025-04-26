@@ -9,7 +9,7 @@ export default class abertura extends Phaser.Scene {
   preload () { }
 
   create () {
-    this.scene.start('fase1')
+    this.scene.start('patio')
   }
 
   update () { }

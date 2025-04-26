@@ -1,0 +1,326 @@
+{
+       "compressionlevel": -1,
+       "height": 20,
+       "infinite": true,
+       "layers": [
+              {
+                     "chunks": [
+                            {
+                                   "data": "AQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAwAAAAQAAAACAAAABAAAAAIAAAAEAAAAAwAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAMAAAACAAAABAAAAAQAAAAEAAAAAgAAAAMAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAgAAAAMAAAACAAAAAwAAAAMAAAADAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAIAAAADAAAAAgAAAAQAAAACAAAAAgAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAwAAAAIAAAAEAAAABAAAAAQAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAIAAAAEAAAAAwAAAAIAAAADAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAACAAAABAAAAAMAAAADAAAABAAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAwAAAAMAAAADAAAABAAAAAQAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAMAAAADAAAABAAAAAQAAAADAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAgAAAAIAAAACAAAAAwAAAAMAAAADAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAACAAAABAAAAAIAAAACAAAAAwAAAAMAAAAEAAAAAwAAAAMAAAACAAAABAAAAAMAAAACAAAABAAAAAIAAAACAAAAAgAAAAMAAAACAAAAAwAAAAMAAAAEAAAAAgAAAAMAAAACAAAAAwAAAAQAAAAEAAAAAwAAAAIAAAADAAAABAAAAAQAAAAEAAAAAgAAAAMAAAACAAAABAAAAAQAAAADAAAABAAAAAIAAAACAAAAAwAAAAIAAAAEAAAABAAAAAQAAAADAAAAAgAAAAIAAAACAAAAAwAAAAMAAAAEAAAAAwAAAAIAAAADAAAAAwAAAAQAAAAEAAAABAAAAAIAAAAEAAAAAwAAAAMAAAAEAAAAAwAAAAMAAAAEAAAAAgAAAAQAAAAEAAAABAAAAAMAAAADAAAABAAAAAQAAAAEAAAAAwAAAAQAAAADAAAAAgAAAAIAAAACAAAAAwAAAA==",
+                                   "height": 16,
+                                   "width": 16,
+                                   "x": -16,
+                                   "y": 0
+                            },
+                            {
+                                   "data": "AwAAAAQAAAADAAAABAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAADAAAAAwAAAAMAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAQAAAADAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAIAAAADAAAAAwAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAACAAAABAAAAAIAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAABAAAAAMAAAACAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAQAAAADAAAABAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAADAAAABAAAAAMAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAIAAAADAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAIAAAAEAAAAAgAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAAAwAAAAIAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAABAAAAAIAAAAEAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAACAAAAAwAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAADAAAABAAAAAIAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAwAAAAMAAAADAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAIAAAACAAAAAwAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+                                   "height": 16,
+                                   "width": 16,
+                                   "x": 0,
+                                   "y": 0
+                            }
+                     ],
+                     "compression": "",
+                     "encoding": "base64",
+                     "height": 32,
+                     "id": 1,
+                     "name": "chao",
+                     "opacity": 1,
+                     "startx": -32,
+                     "starty": 0,
+                     "type": "tilelayer",
+                     "visible": true,
+                     "width": 64,
+                     "x": 0,
+                     "y": 0
+              },
+              {
+                     "chunks": [
+                            {
+                                   "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFQAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAVAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAABEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+                                   "height": 16,
+                                   "width": 16,
+                                   "x": -16,
+                                   "y": 0
+                            },
+                            {
+                                   "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+                                   "height": 16,
+                                   "width": 16,
+                                   "x": 0,
+                                   "y": 0
+                            }
+                     ],
+                     "compression": "",
+                     "encoding": "base64",
+                     "height": 32,
+                     "id": 3,
+                     "name": "objetos",
+                     "opacity": 1,
+                     "startx": -16,
+                     "starty": 0,
+                     "type": "tilelayer",
+                     "visible": true,
+                     "width": 48,
+                     "x": 0,
+                     "y": 0
+              }
+       ],
+       "nextlayerid": 4,
+       "nextobjectid": 1,
+       "orientation": "orthogonal",
+       "renderorder": "right-down",
+       "tiledversion": "1.11.2",
+       "tileheight": 64,
+       "tilesets": [
+              {
+                     "columns": 1,
+                     "firstgid": 1,
+                     "image": "texturas/chao/pedras.png",
+                     "imageheight": 64,
+                     "imagewidth": 64,
+                     "margin": 0,
+                     "name": "pedras",
+                     "spacing": 0,
+                     "tilecount": 1,
+                     "tileheight": 64,
+                     "tiles": [
+                            {
+                                   "id": 0,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            }
+                     ],
+                     "tilewidth": 64
+              },
+              {
+                     "columns": 2,
+                     "firstgid": 2,
+                     "image": "texturas/chao/grama.png",
+                     "imageheight": 128,
+                     "imagewidth": 128,
+                     "margin": 0,
+                     "name": "grama",
+                     "spacing": 0,
+                     "tilecount": 4,
+                     "tileheight": 64,
+                     "tiles": [
+                            {
+                                   "id": 0,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 1,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 2,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            }
+                     ],
+                     "tilewidth": 64
+              },
+              {
+                     "columns": 8,
+                     "firstgid": 6,
+                     "image": "texturas/objetos/arvores-verdes.png",
+                     "imageheight": 128,
+                     "imagewidth": 512,
+                     "margin": 0,
+                     "name": "arvores-verdes",
+                     "spacing": 0,
+                     "tilecount": 16,
+                     "tileheight": 64,
+                     "tiles": [
+                            {
+                                   "id": 0,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 1,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 2,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 3,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 4,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 5,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 6,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 7,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 8,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 9,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 10,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": true
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 11,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": true
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 12,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 13,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": false
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 14,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": true
+                                          }
+                                   ]
+                            },
+                            {
+                                   "id": 15,
+                                   "properties": [
+                                          {
+                                                 "name": "collides",
+                                                 "type": "bool",
+                                                 "value": true
+                                          }
+                                   ]
+                            }
+                     ],
+                     "tilewidth": 64
+              }
+       ],
+       "tilewidth": 64,
+       "type": "map",
+       "version": "1.10",
+       "width": 30
+}

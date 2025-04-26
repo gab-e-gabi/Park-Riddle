@@ -4,7 +4,7 @@ export default class abertura extends Phaser.Scene {
     super('preload')
   }
 
-  init () {
+  init() {
     this.add.rectangle(400, 300, 468, 32).setStrokeStyle(1, 0xffffff)
     const progresso = this.add.rectangle(400 - 230, 300, 4, 28, 0xffffff)
     this.load.on('progress', (progress) => {
@@ -12,7 +12,7 @@ export default class abertura extends Phaser.Scene {
     })
   }
 
-  preload () {
+  preload() {
     this.load.spritesheet('botao', 'assets/botao.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -26,17 +26,14 @@ export default class abertura extends Phaser.Scene {
         frameWidth: 64,
         frameHeight: 64
       })
-    this.load.image('grama', 'assets/mapa/grama.png')
-    this.load.image('sombras', 'assets/mapa/sombras.png')
-    this.load.image('itens', 'assets/mapa/itens.png')
-    this.load.image('plantas', 'assets/mapa/plantas.png')
-    this.load.image('sombras-plantas', 'assets/mapa/sombras-plantas.png')
-    this.load.image('tenda', 'assets/mapa/tenda.png')
+    this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
+    this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
+    this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
   }
 
-  create () {
+  create() {
     this.scene.start('sala')
   }
 
-  update () { }
+  update() { }
 }
