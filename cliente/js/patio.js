@@ -4,13 +4,17 @@ export default class abertura extends Phaser.Scene {
     super('patio')
 
     this.threshold = 0.1
-    this.speed = 75
+    this.speed = 90
     this.direcaoAtual = 'frente'
   }
 
   init() { }
 
   preload() {
+    this.load.audio('chuva', 'assets/audio/chuva.wav')
+
+    this.load.image('lanterna', 'assets/luz.png')
+    this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
 
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
@@ -26,6 +30,7 @@ export default class abertura extends Phaser.Scene {
   }
 
   create() {
+
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
     this.tilesetGrama = this.tilemapMapa.addTilesetImage('grama')
@@ -35,6 +40,13 @@ export default class abertura extends Phaser.Scene {
 
     //Diz qual imagem esta em qual camada
     this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetGrama, this.tilesetPedras])
+
+    this.lanterna = this.add.image(0, 0, 'lanterna')
+    this.lanterna.setAlpha(0.5)
+    this.lanterna.setBlendMode(Phaser.BlendModes.ADD)
+
+    this.personagemLocal = this.physics.add.sprite(0, 400, 'ernesto')
+
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
     //
 
@@ -44,11 +56,12 @@ export default class abertura extends Phaser.Scene {
       frameRate: 30
     })
 
+
     //Fisica do player
-    this.personagemLocal = this.physics.add.sprite(0, 400, 'ernesto')
+    this.personagemLocal.setSize(5, 5)
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.physics.add.collider(this.personagemLocal, this.layerObjetos)
-    this.cameras.main.startFollow(this.personagemLocal)
+    this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
     //
 
     //Animacoes do personagem andando
@@ -101,17 +114,43 @@ export default class abertura extends Phaser.Scene {
       frameRate: 12,
       repeat: -1
     })
+    //Camada para escurecer o fundo
+    this.noite = this.add.rectangle(0, 0, 1600, 1200, 0x472a66, 0.75)
+    this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
 
     this.joystick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-      x: 200,
-      y: 310,
+      x: 100,
+      y: 360,
       radius: 50, // Raio do joystick
-      base: this.add.circle(120, 360, 50, 0x888888),
+      base: this.add.circle(120, 360, 50, 0x4a3513),
       thumb: this.add.circle(120, 360, 25, 0xcccccc)
     })
+
+    //chuva
+    this.add.particles(-1080, -512, 'particula-chuva', {
+      x: { min: 0, max: 1024 },
+      quantity: 50,
+      lifespan: 4000,
+      speedY: { min: 400, max: 1800 },
+      gravityX: 20,
+      scale: 0.6,
+    });
+    //tenta Fullscreen
+    this.fullscreen = this.add.rectangle(0, 0, 5000, 3000, 0x000000, 0)
+    this.fullscreen.setInteractive()
+      .on('pointerdown', () => {
+        this.scale.startFullscreen()
+        this.chuva = this.sound.add('chuva')
+        this.chuva.setLoop(true)
+        this.chuva.setVolume(0.2)
+        this.chuva.play()
+        this.fullscreen.destroy()
+      })
+    
   }
 
   update() {
+    //console.log(this.personagemLocal.x, this.personagemLocal.y)
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
@@ -121,6 +160,10 @@ export default class abertura extends Phaser.Scene {
       const velocityY = Math.sin(angle) * this.speed
 
       this.personagemLocal.setVelocity(velocityX, velocityY)
+      this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+      this.lanterna.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
+      this.lanterna.setRotation(angle)
+      this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
 
       // Animação do personagem conforme a direção do movimento
       if (Math.abs(velocityX) > Math.abs(velocityY)) {
