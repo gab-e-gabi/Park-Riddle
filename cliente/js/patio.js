@@ -4,7 +4,7 @@ export default class abertura extends Phaser.Scene {
     super('patio')
 
     this.threshold = 0.1
-    this.speed = 90
+    this.speed = 75
     this.direcaoAtual = 'frente'
   }
 
@@ -66,13 +66,13 @@ export default class abertura extends Phaser.Scene {
 
     //Animacoes do personagem andando
     this.anims.create({
-      key: 'personagem-andando-frente',
+      key: 'personagem-andando-baixo',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 0, end: 12 }),
       frameRate: 18,
       repeat: -1
     })
     this.anims.create({
-      key: 'personagem-andando-tras',
+      key: 'personagem-andando-cima',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 13, end: 25 }),
       frameRate: 18,
       repeat: -1
@@ -89,15 +89,41 @@ export default class abertura extends Phaser.Scene {
       frameRate: 18,
       repeat: -1
     })
+    this.anims.create({
+      key: 'personagem-andando-cima-esquerda',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 52, end: 64 }),
+      frameRate: 18,
+      repeat: -1,
+    })
+    this.anims.create({
+      key: 'personagem-andando-cima-direita',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 65, end: 77 }),
+      frameRate: 18,
+      repeat: -1
+    })
+    this.anims.create({
+      key: 'personagem-andando-baixo-esquerda',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 78, end: 90 }),
+      frameRate: 18,
+      repeat: -1
+    })
+    this.anims.create({
+      key: 'personagem-andando-baixo-direita',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 91, end: 103 }),
+      frameRate: 18,
+      repeat: -1
+    })
+
+
     // Animações do personagem parado
     this.anims.create({
-      key: 'personagem-parado-frente',
+      key: 'personagem-parado-baixo',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 0, end: 0 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
-      key: 'personagem-parado-tras',
+      key: 'personagem-parado-cima',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 14, end: 14 }),
       frameRate: 12,
       repeat: -1
@@ -114,6 +140,31 @@ export default class abertura extends Phaser.Scene {
       frameRate: 12,
       repeat: -1
     })
+    this.anims.create({
+      key: 'personagem-parado-cima-esquerda',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 53, end: 53 }),
+      frameRate: 12,
+      repeat: -1
+    })
+    this.anims.create({
+      key: 'personagem-parado-cima-direita',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 66, end: 66 }),
+      frameRate: 12,
+      repeat: -1
+    })
+    this.anims.create({
+      key: 'personagem-parado-baixo-esquerda',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 79, end: 79 }),
+      frameRate: 12,
+      repeat: -1
+    })
+    this.anims.create({
+      key: 'personagem-parado-baixo-direita',
+      frames: this.anims.generateFrameNumbers('ernesto', { start: 92, end: 92 }),
+      frameRate: 12,
+      repeat: -1
+    })
+
     //Camada para escurecer o fundo
     this.noite = this.add.rectangle(0, 0, 1600, 1200, 0x472a66, 0.75)
     this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
@@ -134,7 +185,9 @@ export default class abertura extends Phaser.Scene {
       speedY: { min: 400, max: 1800 },
       gravityX: 20,
       scale: 0.6,
+      setGamma: { min: 0.5, max: 1 },
     });
+
     //tenta Fullscreen
     this.fullscreen = this.add.rectangle(0, 0, 5000, 3000, 0x000000, 0)
     this.fullscreen.setInteractive()
@@ -146,18 +199,19 @@ export default class abertura extends Phaser.Scene {
         this.chuva.play()
         this.fullscreen.destroy()
       })
-    
+
   }
 
   update() {
+    console.log(this.game.loop.actualFps)
     //console.log(this.personagemLocal.x, this.personagemLocal.y)
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
     if (force > this.threshold) {
-      const velocityX = Math.cos(angle) * this.speed
-      const velocityY = Math.sin(angle) * this.speed
+      const velocityX = Math.round(Math.cos(angle) * this.speed)
+      const velocityY = Math.round(Math.sin(angle) * this.speed)
 
       this.personagemLocal.setVelocity(velocityX, velocityY)
       this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
@@ -165,42 +219,85 @@ export default class abertura extends Phaser.Scene {
       this.lanterna.setRotation(angle)
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
 
-      // Animação do personagem conforme a direção do movimento
-      if (Math.abs(velocityX) > Math.abs(velocityY)) {
-        if (velocityX > 0) {
-          this.personagemLocal.anims.play('personagem-andando-direita', true)
-          this.direcaoAtual = 'direita'
-        } else {
-          this.personagemLocal.anims.play('personagem-andando-esquerda', true)
-          this.direcaoAtual = 'esquerda'
-        }
+      // Acha o aungulo mais próximo da direção do joystick
+      let o = undefined
+      if (this.joystick.angle < 0) {
+        o = (this.joystick.angle % 360 + 360) % 360;
       } else {
-        if (velocityY > 0) {
-          this.personagemLocal.anims.play('personagem-andando-frente', true)
-          this.direcaoAtual = 'frente'
-        } else {
-          this.personagemLocal.anims.play('personagem-andando-tras', true)
-          this.direcaoAtual = 'tras'
-        }
+        o = this.joystick.angle
       }
-    } else {
-      // Se a força do joystick for baixa, o personagem para
-      this.personagemLocal.setVelocity(0)
-      switch (this.direcaoAtual) {
-        case 'frente':
-          this.personagemLocal.anims.play('personagem-parado-frente', true)
-          break
-        case 'direita':
-          this.personagemLocal.anims.play('personagem-parado-direita', true)
+      const closest = (arr, n) => arr.sort((a, b) => Math.abs(a - n) - Math.abs(b - n))[0];
+      this.direcao = closest([0, 45, 90, 135, 180, 225, 270, 315, 360], o)
+      
+      // Animação do personagem conforme a direção do movimento
+        switch (this.direcao) {
+          case 0:
+            this.personagemLocal.anims.play('personagem-andando-direita', true)
+            this.direcaoAtual = 'direita'
+            break
+          case 45:
+            this.personagemLocal.anims.play('personagem-andando-baixo-direita', true)
+            this.direcaoAtual = 'baixo-direita'
+            break
+          case 90:
+            this.personagemLocal.anims.play('personagem-andando-baixo', true)
+            this.direcaoAtual = 'baixo'
+            break
+          case 135:
+            this.personagemLocal.anims.play('personagem-andando-baixo-esquerda', true)
+            this.direcaoAtual = 'baixo-esquerda'
+            break
+          case 180:
+            this.personagemLocal.anims.play('personagem-andando-esquerda', true)
+            this.direcaoAtual = 'esquerda'
+            break
+          case 225:
+            this.personagemLocal.anims.play('personagem-andando-cima-esquerda', true)
+            this.direcaoAtual = 'cima-esquerda'
+            break
+          case 270:
+            this.personagemLocal.anims.play('personagem-andando-cima', true)
+            this.direcaoAtual = 'cima'
+            break
+          case 315:
+            this.personagemLocal.anims.play('personagem-andando-cima-direita', true)
+            this.direcaoAtual = 'cima-direita'
+            break
+          case 360:
+            this.personagemLocal.anims.play('personagem-andando-direita', true)
+            this.direcaoAtual = 'direita'
+            break
+        }
 
-          break
-        case 'esquerda':
-          this.personagemLocal.anims.play('personagem-parado-esquerda', true)
-          break
-        case 'tras':
-          this.personagemLocal.anims.play('personagem-parado-tras', true)
-          break
+      } else {
+        // Se a força do joystick for baixa, o personagem para
+        this.personagemLocal.setVelocity(0)
+        switch (this.direcaoAtual) {
+          case 'baixo':
+            this.personagemLocal.anims.play('personagem-parado-baixo', true)
+            break
+          case 'direita':
+            this.personagemLocal.anims.play('personagem-parado-direita', true)
+            break
+          case 'esquerda':
+            this.personagemLocal.anims.play('personagem-parado-esquerda', true)
+            break
+          case 'cima':
+            this.personagemLocal.anims.play('personagem-parado-cima', true)
+            break
+          case 'cima-esquerda':
+            this.personagemLocal.anims.play('personagem-parado-cima-esquerda', true)
+            break
+          case 'cima-direita':
+            this.personagemLocal.anims.play('personagem-parado-cima-direita', true)
+            break
+          case 'baixo-esquerda':  
+            this.personagemLocal.anims.play('personagem-parado-baixo-esquerda', true)
+            break
+          case 'baixo-direita':
+            this.personagemLocal.anims.play('personagem-parado-baixo-direita', true)
+            break
+        }
       }
     }
   }
-}
