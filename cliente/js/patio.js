@@ -11,7 +11,6 @@ export default class abertura extends Phaser.Scene {
   init() { }
 
   preload() {
-    this.load.audio('chuva', 'assets/audio/chuva.wav')
 
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
@@ -27,10 +26,16 @@ export default class abertura extends Phaser.Scene {
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
 
     this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true)
+  
+    this.load.audio("trilha-sonora", 'assets/trilha-sonora.mp3')
+    this.load.audio('chuva', 'assets/audio/chuva.wav')
+
   }
 
   create() {
-
+    this.trilha = this.sound.add("trilha-sonora", { loop: true }).play()
+    this.chuva = this.sound.add("chuva", { loop: true }).play()
+    
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
     this.tilesetGrama = this.tilemapMapa.addTilesetImage('grama')
@@ -193,10 +198,6 @@ export default class abertura extends Phaser.Scene {
     this.fullscreen.setInteractive()
       .on('pointerdown', () => {
         this.scale.startFullscreen()
-        this.chuva = this.sound.add('chuva')
-        this.chuva.setLoop(true)
-        this.chuva.setVolume(0.2)
-        this.chuva.play()
         this.fullscreen.destroy()
       })
 
