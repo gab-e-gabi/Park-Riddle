@@ -6,6 +6,7 @@ export default class abertura extends Phaser.Scene {
     this.threshold = 0.1
     this.speed = 75
     this.direcaoAtual = 'frente'
+    this.frameRate = 14
   }
 
   init() { }
@@ -24,18 +25,25 @@ export default class abertura extends Phaser.Scene {
     this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
     this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
+    this.load.image('tendas', 'assets/mapa/texturas/objetos/tendaLLD.png')
 
     this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true)
-  
-    this.load.audio("trilha-sonora", 'assets/trilha-sonora.mp3')
-    this.load.audio('chuva', 'assets/audio/chuva.wav')
 
+    this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
+    this.load.audio('chuva', 'assets/audio/chuva.wav')
+    this.load.audio('passos', 'assets/audio/passos.mp3')
   }
 
   create() {
-    this.trilha = this.sound.add("trilha-sonora", { loop: true }).play()
-    this.chuva = this.sound.add("chuva", { loop: true }).play()
-    
+    this.trilha = this.sound.add("trilha-sonora", {
+      loop: true,
+      volume: 0.4,
+    }).play()
+    this.chuva = this.sound.add("chuva", {
+      loop: true,
+      volume: 0.5
+    }).play()
+
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
     this.tilesetGrama = this.tilemapMapa.addTilesetImage('grama')
@@ -50,7 +58,7 @@ export default class abertura extends Phaser.Scene {
     this.lanterna.setAlpha(0.5)
     this.lanterna.setBlendMode(Phaser.BlendModes.ADD)
 
-    this.personagemLocal = this.physics.add.sprite(0, 400, 'ernesto')
+    this.personagemLocal = this.physics.add.sprite(300, 400, 'ernesto')
 
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
     //
@@ -70,52 +78,53 @@ export default class abertura extends Phaser.Scene {
     //
 
     //Animacoes do personagem andando
+
     this.anims.create({
       key: 'personagem-andando-baixo',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 0, end: 12 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-cima',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 13, end: 25 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-esquerda',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 26, end: 38 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-direita',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 39, end: 51 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-cima-esquerda',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 52, end: 64 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1,
     })
     this.anims.create({
       key: 'personagem-andando-cima-direita',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 65, end: 77 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-baixo-esquerda',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 78, end: 90 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-baixo-direita',
       frames: this.anims.generateFrameNumbers('ernesto', { start: 91, end: 103 }),
-      frameRate: 18,
+      frameRate: this.frameRate,
       repeat: -1
     })
 
@@ -183,7 +192,7 @@ export default class abertura extends Phaser.Scene {
     })
 
     //chuva
-    this.add.particles(-1080, -512, 'particula-chuva', {
+    this.particulaChuva = this.add.particles(0, -512, 'particula-chuva', {
       x: { min: 0, max: 1024 },
       quantity: 50,
       lifespan: 4000,
@@ -191,7 +200,8 @@ export default class abertura extends Phaser.Scene {
       gravityX: 20,
       scale: 0.6,
       setGamma: { min: 0.5, max: 1 },
-    });
+    })
+      .setScrollFactor(0);
 
     //tenta Fullscreen
     this.fullscreen = this.add.rectangle(0, 0, 5000, 3000, 0x000000, 0)
@@ -200,17 +210,25 @@ export default class abertura extends Phaser.Scene {
         this.scale.startFullscreen()
         this.fullscreen.destroy()
       })
+    this.passos = this.sound.add('passos', {
+      mute: false,
+      volume: 0.5,
+      rate: 1,
+      detune: 0,
+      seek: 0,
+      loop: false,
+      delay: 0,
+    })
 
   }
 
   update() {
-    console.log(this.game.loop.actualFps)
-    //console.log(this.personagemLocal.x, this.personagemLocal.y)
-
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
     if (force > this.threshold) {
+      
+
       const velocityX = Math.round(Math.cos(angle) * this.speed)
       const velocityY = Math.round(Math.sin(angle) * this.speed)
 
@@ -229,76 +247,87 @@ export default class abertura extends Phaser.Scene {
       }
       const closest = (arr, n) => arr.sort((a, b) => Math.abs(a - n) - Math.abs(b - n))[0];
       this.direcao = closest([0, 45, 90, 135, 180, 225, 270, 315, 360], o)
-      
-      // Animação do personagem conforme a direção do movimento
-        switch (this.direcao) {
-          case 0:
-            this.personagemLocal.anims.play('personagem-andando-direita', true)
-            this.direcaoAtual = 'direita'
-            break
-          case 45:
-            this.personagemLocal.anims.play('personagem-andando-baixo-direita', true)
-            this.direcaoAtual = 'baixo-direita'
-            break
-          case 90:
-            this.personagemLocal.anims.play('personagem-andando-baixo', true)
-            this.direcaoAtual = 'baixo'
-            break
-          case 135:
-            this.personagemLocal.anims.play('personagem-andando-baixo-esquerda', true)
-            this.direcaoAtual = 'baixo-esquerda'
-            break
-          case 180:
-            this.personagemLocal.anims.play('personagem-andando-esquerda', true)
-            this.direcaoAtual = 'esquerda'
-            break
-          case 225:
-            this.personagemLocal.anims.play('personagem-andando-cima-esquerda', true)
-            this.direcaoAtual = 'cima-esquerda'
-            break
-          case 270:
-            this.personagemLocal.anims.play('personagem-andando-cima', true)
-            this.direcaoAtual = 'cima'
-            break
-          case 315:
-            this.personagemLocal.anims.play('personagem-andando-cima-direita', true)
-            this.direcaoAtual = 'cima-direita'
-            break
-          case 360:
-            this.personagemLocal.anims.play('personagem-andando-direita', true)
-            this.direcaoAtual = 'direita'
-            break
-        }
 
-      } else {
-        // Se a força do joystick for baixa, o personagem para
-        this.personagemLocal.setVelocity(0)
-        switch (this.direcaoAtual) {
-          case 'baixo':
-            this.personagemLocal.anims.play('personagem-parado-baixo', true)
-            break
-          case 'direita':
-            this.personagemLocal.anims.play('personagem-parado-direita', true)
-            break
-          case 'esquerda':
-            this.personagemLocal.anims.play('personagem-parado-esquerda', true)
-            break
-          case 'cima':
-            this.personagemLocal.anims.play('personagem-parado-cima', true)
-            break
-          case 'cima-esquerda':
-            this.personagemLocal.anims.play('personagem-parado-cima-esquerda', true)
-            break
-          case 'cima-direita':
-            this.personagemLocal.anims.play('personagem-parado-cima-direita', true)
-            break
-          case 'baixo-esquerda':  
-            this.personagemLocal.anims.play('personagem-parado-baixo-esquerda', true)
-            break
-          case 'baixo-direita':
-            this.personagemLocal.anims.play('personagem-parado-baixo-direita', true)
-            break
-        }
+      // Animação do personagem conforme a direção do movimento
+      switch (this.direcao) {
+        case 0:
+          this.personagemLocal.anims.play('personagem-andando-direita', true)
+          this.direcaoAtual = 'direita'
+          break
+        case 45:
+          this.personagemLocal.anims.play('personagem-andando-baixo-direita', true)
+          this.direcaoAtual = 'baixo-direita'
+          break
+        case 90:
+          this.personagemLocal.anims.play('personagem-andando-baixo', true)
+          this.direcaoAtual = 'baixo'
+          break
+        case 135:
+          this.personagemLocal.anims.play('personagem-andando-baixo-esquerda', true)
+          this.direcaoAtual = 'baixo-esquerda'
+          break
+        case 180:
+          this.personagemLocal.anims.play('personagem-andando-esquerda', true)
+          this.direcaoAtual = 'esquerda'
+          break
+        case 225:
+          this.personagemLocal.anims.play('personagem-andando-cima-esquerda', true)
+          this.direcaoAtual = 'cima-esquerda'
+          break
+        case 270:
+          this.personagemLocal.anims.play('personagem-andando-cima', true)
+          this.direcaoAtual = 'cima'
+          break
+        case 315:
+          this.personagemLocal.anims.play('personagem-andando-cima-direita', true)
+          this.direcaoAtual = 'cima-direita'
+          break
+        case 360:
+          this.personagemLocal.anims.play('personagem-andando-direita', true)
+          this.direcaoAtual = 'direita'
+          break
+      }
+
+      //Retorna o frame atual na animação
+      this.frameAtual = this.personagemLocal.anims.currentFrame.index;
+
+      //Frames do ernesto com o pé no chao
+      const pesNoChao = [4,10]
+
+      //Toca som de passos quando o pé toca o chão
+      if (pesNoChao.includes(this.frameAtual)) {
+        this.passos.play()
+      }
+      
+    } else {
+      // Se a força do joystick for baixa, o personagem para
+      this.personagemLocal.setVelocity(0)
+      switch (this.direcaoAtual) {
+        case 'baixo':
+          this.personagemLocal.anims.play('personagem-parado-baixo', true)
+          break
+        case 'direita':
+          this.personagemLocal.anims.play('personagem-parado-direita', true)
+          break
+        case 'esquerda':
+          this.personagemLocal.anims.play('personagem-parado-esquerda', true)
+          break
+        case 'cima':
+          this.personagemLocal.anims.play('personagem-parado-cima', true)
+          break
+        case 'cima-esquerda':
+          this.personagemLocal.anims.play('personagem-parado-cima-esquerda', true)
+          break
+        case 'cima-direita':
+          this.personagemLocal.anims.play('personagem-parado-cima-direita', true)
+          break
+        case 'baixo-esquerda':
+          this.personagemLocal.anims.play('personagem-parado-baixo-esquerda', true)
+          break
+        case 'baixo-direita':
+          this.personagemLocal.anims.play('personagem-parado-baixo-direita', true)
+          break
       }
     }
   }
+}
