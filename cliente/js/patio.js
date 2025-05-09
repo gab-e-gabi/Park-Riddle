@@ -35,14 +35,14 @@ export default class abertura extends Phaser.Scene {
   }
 
   create() {
-    this.trilha = this.sound.add("trilha-sonora", {
-      loop: true,
-      volume: 0.4,
-    }).play()
-    this.chuva = this.sound.add("chuva", {
-      loop: true,
-      volume: 0.5
-    }).play()
+    //this.trilha = this.sound.add("trilha-sonora", {
+    //  loop: true,
+    //  volume: 0.4,
+    //}).play()
+    //this.chuva = this.sound.add("chuva", {
+    //  loop: true,
+    //  volume: 0.5
+    //}).play()
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
@@ -210,19 +210,19 @@ export default class abertura extends Phaser.Scene {
         this.scale.startFullscreen()
         this.fullscreen.destroy()
       })
+
+    //Modulação dos passos
     this.passos = this.sound.add('passos', {
-      mute: false,
       volume: 0.5,
-      rate: 1,
-      detune: 0,
-      seek: 0,
-      loop: false,
-      delay: 0,
     })
 
   }
 
   update() {
+
+    console.log(this.passos.detune)
+
+
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
@@ -287,6 +287,10 @@ export default class abertura extends Phaser.Scene {
           this.direcaoAtual = 'direita'
           break
       }
+
+      //Altera pitch dos passos
+      let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
+      this.passos.setDetune(Modulado)
 
       //Retorna o frame atual na animação
       this.frameAtual = this.personagemLocal.anims.currentFrame.index;
