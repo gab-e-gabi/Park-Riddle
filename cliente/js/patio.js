@@ -2,12 +2,13 @@ export default class abertura extends Phaser.Scene {
 
   constructor () {
     super('patio')
-
     this.threshold = 0.1
-    this.speed = 75
+    this.speed = 110
+    this.frameRate = 25
     this.direcaoAtual = 'frente'
-    this.frameRate = 14
   }
+  //Corrida 110 25
+  //Caminhada 75 18
 
   init() { }
 
@@ -32,17 +33,18 @@ export default class abertura extends Phaser.Scene {
     this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
     this.load.audio('chuva', 'assets/audio/chuva.wav')
     this.load.audio('passos', 'assets/audio/passos.mp3')
+    this.input.addPointer()
   }
 
   create() {
-    //this.trilha = this.sound.add("trilha-sonora", {
-    //  loop: true,
-    //  volume: 0.4,
-    //}).play()
-    //this.chuva = this.sound.add("chuva", {
-    //  loop: true,
-    //  volume: 0.5
-    //}).play()
+    this.trilha = this.sound.add("trilha-sonora", {
+      loop: true,
+      volume: 0.4,
+    }).play()
+    this.chuva = this.sound.add("chuva", {
+      loop: true,
+      volume: 0.5
+    }).play()
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
@@ -183,14 +185,6 @@ export default class abertura extends Phaser.Scene {
     this.noite = this.add.rectangle(0, 0, 1600, 1200, 0x472a66, 0.75)
     this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
 
-    this.joystick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-      x: 100,
-      y: 360,
-      radius: 50, // Raio do joystick
-      base: this.add.circle(120, 360, 50, 0x4a3513),
-      thumb: this.add.circle(120, 360, 25, 0xcccccc)
-    })
-
     //chuva
     this.particulaChuva = this.add.particles(0, -512, 'particula-chuva', {
       x: { min: 0, max: 1024 },
@@ -202,6 +196,14 @@ export default class abertura extends Phaser.Scene {
       setGamma: { min: 0.5, max: 1 },
     })
       .setScrollFactor(0);
+
+    this.joystick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
+      x: 100,
+      y: 360,
+      radius: 50, // Raio do joystick
+      base: this.add.circle(120, 360, 50, 0x4a3513),
+      thumb: this.add.circle(120, 360, 25, 0xcccccc)
+    })
 
     //tenta Fullscreen
     this.fullscreen = this.add.rectangle(0, 0, 5000, 3000, 0x000000, 0)
@@ -216,27 +218,38 @@ export default class abertura extends Phaser.Scene {
       volume: 0.5,
     })
 
+    //Botão de corrida
+    this.add.circle(700, 400, 30, 0xcccccc)
+      .setInteractive()
+      .setScrollFactor(0)
+      .on('pointerdown', () => {
+        this.speed = 110
+        this.frameRate = 25
+      })
+      .on('pointerup', () => {
+        this.speed = 75
+        this.frameRate = 18
+      })
   }
 
   update() {
 
-    console.log(this.passos.detune)
-
+console.log(this.speed, this.frameRate)
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
     if (force > this.threshold) {
-      
+
 
       const velocityX = Math.round(Math.cos(angle) * this.speed)
       const velocityY = Math.round(Math.sin(angle) * this.speed)
 
       this.personagemLocal.setVelocity(velocityX, velocityY)
-      this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
       this.lanterna.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
       this.lanterna.setRotation(angle)
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
+      this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
       // Acha o aungulo mais próximo da direção do joystick
       let o = undefined
@@ -296,13 +309,13 @@ export default class abertura extends Phaser.Scene {
       this.frameAtual = this.personagemLocal.anims.currentFrame.index;
 
       //Frames do ernesto com o pé no chao
-      const pesNoChao = [4,10]
+      const pesNoChao = [4, 10]
 
       //Toca som de passos quando o pé toca o chão
       if (pesNoChao.includes(this.frameAtual)) {
         this.passos.play()
       }
-      
+
     } else {
       // Se a força do joystick for baixa, o personagem para
       this.personagemLocal.setVelocity(0)
