@@ -10,8 +10,24 @@ io.on("connection", (socket) => {
   socket.on("entrar-na-sala", (sala) => {
     socket.join(sala)
     console.log(`Usuário ${socket.id} entrou na sala ${sala}`)
+
+    let jogadores = {};
+    if (io.sockets.adapter.rooms.get(sala).size === 1) {
+      jogadores = {
+        primeiro: socket.id,
+        segundo: undefined,
+      }
+    } else if (io.sockets.adapter.rooms.get(sala).size === 2) {
+      const [primeiro] = io.sockets.adapter.rooms.get(sala)
+      jogadores = {
+        primeiro,
+        segundo: socket.id,
+      }
+    }
+    io.to(sala).emit("jogadores", jogadores);
   })
-  
+
+
   socket.on("disconnect", () => { })
 })
 

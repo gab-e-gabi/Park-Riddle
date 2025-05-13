@@ -20,7 +20,14 @@ export default class abertura extends Phaser.Scene {
         .on("pointerdown", () => {
           this.game.sala = sala.numero
           this.game.socket.emit("entrar-na-sala", this.game.sala);
-         })
+        })
+    })
+    this.game.socket.on("jogadores", (jogadores) => {
+      if (jogadores.segundo) {
+        this.game.jogadores = jogadores;
+        this.scene.stop();
+        this.scene.start("patio");
+      }
     })
   }
 }
