@@ -1,16 +1,26 @@
 export default class abertura extends Phaser.Scene {
-
   constructor () {
     super('sala')
   }
 
-  init () { }
-
-  preload () { }
-
   create () {
-    this.scene.start('patio')
-  }
+    this.salas = [
+      { x: 200, y: 200, numero: '1' },
+      { x: 300, y: 200, numero: '2' },
+      { x: 400, y: 200, numero: '3' },
+      { x: 500, y: 200, numero: '4' },
+      { x: 600, y: 200, numero: '5' },
+      { x: 700, y: 200, numero: '6' },
+    ];
 
-  update () { }
+    this.salas.forEach(sala => {
+      sala.botao = this.add
+        .text(sala.x, sala.y, sala.numero)
+        .setInteractive()
+        .on("pointerdown", () => {
+          this.game.sala = sala.numero
+          this.game.socket.emit("entrar-na-sala", this.game.sala);
+         })
+    })
+  }
 }
