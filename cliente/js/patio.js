@@ -22,6 +22,11 @@ export default class abertura extends Phaser.Scene {
       frameHeight: 64
     })
 
+    this.load.spritesheet('Dan', 'assets/Dan.png', {
+    frameWidth: 64,
+      frameHeight: 64
+    })
+
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
     this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
@@ -60,7 +65,18 @@ export default class abertura extends Phaser.Scene {
     this.lanterna.setAlpha(0.5)
     this.lanterna.setBlendMode(Phaser.BlendModes.ADD)
 
+  if (this.game.jogadores.primeiro == this.game.socket.id) {
     this.personagemLocal = this.physics.add.sprite(300, 400, 'ernesto')
+    this.personagemRemoto = this.physics.add.sprite(350, 450, 'Dan')
+  } else if (this.game.jogadores.segundo == this.game.socket.id) {
+    this.personagemLocal = this.physics.add.sprite(350, 450, 'Dan')
+    this.personagemRemoto = this.physics.add.sprite(300, 400, 'ernesto')
+  } else {
+    window.alert("Jogador não encontrado")
+    this.game.stop()
+    this.game.start("abertura")
+  }
+    
 
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
     //
@@ -83,49 +99,49 @@ export default class abertura extends Phaser.Scene {
 
     this.anims.create({
       key: 'personagem-andando-baixo',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 0, end: 12 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 0, end: 12 }),
       frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-cima',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 13, end: 25 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 13, end: 25 }),
       frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-esquerda',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 26, end: 38 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 26, end: 38 }),
       frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-direita',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 39, end: 51 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 39, end: 51 }),
       frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-cima-esquerda',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 52, end: 64 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 52, end: 64 }),
       frameRate: this.frameRate,
       repeat: -1,
     })
     this.anims.create({
       key: 'personagem-andando-cima-direita',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 65, end: 77 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 65, end: 77 }),
       frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-baixo-esquerda',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 78, end: 90 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 78, end: 90 }),
       frameRate: this.frameRate,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-andando-baixo-direita',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 91, end: 103 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 91, end: 103 }),
       frameRate: this.frameRate,
       repeat: -1
     })
@@ -134,49 +150,49 @@ export default class abertura extends Phaser.Scene {
     // Animações do personagem parado
     this.anims.create({
       key: 'personagem-parado-baixo',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 0, end: 0 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 0, end: 0 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-parado-cima',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 14, end: 14 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 14, end: 14 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-parado-esquerda',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 27, end: 27 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 27, end: 27 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-parado-direita',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 40, end: 40 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 40, end: 40 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-parado-cima-esquerda',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 53, end: 53 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 53, end: 53 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-parado-cima-direita',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 66, end: 66 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 66, end: 66 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-parado-baixo-esquerda',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 79, end: 79 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 79, end: 79 }),
       frameRate: 12,
       repeat: -1
     })
     this.anims.create({
       key: 'personagem-parado-baixo-direita',
-      frames: this.anims.generateFrameNumbers('ernesto', { start: 92, end: 92 }),
+      frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 92, end: 92 }),
       frameRate: 12,
       repeat: -1
     })
@@ -206,12 +222,14 @@ export default class abertura extends Phaser.Scene {
     })
 
     //tenta Fullscreen
-    this.fullscreen = this.add.rectangle(0, 0, 5000, 3000, 0x000000, 0)
+    /*
+     this.fullscreen = this.add.rectangle(0, 0, 5000, 3000, 0x000000, 0)
     this.fullscreen.setInteractive()
       .on('pointerdown', () => {
         this.scale.startFullscreen()
         this.fullscreen.destroy()
       })
+    */
 
     //Modulação dos passos
     this.passos = this.sound.add('passos', {
