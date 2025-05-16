@@ -10,9 +10,9 @@ export default class abertura extends Phaser.Scene {
   //Corrida 110 25
   //Caminhada 75 18
 
-  init () { }
+  init() { }
 
-  preload () {
+  preload() {
 
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
@@ -41,7 +41,7 @@ export default class abertura extends Phaser.Scene {
     this.input.addPointer()
   }
 
-  create () {
+  create() {
     this.trilha = this.sound.add("trilha-sonora", {
       loop: true,
       volume: 0.4,
@@ -71,16 +71,47 @@ export default class abertura extends Phaser.Scene {
         { negotiated: true, id: 0 }
       )
 
+      this.game.remoteConnection.onicecandidate = ({ candidate }) => {
+        this.game.socket.emit("candidate", this.game.sala, candidate)
+      }
+      this.game.remoteConnection.ontrack = ({ streams: [track] }) => {
+        this.game.audio.srcObject = track
+      }
+
+      if (this.game.midias) {
+        this.game.midias.getTracks().forEach((track) => {
+          this.game.remoteConnection.addTrack(track, this.game.midias)
+        });
+      }
+
+      this.game.socket.on("offer", descripition => {
+        this.game.remoteConnection
+          .setRemoteDescription(descripition)
+          .then(() => this.game.remoteConnection.createAnswer())
+          .then((answer) => this.game.remoteConnection.setLocalDescription(answer)
+          )
+          .then(() =>
+            this.game.socket.emit(
+              "answer",
+              this.game.sala,
+              this.game.remoteConnection.localDescription
+            )
+          )
+          .catch((error) => console.error("Erro ao criar resposta", error));
+      })
+
       this.personagemLocal = this.physics.add.sprite(300, 400, 'ernesto')
       this.personagemRemoto = this.physics.add.sprite(350, 450, 'Dan')
+
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers)
       this.game.dadosJogo = this.game.remoteConnection.createDataChannel('dadosJogo',
         { negotiated: true, id: 0 }
       )
-      
       this.personagemLocal = this.physics.add.sprite(350, 450, 'Dan')
+
       this.personagemRemoto = this.physics.add.sprite(300, 400, 'ernesto')
+
     } else {
       window.alert("Jogador não encontrado")
       this.game.stop()
@@ -260,7 +291,7 @@ export default class abertura extends Phaser.Scene {
       })
   }
 
-  update () {
+  update() {
 
     console.log(this.speed, this.frameRate)
 
