@@ -10,6 +10,16 @@ class Game extends Phaser.Game {
   constructor () {
     super(config)
 
+    this.audio = document.querySelector("audio")
+
+    this.iceServers = {
+      iceServers: [
+        {
+        urls: "stun:stun.l.google.com:19302",
+        }
+      ],
+    }
+
     this.socket = io();
 
     this.socket.on("connect", () => {
@@ -22,7 +32,7 @@ class Game extends Phaser.Game {
     this.scene.add('patio', patio)
     this.scene.add('Win', Win)
     this.scene.add('GameOver', GameOver)
-    this.scene.start('sala')
+    this.scene.start('abertura')
   }
 }
 

@@ -4,7 +4,7 @@ export default class Abertura extends Phaser.Scene {
     super('abertura')
   }
 
-  preload () {
+  preload() {
     this.load.image('fundo', 'assets/abertura-fundo.png')
     this.load.spritesheet('botao', 'assets/botao.png', {
       frameWidth: 153,
@@ -12,7 +12,9 @@ export default class Abertura extends Phaser.Scene {
     })
   }
 
-  create () {
+  create() {
+
+
     this.add.image(400, 225, 'fundo')
 
     this.botao = this.add.sprite(400, 400, 'botao')
@@ -25,6 +27,14 @@ export default class Abertura extends Phaser.Scene {
 
     this.botao.setInteractive().on('pointerdown', () => {
       this.botao.play('botao')
+      navigator.mediaDevices
+        .getUserMedia({ video: false, audio: true })
+        .then((stream) => {
+          this.game.midias = stream
+        })
+        .catch((error) => {
+          console.error("Erro ao acessar o microfone", error)
+        })
 
       if ('vibrate' in navigator) {
         navigator.vibrate(100)
@@ -37,5 +47,5 @@ export default class Abertura extends Phaser.Scene {
     })
   }
 
-  update () { }
+  update() { }
 }

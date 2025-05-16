@@ -37,14 +37,14 @@ export default class abertura extends Phaser.Scene {
   }
 
   create() {
-    //this.trilha = this.sound.add("trilha-sonora", {
-    //loop: true,
-    //  volume: 0.4,
-    //}).play()
-    //this.chuva = this.sound.add("chuva", {
-    //  loop: true,
-    //  volume: 0.5
-    //}).play()
+    this.trilha = this.sound.add("trilha-sonora", {
+    loop: true,
+      volume: 0.4,
+    }).play()
+    this.chuva = this.sound.add("chuva", {
+      loop: true,
+      volume: 0.5
+    }).play()
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
