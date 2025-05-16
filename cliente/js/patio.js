@@ -10,9 +10,9 @@ export default class abertura extends Phaser.Scene {
   //Corrida 110 25
   //Caminhada 75 18
 
-  init() { }
+  init () { }
 
-  preload() {
+  preload () {
 
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
@@ -23,7 +23,7 @@ export default class abertura extends Phaser.Scene {
     })
 
     this.load.spritesheet('Dan', 'assets/Dan.png', {
-    frameWidth: 64,
+      frameWidth: 64,
       frameHeight: 64
     })
 
@@ -41,9 +41,9 @@ export default class abertura extends Phaser.Scene {
     this.input.addPointer()
   }
 
-  create() {
+  create () {
     this.trilha = this.sound.add("trilha-sonora", {
-    loop: true,
+      loop: true,
       volume: 0.4,
     }).play()
     this.chuva = this.sound.add("chuva", {
@@ -65,18 +65,28 @@ export default class abertura extends Phaser.Scene {
     this.lanterna.setAlpha(0.5)
     this.lanterna.setBlendMode(Phaser.BlendModes.ADD)
 
-  if (this.game.jogadores.primeiro == this.game.socket.id) {
-    this.personagemLocal = this.physics.add.sprite(300, 400, 'ernesto')
-    this.personagemRemoto = this.physics.add.sprite(350, 450, 'Dan')
-  } else if (this.game.jogadores.segundo == this.game.socket.id) {
-    this.personagemLocal = this.physics.add.sprite(350, 450, 'Dan')
-    this.personagemRemoto = this.physics.add.sprite(300, 400, 'ernesto')
-  } else {
-    window.alert("Jogador não encontrado")
-    this.game.stop()
-    this.game.start("abertura")
-  }
-    
+    if (this.game.jogadores.primeiro === this.game.socket.id) {
+      this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers)
+      this.game.dadosJogo = this.game.remoteConnection.createDataChannel('dadosJogo',
+        { negotiated: true, id: 0 }
+      )
+
+      this.personagemLocal = this.physics.add.sprite(300, 400, 'ernesto')
+      this.personagemRemoto = this.physics.add.sprite(350, 450, 'Dan')
+    } else if (this.game.jogadores.segundo === this.game.socket.id) {
+      this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers)
+      this.game.dadosJogo = this.game.remoteConnection.createDataChannel('dadosJogo',
+        { negotiated: true, id: 0 }
+      )
+      
+      this.personagemLocal = this.physics.add.sprite(350, 450, 'Dan')
+      this.personagemRemoto = this.physics.add.sprite(300, 400, 'ernesto')
+    } else {
+      window.alert("Jogador não encontrado")
+      this.game.stop()
+      this.game.start("abertura")
+    }
+
 
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
     //
@@ -250,9 +260,9 @@ export default class abertura extends Phaser.Scene {
       })
   }
 
-  update() {
+  update () {
 
-console.log(this.speed, this.frameRate)
+    console.log(this.speed, this.frameRate)
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
