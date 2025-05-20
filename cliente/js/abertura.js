@@ -32,14 +32,12 @@ export default class Abertura extends Phaser.Scene {
         .then((stream) => {
           this.game.midias = stream
         })
-        .catch((error) => {
-          console.error("Erro ao acessar o microfone", error)
+        .catch((error) => console.error(error))
         })
 
       if ('vibrate' in navigator) {
         navigator.vibrate(100)
       }
-    })
 
     this.botao.on('animationcomplete', () => {
       this.scene.stop()

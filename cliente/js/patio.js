@@ -1,3 +1,5 @@
+/*global Phaser*/
+/*eslint no-undef: "error"*/
 export default class abertura extends Phaser.Scene {
 
   constructor () {
@@ -10,9 +12,9 @@ export default class abertura extends Phaser.Scene {
   //Corrida 110 25
   //Caminhada 75 18
 
-  init() { }
+  init () { }
 
-  preload() {
+  preload () {
 
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
@@ -33,7 +35,7 @@ export default class abertura extends Phaser.Scene {
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
     this.load.image('tendas', 'assets/mapa/texturas/objetos/tendaLLD.png')
 
-    this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true)
+    this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
     this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
     this.load.audio('chuva', 'assets/audio/chuva.wav')
@@ -41,14 +43,14 @@ export default class abertura extends Phaser.Scene {
     this.input.addPointer()
   }
 
-  create() {
+  create () {
     this.trilha = this.sound.add("trilha-sonora", {
       loop: true,
       volume: 0.4,
     }).play()
     this.chuva = this.sound.add("chuva", {
       loop: true,
-      volume: 0.5
+      volume: 0.2
     }).play()
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
@@ -66,58 +68,120 @@ export default class abertura extends Phaser.Scene {
     this.lanterna.setBlendMode(Phaser.BlendModes.ADD)
 
     if (this.game.jogadores.primeiro === this.game.socket.id) {
-      this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers)
-      this.game.dadosJogo = this.game.remoteConnection.createDataChannel('dadosJogo',
-        { negotiated: true, id: 0 }
-      )
+      this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
+      this.game.dadosJogo = this.game.remoteConnection.createDataChannel(
+        "dadosJogo",
+        { negotiated: true, id: 0 },
+      );
 
       this.game.remoteConnection.onicecandidate = ({ candidate }) => {
-        this.game.socket.emit("candidate", this.game.sala, candidate)
-      }
-      this.game.remoteConnection.ontrack = ({ streams: [track] }) => {
-        this.game.audio.srcObject = track
-      }
+        candidate &&
+          this.game.socket.emit("candidate", this.game.sala, candidate);
+      };
+
+      this.game.remoteConnection.ontrack = ({ streams: [stream] }) => {
+        this.game.audio.srcObject = stream;
+      };
 
       if (this.game.midias) {
-        this.game.midias.getTracks().forEach((track) => {
-          this.game.remoteConnection.addTrack(track, this.game.midias)
-        });
+        this.game.midias
+          .getTracks()
+          .forEach((track) =>
+            this.game.remoteConnection.addTrack(track, this.game.midias),
+          );
       }
 
-      this.game.socket.on("offer", descripition => {
+      this.game.socket.on("offer", (description) => {
         this.game.remoteConnection
-          .setRemoteDescription(descripition)
+          .setRemoteDescription(description)
           .then(() => this.game.remoteConnection.createAnswer())
-          .then((answer) => this.game.remoteConnection.setLocalDescription(answer)
+          .then((answer) =>
+            this.game.remoteConnection.setLocalDescription(answer),
           )
           .then(() =>
             this.game.socket.emit(
               "answer",
               this.game.sala,
-              this.game.remoteConnection.localDescription
-            )
-          )
-          .catch((error) => console.error("Erro ao criar resposta", error));
-      })
+              this.game.remoteConnection.localDescription,
+            ),
+          );
+      });
+
+      this.game.socket.on("candidate", (candidate) => {
+        this.game.remoteConnection.addIceCandidate(candidate);
+      });
 
       this.personagemLocal = this.physics.add.sprite(300, 400, 'ernesto')
-      this.personagemRemoto = this.physics.add.sprite(350, 450, 'Dan')
+      this.personagemRemoto = this.add.sprite(350, 450, 'Dan')
 
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
-      this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers)
-      this.game.dadosJogo = this.game.remoteConnection.createDataChannel('dadosJogo',
-        { negotiated: true, id: 0 }
-      )
-      this.personagemLocal = this.physics.add.sprite(350, 450, 'Dan')
+      this.game.localConnection = new RTCPeerConnection(this.game.iceServers);
+      this.game.dadosJogo = this.game.localConnection.createDataChannel(
+        "dadosJogo",
+        {
+          negotiated: true,
+          id: 0,
+        },
+      );
 
-      this.personagemRemoto = this.physics.add.sprite(300, 400, 'ernesto')
+      this.game.localConnection.onicecandidate = ({ candidate }) => {
+        this.game.socket.emit("candidate", this.game.sala, candidate);
+      };
+
+      this.game.localConnection.ontrack = ({ streams: [stream] }) => {
+        this.game.audio.srcObject = stream;
+      };
+
+      if (this.game.midias) {
+        this.game.midias
+          .getTracks()
+          .forEach((track) =>
+            this.game.localConnection.addTrack(track, this.game.midias),
+          );
+      }
+
+      this.game.localConnection
+        .createOffer()
+        .then((offer) => this.game.localConnection.setLocalDescription(offer))
+        .then(() =>
+          this.game.socket.emit(
+            "offer",
+            this.game.sala,
+            this.game.localConnection.localDescription,
+          ),
+        );
+
+      this.game.socket.on("answer", (description) => {
+        this.game.localConnection.setRemoteDescription(description);
+      });
+
+      this.game.socket.on("candidate", (candidate) => {
+        this.game.localConnection.addIceCandidate(candidate);
+      });
+
+      this.personagemLocal = this.physics.add.sprite(350, 450, 'Dan')
+      this.personagemRemoto = this.add.sprite(300, 400, 'ernesto')
 
     } else {
-      window.alert("Jogador não encontrado")
-      this.game.stop()
-      this.game.start("abertura")
+      window.alert("Sala cheia!")
+      this.scene.stop()
+      this.scene.start("sala")
     }
 
+    this.game.dadosJogo.onopen = () => {
+      console.log("Conexão de dados aberta!");
+    }
+
+    // Processa as mensagens recebidas via DataChannel
+    this.game.dadosJogo.onmessage = (event) => {
+      const dados = JSON.parse(event.data);
+
+      if (dados.personagem) {
+        this.personagemRemoto.x = dados.personagem.x;
+        this.personagemRemoto.y = dados.personagem.y;
+        this.personagemRemoto.setFrame(dados.personagem.frame);
+      }
+    };
 
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
     //
@@ -291,8 +355,7 @@ export default class abertura extends Phaser.Scene {
       })
   }
 
-  update() {
-
+  update () {
     console.log(this.speed, this.frameRate)
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
@@ -404,6 +467,23 @@ export default class abertura extends Phaser.Scene {
           this.personagemLocal.anims.play('personagem-parado-baixo-direita', true)
           break
       }
+    }
+    try {
+      if (this.game.dadosJogo.readyState === "open") {
+        if (this.personagemLocal) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              personagem: {
+                x: this.personagemLocal.x,
+                y: this.personagemLocal.y,
+                frame: this.personagemLocal.frame.name,
+              },
+            }),
+          );
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 }

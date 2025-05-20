@@ -11,14 +11,16 @@ class Game extends Phaser.Game {
     super(config)
 
     this.audio = document.querySelector("audio")
-
     this.iceServers = {
-      iceServers: [
-        {
-        urls: "stun:stun.l.google.com:19302",
-        }
-      ],
-    }
+        iceServers: [
+          {
+            urls: "stun:feira-de-jogos.dev.br",
+          },
+          {
+            urls: "stun:stun.1.google.com:19302",
+          },
+        ],
+      }
 
     this.socket = io();
 
