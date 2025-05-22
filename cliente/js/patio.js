@@ -12,9 +12,9 @@ export default class abertura extends Phaser.Scene {
   //Corrida 110 25
   //Caminhada 75 18
 
-  init () { }
+  init() { }
 
-  preload () {
+  preload() {
 
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
@@ -43,7 +43,7 @@ export default class abertura extends Phaser.Scene {
     this.input.addPointer()
   }
 
-  create () {
+  create() {
     this.trilha = this.sound.add("trilha-sonora", {
       loop: true,
       volume: 0.4,
@@ -63,9 +63,13 @@ export default class abertura extends Phaser.Scene {
     //Diz qual imagem esta em qual camada
     this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetGrama, this.tilesetPedras])
 
-    this.lanterna = this.add.image(0, 0, 'lanterna')
-    this.lanterna.setAlpha(0.5)
-    this.lanterna.setBlendMode(Phaser.BlendModes.ADD)
+    this.lanternaLocal = this.add.image(0, 0, 'lanterna')
+    this.lanternaLocal.setAlpha(0.5)
+    this.lanternaLocal.setBlendMode(Phaser.BlendModes.ADD)
+
+    this.lanternaRemota = this.add.image(0, 0, 'lanterna')
+    this.lanternaRemota.setAlpha(0.5)
+    this.lanternaRemota.setBlendMode(Phaser.BlendModes.ADD)
 
     if (this.game.jogadores.primeiro === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
@@ -180,6 +184,7 @@ export default class abertura extends Phaser.Scene {
         this.personagemRemoto.x = dados.personagem.x;
         this.personagemRemoto.y = dados.personagem.y;
         this.personagemRemoto.setFrame(dados.personagem.frame);
+        this.angleRemoto = dados.personagem.lanterna
       }
     };
 
@@ -355,11 +360,14 @@ export default class abertura extends Phaser.Scene {
       })
   }
 
-  update () {
-    console.log(this.speed, this.frameRate)
+  update() {
+    console.log(this.angleRemoto)
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
+
+    this.lanternaRemota.setPosition(this.personagemRemoto.x, this.personagemRemoto.y + 15)
+    this.lanternaRemota.setRotation(this.angleRemoto)
 
     if (force > this.threshold) {
 
@@ -367,9 +375,10 @@ export default class abertura extends Phaser.Scene {
       const velocityX = Math.round(Math.cos(angle) * this.speed)
       const velocityY = Math.round(Math.sin(angle) * this.speed)
 
+      this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
+      this.lanternaLocal.setRotation(angle)
+
       this.personagemLocal.setVelocity(velocityX, velocityY)
-      this.lanterna.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
-      this.lanterna.setRotation(angle)
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
       this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
@@ -477,6 +486,7 @@ export default class abertura extends Phaser.Scene {
                 x: this.personagemLocal.x,
                 y: this.personagemLocal.y,
                 frame: this.personagemLocal.frame.name,
+                lanterna: angle
               },
             }),
           );
