@@ -29,6 +29,11 @@ export default class abertura extends Phaser.Scene {
       frameHeight: 64
     })
 
+    this.load.spritesheet('gato', 'assets/gato-teste.png', {
+      frameWidth: 32,
+      frameHeight: 33
+    })
+
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
     this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
@@ -185,6 +190,14 @@ export default class abertura extends Phaser.Scene {
         this.personagemRemoto.y = dados.personagem.y;
         this.personagemRemoto.setFrame(dados.personagem.frame);
         this.angleRemoto = dados.personagem.lanterna
+      }
+
+      if (dados.gatos) {
+        this.gatos.forEach((gato, i) => {
+          if (!dados.gatos[i].visible) {
+            gato.objeto.disableBody(true, true)
+          }
+        })
       }
     };
 
@@ -358,6 +371,18 @@ export default class abertura extends Phaser.Scene {
         this.speed = 75
         this.frameRate = 18
       })
+    this.gatos = [
+      { x: 100, y: 100 },
+      { x: 100, y: 200 },
+      { x: 200, y: 200 },
+      { x: 250, y: 300 },
+    ]
+    
+    this.gatos.forEach((gato) => {
+      gato.objeto = this.physics.add.sprite(gato.x, gato.y, 'gato')
+      gato.objeto.play('gato-teste')
+      this.physics.add.overlap(this.personagemLocal, gato.objeto, (personagem, gato) => {gato.disableBody(true, true)}, null, this)
+     });
   }
 
   update() {
@@ -479,7 +504,7 @@ export default class abertura extends Phaser.Scene {
     }
     try {
       if (this.game.dadosJogo.readyState === "open") {
-        if (this.personagemLocal) {
+        if (this.personagemLocal && this.gatos) {
           this.game.dadosJogo.send(
             JSON.stringify({
               personagem: {
@@ -488,7 +513,8 @@ export default class abertura extends Phaser.Scene {
                 frame: this.personagemLocal.frame.name,
                 lanterna: angle
               },
-            }),
+              gatos: this.gatos.map(gato => (gato => ({ visible: gato.objeto.visible }))(gato)),
+            })
           );
         }
       }
