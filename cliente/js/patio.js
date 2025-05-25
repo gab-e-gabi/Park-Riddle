@@ -5,12 +5,8 @@ export default class abertura extends Phaser.Scene {
   constructor () {
     super('patio')
     this.threshold = 0.1
-    this.speed = 110
-    this.frameRate = 25
     this.direcaoAtual = 'frente'
   }
-  //Corrida 110 25
-  //Caminhada 75 18
 
   init() { }
 
@@ -24,7 +20,7 @@ export default class abertura extends Phaser.Scene {
       frameHeight: 64
     })
 
-    this.load.spritesheet('Dan', 'assets/Dan.png', {
+    this.load.spritesheet('Dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
     })
@@ -49,6 +45,8 @@ export default class abertura extends Phaser.Scene {
   }
 
   create() {
+
+    //Sons
     this.trilha = this.sound.add("trilha-sonora", {
       loop: true,
       volume: 0.4,
@@ -57,6 +55,9 @@ export default class abertura extends Phaser.Scene {
       loop: true,
       volume: 0.2
     }).play()
+    this.passos = this.sound.add('passos', {
+      volume: 0.5,
+    })
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
@@ -69,12 +70,14 @@ export default class abertura extends Phaser.Scene {
     this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetGrama, this.tilesetPedras])
 
     this.lanternaLocal = this.add.image(0, 0, 'lanterna')
-    this.lanternaLocal.setAlpha(0.5)
-    this.lanternaLocal.setBlendMode(Phaser.BlendModes.ADD)
+    this.lanternaLocal
+      .setAlpha(0.7)
+      .setBlendMode(Phaser.BlendModes.ADD)
 
     this.lanternaRemota = this.add.image(0, 0, 'lanterna')
-    this.lanternaRemota.setAlpha(0.5)
-    this.lanternaRemota.setBlendMode(Phaser.BlendModes.ADD)
+    this.lanternaRemota
+      .setAlpha(0.7)
+      .setBlendMode(Phaser.BlendModes.ADD)
 
     if (this.game.jogadores.primeiro === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
@@ -122,6 +125,35 @@ export default class abertura extends Phaser.Scene {
 
       this.personagemLocal = this.physics.add.sprite(300, 400, 'ernesto')
       this.personagemRemoto = this.add.sprite(350, 450, 'Dan')
+      this.speed = 75
+      this.frameRate = 18
+      this.personagemLocal.stamina = 650
+      this.personagemLocal.cansado = 0
+
+      this.barraStaminaMeio = this.add.circle(0, 0, 150 / 50, 0x000000)
+      this.barraStaminaMeio.depth = 102
+
+      this.barraStamina = this.add.circle(0, 0, this.personagemLocal.stamina / 50, 0x1a620e)
+      this.barraStamina.depth = 101
+
+      this.barraStaminaFundo = this.add.circle(0, 0, 700 / 50, 0x000000)
+      this.barraStaminaFundo.depth = 100
+
+      //Botão de corrida
+      this.add.circle(700, 400, 30, 0xcccccc)
+        .setInteractive()
+        .setScrollFactor(0)
+        .on('pointerdown', () => {
+          this.speed = 150
+          this.frameRate = 25
+          this.personagemLocal.movimento = 'correndo'
+        })
+        .on('pointerup', () => {
+          this.speed = 90
+          this.frameRate = 18
+          this.personagemLocal.movimento = 'andando'
+        })
+        .depth = 100
 
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
       this.game.localConnection = new RTCPeerConnection(this.game.iceServers);
@@ -170,6 +202,35 @@ export default class abertura extends Phaser.Scene {
 
       this.personagemLocal = this.physics.add.sprite(350, 450, 'Dan')
       this.personagemRemoto = this.add.sprite(300, 400, 'ernesto')
+      this.speed = 90
+      this.frameRate = 18
+      this.personagemLocal.stamina = 650
+      this.personagemLocal.cansado = 0
+
+      this.barraStaminaMeio = this.add.circle(0, 0, 150 / 50, 0x000000)
+      this.barraStaminaMeio.depth = 102
+
+      this.barraStamina = this.add.circle(0, 0, this.personagemLocal.stamina / 50, 0x1a620e)
+      this.barraStamina.depth = 101
+
+      this.barraStaminaFundo = this.add.circle(0, 0, 700 / 50, 0x000000)
+      this.barraStaminaFundo.depth = 100
+
+      //Botão de corrida
+      this.add.circle(700, 400, 30, 0xcccccc)
+        .setInteractive()
+        .setScrollFactor(0)
+        .on('pointerdown', () => {
+          this.speed = 150
+          this.frameRate = 25
+          this.personagemLocal.movimento = 'correndo'
+        })
+        .on('pointerup', () => {
+          this.speed = 90
+          this.frameRate = 18
+          this.personagemLocal.movimento = 'andando'
+        })
+        .depth = 100
 
     } else {
       window.alert("Sala cheia!")
@@ -202,13 +263,6 @@ export default class abertura extends Phaser.Scene {
     };
 
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
-    //
-
-    this.anims.create({
-      key: 'botao',
-      frames: this.anims.generateFrameNumbers('botao', { start: 0, end: 0 }),
-      frameRate: 30
-    })
 
 
     //Fisica do player
@@ -216,10 +270,8 @@ export default class abertura extends Phaser.Scene {
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.physics.add.collider(this.personagemLocal, this.layerObjetos)
     this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
-    //
 
     //Animacoes do personagem andando
-
     this.anims.create({
       key: 'personagem-andando-baixo',
       frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 0, end: 12 }),
@@ -321,7 +373,7 @@ export default class abertura extends Phaser.Scene {
     })
 
     //Camada para escurecer o fundo
-    this.noite = this.add.rectangle(0, 0, 1600, 1200, 0x472a66, 0.75)
+    this.noite = this.add.rectangle(1600, 1200, 1600, 1200, 0x472a66, 0.75)
     this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
 
     //chuva
@@ -344,68 +396,85 @@ export default class abertura extends Phaser.Scene {
       thumb: this.add.circle(120, 360, 25, 0xcccccc)
     })
 
-    //tenta Fullscreen
-    /*
-     this.fullscreen = this.add.rectangle(0, 0, 5000, 3000, 0x000000, 0)
-    this.fullscreen.setInteractive()
-      .on('pointerdown', () => {
-        this.scale.startFullscreen()
-        this.fullscreen.destroy()
-      })
-    */
-
-    //Modulação dos passos
-    this.passos = this.sound.add('passos', {
-      volume: 0.5,
-    })
-
-    //Botão de corrida
-    this.add.circle(700, 400, 30, 0xcccccc)
-      .setInteractive()
-      .setScrollFactor(0)
-      .on('pointerdown', () => {
-        this.speed = 110
-        this.frameRate = 25
-      })
-      .on('pointerup', () => {
-        this.speed = 75
-        this.frameRate = 18
-      })
     this.gatos = [
       { x: 100, y: 100 },
       { x: 100, y: 200 },
       { x: 200, y: 200 },
       { x: 250, y: 300 },
     ]
-    
+
     this.gatos.forEach((gato) => {
       gato.objeto = this.physics.add.sprite(gato.x, gato.y, 'gato')
       gato.objeto.play('gato-teste')
-      this.physics.add.overlap(this.personagemLocal, gato.objeto, (personagem, gato) => {gato.disableBody(true, true)}, null, this)
-     });
+      this.physics.add.overlap(this.personagemLocal, gato.objeto, (personagem, gato) => { gato.disableBody(true, true) }, null, this)
+    });
   }
 
   update() {
-    console.log(this.angleRemoto)
+    console.log(this.barraStaminaFundo.radius)
+    this.barraStamina.setAlpha(1)
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
+    if (angle != 0) {
+      this.ultimoAngulo = angle
+    }
+
+    if (this.personagemLocal.movimento == 'andando' && this.personagemLocal.stamina != 650) {
+      this.personagemLocal.stamina += 1
+      this.barraStamina.radius = this.personagemLocal.stamina / 50
+
+    } else if (this.personagemLocal.stamina == 650) {
+      this.personagemLocal.cansado = 0
+      this.barraStamina.setFillStyle(0x309a06)
+      this.barraStamina.setAlpha(0)
+      // this.barraStaminaFundo.setAlpha(0)
+      this.barraStaminaMeio.setAlpha(1)
+      this.barraStaminaMeio.setFillStyle(0x309a06)
+
+      if (this.barraStaminaFundo.radius >= this.barraStaminaMeio.radius + 1) {
+        this.barraStaminaFundo.radius -= 0.4
+      }
+    }
+
     this.lanternaRemota.setPosition(this.personagemRemoto.x, this.personagemRemoto.y + 15)
     this.lanternaRemota.setRotation(this.angleRemoto)
+    this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
+    this.lanternaLocal.setRotation(this.ultimoAngulo)
+    this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
     if (force > this.threshold) {
-
 
       const velocityX = Math.round(Math.cos(angle) * this.speed)
       const velocityY = Math.round(Math.sin(angle) * this.speed)
 
-      this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
-      this.lanternaLocal.setRotation(angle)
+      if (this.personagemLocal.cansado == 0) {
+        if (this.personagemLocal.movimento == 'correndo' && this.personagemLocal.stamina > 150) {
+          this.personagemLocal.stamina -= 1
+          this.barraStamina.setAlpha(1)
+          this.barraStaminaFundo.setAlpha(1)
+          this.barraStaminaMeio.setAlpha(1)
+          this.barraStaminaMeio.setFillStyle(0x000000)
+          this.barraStamina.radius = this.personagemLocal.stamina / 50
+          this.barraStaminaFundo.radius = 650 / 50 + 2
+        }
+        else if (this.personagemLocal.stamina == 150) {
+          this.personagemLocal.movimento = 'andando'
+          this.personagemLocal.cansado = 1
+          this.barraStamina.setAlpha(1)
+          this.barraStaminaFundo.setAlpha(1)
+          this.barraStaminaMeio.setAlpha(1)
+          this.barraStamina.setFillStyle(0x9a3706)
+          this.speed = 75
+        }
+      }
 
       this.personagemLocal.setVelocity(velocityX, velocityY)
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
-      this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+      this.barraStamina.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
+      this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
+      this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
 
       // Acha o aungulo mais próximo da direção do joystick
       let o = undefined
@@ -511,7 +580,7 @@ export default class abertura extends Phaser.Scene {
                 x: this.personagemLocal.x,
                 y: this.personagemLocal.y,
                 frame: this.personagemLocal.frame.name,
-                lanterna: angle
+                lanterna: this.ultimoAngulo
               },
               gatos: this.gatos.map(gato => (gato => ({ visible: gato.objeto.visible }))(gato)),
             })
