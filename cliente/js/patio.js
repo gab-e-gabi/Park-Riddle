@@ -34,7 +34,7 @@ export default class abertura extends Phaser.Scene {
     this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
     this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
-    this.load.image('tendas', 'assets/mapa/texturas/objetos/tendaLLD.png')
+    this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
@@ -64,6 +64,7 @@ export default class abertura extends Phaser.Scene {
     this.tilesetGrama = this.tilemapMapa.addTilesetImage('grama')
     this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores-verdes')
     this.tilesetPedras = this.tilemapMapa.addTilesetImage('pedras')
+    this.tilesetTendas = this.tilemapMapa.addTilesetImage('tendaLLD')
     //
 
     //Diz qual imagem esta em qual camada
@@ -262,14 +263,31 @@ export default class abertura extends Phaser.Scene {
       }
     };
 
-    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
-
-
+    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores, this.tilesetTendas])
+    
     //Fisica do player
-    this.personagemLocal.setSize(5, 5)
+    this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
+    .setBounds(
+    0,
+    0,
+    this.layerChao.width,
+    this.layerChao.height)
+
+    this.physics.world.setBounds(
+    0,
+    0,
+    this.layerChao.width,
+    this.layerChao.height)
+
+    this.personagemLocal.setSize(32, 48)
+    this.personagemLocal.setOffset(16, 16) 
+    this.personagemLocal.setCollideWorldBounds(true)
+
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.physics.add.collider(this.personagemLocal, this.layerObjetos)
-    this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
+
+    
+this.physics.world.createDebugGraphic();
 
     //Animacoes do personagem andando
     this.anims.create({
@@ -411,8 +429,7 @@ export default class abertura extends Phaser.Scene {
   }
 
   update() {
-    console.log(this.barraStaminaFundo.radius)
-    this.barraStamina.setAlpha(1)
+
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
