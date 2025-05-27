@@ -8,9 +8,9 @@ export default class abertura extends Phaser.Scene {
     this.direcaoAtual = 'frente'
   }
 
-  init() { }
+  init () { }
 
-  preload() {
+  preload () {
 
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
@@ -38,13 +38,18 @@ export default class abertura extends Phaser.Scene {
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
+    this.load.spritesheet("tela-cheia", "assets/tela-cheia.png", {
+      frameWidth: 32,
+      frameHeight: 32
+    })
+
     this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
     this.load.audio('chuva', 'assets/audio/chuva.wav')
     this.load.audio('passos', 'assets/audio/passos.mp3')
     this.input.addPointer()
   }
 
-  create() {
+  create () {
 
     //Sons
     this.trilha = this.sound.add("trilha-sonora", {
@@ -264,30 +269,30 @@ export default class abertura extends Phaser.Scene {
     };
 
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores, this.tilesetTendas])
-    
+
     //Fisica do player
     this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
-    .setBounds(
-    0,
-    0,
-    this.layerChao.width,
-    this.layerChao.height)
+      .setBounds(
+        0,
+        0,
+        this.layerChao.width,
+        this.layerChao.height)
 
     this.physics.world.setBounds(
-    0,
-    0,
-    this.layerChao.width,
-    this.layerChao.height)
+      0,
+      0,
+      this.layerChao.width,
+      this.layerChao.height)
 
     this.personagemLocal.setSize(32, 48)
-    this.personagemLocal.setOffset(16, 16) 
+    this.personagemLocal.setOffset(16, 16)
     this.personagemLocal.setCollideWorldBounds(true)
 
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.physics.add.collider(this.personagemLocal, this.layerObjetos)
 
-    
-this.physics.world.createDebugGraphic();
+
+    //this.physics.world.createDebugGraphic();
 
     //Animacoes do personagem andando
     this.anims.create({
@@ -426,9 +431,20 @@ this.physics.world.createDebugGraphic();
       gato.objeto.play('gato-teste')
       this.physics.add.overlap(this.personagemLocal, gato.objeto, (personagem, gato) => { gato.disableBody(true, true) }, null, this)
     });
+
+    this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
+      if (this.scale.isFullscreen) {
+        this.scale.stopFullscreen();
+        this.telaCheia.setFrame(0);
+      } else {
+        this.scale.startFullscreen();
+        this.telaCheia.setFrame(1);
+      }
+    }).setScrollFactor(0);
   }
 
-  update() {
+
+  update () {
 
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
