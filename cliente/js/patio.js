@@ -4,7 +4,7 @@ export default class abertura extends Phaser.Scene {
 
   constructor () {
     super('patio')
-    this.threshold = 0.1
+    this.threshold = 1
     this.direcaoAtual = 'cima'
   }
 
@@ -30,6 +30,25 @@ export default class abertura extends Phaser.Scene {
       frameHeight: 33
     })
 
+    this.load.spritesheet('tela-cheia', 'assets/tela-cheia.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    })
+
+    this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('corrida', 'assets/UI/runUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('joystick', 'assets/UI/joystick.png', {
+      frameWidth: 96,
+      frameHeight: 96
+    })
+    this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
+
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
     this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
@@ -38,14 +57,11 @@ export default class abertura extends Phaser.Scene {
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
-    this.load.spritesheet("tela-cheia", "assets/tela-cheia.png", {
-      frameWidth: 32,
-      frameHeight: 32
-    })
-
     this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
     this.load.audio('chuva', 'assets/audio/chuva.wav')
     this.load.audio('passos', 'assets/audio/passos.mp3')
+    this.load.audio('tiro', 'assets/audio/tiro.mp3')
+
     this.input.addPointer()
   }
 
@@ -63,6 +79,7 @@ export default class abertura extends Phaser.Scene {
     this.passos = this.sound.add('passos', {
       volume: 0.5,
     })
+    this.tiroSom = this.sound.add('tiro')
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
@@ -134,7 +151,7 @@ export default class abertura extends Phaser.Scene {
       this.speed = 75
       this.frameRate = 18
       this.personagemLocal.stamina = 650
-      this.personagemLocal.cansado = 0
+      this.personagemLocal.cansado = false
 
       this.barraStaminaMeio = this.add.circle(0, 0, 150 / 50, 0x000000)
       this.barraStaminaMeio.depth = 102
@@ -146,7 +163,7 @@ export default class abertura extends Phaser.Scene {
       this.barraStaminaFundo.depth = 100
 
       //Botão de corrida
-      this.add.circle(700, 400, 30, 0xcccccc)
+      this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0)
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
@@ -160,6 +177,9 @@ export default class abertura extends Phaser.Scene {
           this.personagemLocal.movimento = 'andando'
         })
         .depth = 100
+      this.fazAcao = function() {
+        true
+      }
 
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
       this.game.localConnection = new RTCPeerConnection(this.game.iceServers);
@@ -211,7 +231,7 @@ export default class abertura extends Phaser.Scene {
       this.speed = 90
       this.frameRate = 18
       this.personagemLocal.stamina = 650
-      this.personagemLocal.cansado = 0
+      this.personagemLocal.cansado = false
 
       this.barraStaminaMeio = this.add.circle(0, 0, 150 / 50, 0x000000)
       this.barraStaminaMeio.depth = 102
@@ -223,7 +243,7 @@ export default class abertura extends Phaser.Scene {
       this.barraStaminaFundo.depth = 100
 
       //Botão de corrida
-      this.add.circle(700, 400, 30, 0x5533aa)
+      this.botaoCorrida = this.add.sprite(700, 400, 'corrida',0)
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
@@ -239,14 +259,48 @@ export default class abertura extends Phaser.Scene {
         .depth = 100
 
       //Botão de Ação
-      this.botaoAcao = this.add.circle(700, 350, 20, 0xffffff)
+      this.botaoAcao = this.add.sprite(750, 350, 'tiro', 0)
         .setInteractive()
         .setScrollFactor(0)
+
+      this.botaoAcao
         .on('pointerdown', () => {
         this.personagemLocalAcao = true
+        this.botaoAcao.setFrame(1)
         })
-        .depth = 100
+        this.botaoAcao.depth = 100
 
+      //Animação de tiro
+      this.botaoAcao.on('pointerdown', () => {
+
+        this.botaoAcao.setFrame(1)
+        this.personagemLocalAcao = true
+        this.personagemLocal.setVelocity(0)
+
+        this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
+        if (!this.tiroSom.isPlaying) {
+          this.tiroSom.play()
+        }
+
+        this.personagemLocal.on('animationcomplete', () => {
+          this.personagemLocalAcao = false
+          this.botaoAcao.setFrame(0)
+          this.tiroSom.stop()
+          })
+
+        this.time.delayedCall(700, () => {
+          this.bullet = this.physics.add.image(this.personagemLocal.x, this.personagemLocal.y, 'bullet')
+            .setDisplaySize(4, 4)
+            .setTint(0xffe600)
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setVelocity( Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
+            .setSize(10, 10)
+
+          this.time.delayedCall(600, () => {
+            this.bullet.destroy()
+          })
+        })
+      })
     } else {
       window.alert("Sala cheia!")
       this.scene.stop()
@@ -299,9 +353,6 @@ export default class abertura extends Phaser.Scene {
 
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.physics.add.collider(this.personagemLocal, this.layerObjetos)
-
-
-    //this.physics.world.createDebugGraphic();
 
     //Animacoes do personagem andando
     this.anims.create({
@@ -466,8 +517,8 @@ export default class abertura extends Phaser.Scene {
       x: 100,
       y: 360,
       radius: 50, // Raio do joystick
-      base: this.add.circle(120, 360, 50, 0x4a3513),
-      thumb: this.add.circle(120, 360, 25, 0xcccccc)
+      base: this.add.sprite(120, 360, 'joystick', 0),
+      thumb: this.add.sprite(120, 360, 'joystick', 1)
     })
 
     this.gatos = [
@@ -509,7 +560,7 @@ export default class abertura extends Phaser.Scene {
       this.barraStamina.radius = this.personagemLocal.stamina / 50
 
     } else if (this.personagemLocal.stamina == 650) {
-      this.personagemLocal.cansado = 0
+      this.personagemLocal.cansado = false
       this.barraStamina.setFillStyle(0x309a06)
       this.barraStamina.setAlpha(0)
       // this.barraStaminaFundo.setAlpha(0)
@@ -527,12 +578,12 @@ export default class abertura extends Phaser.Scene {
     this.lanternaLocal.setRotation(this.ultimoAngulo)
     this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
-    if (force > this.threshold) {
+    if (( (this.threshold < force) && (force <= 1000) ) && (this.personagemLocalAcao != true)) {
 
       const velocityX = Math.round(Math.cos(angle) * this.speed)
       const velocityY = Math.round(Math.sin(angle) * this.speed)
 
-      if (this.personagemLocal.cansado == 0) {
+      if (this.personagemLocal.cansado == false) {
         if (this.personagemLocal.movimento == 'correndo' && this.personagemLocal.stamina > 150) {
           this.personagemLocal.stamina -= 1
           this.barraStamina.setAlpha(1)
@@ -540,11 +591,11 @@ export default class abertura extends Phaser.Scene {
           this.barraStaminaMeio.setAlpha(1)
           this.barraStaminaMeio.setFillStyle(0x000000)
           this.barraStamina.radius = this.personagemLocal.stamina / 50
-          this.barraStaminaFundo.radius = 650 / 50 + 2
+          this.barraStaminaFundo.radius = this.personagemLocal.stamina / 50 + 2
         }
         else if (this.personagemLocal.stamina == 150) {
           this.personagemLocal.movimento = 'andando'
-          this.personagemLocal.cansado = 1
+          this.personagemLocal.cansado = true
           this.barraStamina.setAlpha(1)
           this.barraStaminaFundo.setAlpha(1)
           this.barraStaminaMeio.setAlpha(1)
@@ -558,15 +609,6 @@ export default class abertura extends Phaser.Scene {
       this.barraStamina.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
-
-      if (this.personagemLocalAcao == true) {
-        console.log('dentro')
-        this.personagemLocal.setVelocity(0)
-        this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
-        this.personagemLocal.on('animationcomplete', () => {
-          this.personagemLocalAcao = false
-        })
-      }
 
       // Acha o aungulo mais próximo da direção do joystick
       let o = undefined
@@ -629,20 +671,13 @@ export default class abertura extends Phaser.Scene {
       const pesNoChao = [4, 10]
 
       //Toca som de passos quando o pé toca o chão
-      if (pesNoChao.includes(this.frameAtual)) {
+      if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
         this.passos.play()
       }
 
     } else {
       // Se a força do joystick for baixa, o personagem para
-      if (this.personagemLocalAcao == true) {
-        console.log('fora')
-        this.personagemLocal.setVelocity(0)
-        this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
-        this.personagemLocal.on('animationcomplete', () => {
-          this.personagemLocalAcao = false
-          })
-      } else {
+      if (this.personagemLocalAcao != true) {
         this.personagemLocal.setVelocity(0)
         this.personagemLocal.anims.play(`personagem-parado-${this.direcaoAtual}`, true)
       }

@@ -17,19 +17,28 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     })
-    this.load.image('fundo', 'assets/abertura-fundo.png')
     this.load.spritesheet('Dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
     }),
-      this.load.spritesheet('ernesto', 'assets/ernesto.png', {
-        frameWidth: 64,
-        frameHeight: 64
-      }),
+    this.load.spritesheet('ernesto', 'assets/ernesto.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    }),
     this.load.spritesheet('gato', 'assets/gato-teste.png', {
       frameWidth: 32,
       frameHeight: 33
     })
+    this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('corrida', 'assets/UI/runUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    
+    this.load.image('fundo', 'assets/abertura-fundo.png')
     this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
     this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
@@ -40,7 +49,8 @@ export default class abertura extends Phaser.Scene {
 
     this.load.audio('chuva', 'assets/audio/chuva.wav')
     this.load.audio('trilha-sonora', 'assets/audio/trilha-sonora.mp3')
-    this.load.audio('passos', 'assets/audio/passos')
+    this.load.audio('passos', 'assets/audio/passos.mp3')
+    this.load.audio('tiro', 'assets/audio/tiro.mp3')
   }
 
   create() {
