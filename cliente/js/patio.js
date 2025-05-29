@@ -54,6 +54,7 @@ export default class abertura extends Phaser.Scene {
     this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
     this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
+    this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
@@ -86,7 +87,8 @@ export default class abertura extends Phaser.Scene {
     this.tilesetGrama = this.tilemapMapa.addTilesetImage('grama')
     this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores-verdes')
     this.tilesetPedras = this.tilemapMapa.addTilesetImage('pedras')
-    this.tilesetTendas = this.tilemapMapa.addTilesetImage('tendaLLD')
+    this.tilesetTendasLLD = this.tilemapMapa.addTilesetImage('tendaLLD')
+    this.tilesetTendas = this.tilemapMapa.addTilesetImage('tenda')
     //
 
     //Diz qual imagem esta em qual camada

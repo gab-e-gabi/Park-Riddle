@@ -4,7 +4,7 @@
  "layers":[
         {
          "compression":"",
-         "data":"AwAAAAIAAAADAAAABAAAAAQAAAACAAAAAgAAAAQAAAADAAAAAwAAAAIAAAADAAAAAwAAAAIAAAACAAAAAgAAAAQAAAADAAAABAAAAAIAAAAEAAAABAAAAAIAAAAEAAAAAwAAAAQAAAAEAAAAAgAAAAIAAAADAAAAAgAAAAIAAAAEAAAABAAAAAQAAAADAAAAAgAAAAQAAAAEAAAAAwAAAAMAAAADAAAAAwAAAAMAAAABAAAAAQAAAAIAAAACAAAAAwAAAAMAAAACAAAABAAAAAMAAAAEAAAAAgAAAAMAAAAEAAAABAAAAAQAAAADAAAABAAAAAQAAAAEAAAAAwAAAAQAAAADAAAABAAAAAIAAAACAAAABAAAAAMAAAADAAAABAAAAAMAAAABAAAAAQAAAAQAAAACAAAABAAAAAMAAAACAAAAAwAAAAIAAAAEAAAAAgAAAAIAAAAEAAAAAgAAAAQAAAACAAAAAgAAAAQAAAADAAAAAwAAAAQAAAAEAAAAAgAAAAIAAAAEAAAAAwAAAAMAAAACAAAABAAAAAQAAAABAAAAAQAAAAMAAAADAAAABAAAAAQAAAACAAAABAAAAAIAAAAEAAAABAAAAAMAAAACAAAAAwAAAAIAAAACAAAABAAAAAQAAAACAAAAAwAAAAQAAAAEAAAABAAAAAIAAAADAAAAAwAAAAIAAAACAAAABAAAAAMAAAABAAAAAQAAAAMAAAACAAAAAwAAAAIAAAACAAAAAwAAAAIAAAACAAAAAwAAAAQAAAAEAAAAAgAAAAQAAAACAAAAAgAAAAMAAAACAAAABAAAAAMAAAADAAAABAAAAAQAAAACAAAAAwAAAAQAAAADAAAABAAAAAMAAAABAAAAAQAAAAMAAAADAAAAAwAAAAQAAAADAAAABAAAAAMAAAAEAAAAAgAAAAMAAAACAAAAAwAAAAMAAAAEAAAAAgAAAAIAAAADAAAABAAAAAIAAAAEAAAAAwAAAAMAAAADAAAAAgAAAAQAAAAEAAAAAgAAAAQAAAABAAAAAQAAAAMAAAACAAAAAwAAAAMAAAACAAAABAAAAAMAAAACAAAABAAAAAMAAAADAAAABAAAAAIAAAADAAAAAgAAAAQAAAAEAAAABAAAAAMAAAAEAAAABAAAAAQAAAADAAAABAAAAAMAAAAEAAAAAwAAAAEAAAABAAAAAQAAAAEAAAADAAAAAwAAAAIAAAACAAAAAwAAAAIAAAAEAAAAAgAAAAQAAAADAAAAAwAAAAMAAAAEAAAAAwAAAAIAAAADAAAAAwAAAAEAAAABAAAAAQAAAAEAAAADAAAAAgAAAAMAAAADAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAABAAAAAQAAAAEAAAAAwAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAgAAAAQAAAAEAAAAAwAAAAIAAAAEAAAABAAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAgAAAAMAAAACAAAAAgAAAAQAAAAEAAAABAAAAAQAAAAEAAAAAgAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAgAAAAIAAAADAAAAAwAAAAIAAAAEAAAAAgAAAAIAAAACAAAAAgAAAAMAAAADAAAABAAAAAIAAAADAAAAAwAAAAQAAAACAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAwAAAAMAAAADAAAAAwAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAIAAAACAAAAAgAAAAIAAAADAAAAAgAAAAQAAAACAAAAAwAAAAIAAAADAAAAAwAAAAQAAAADAAAABAAAAAEAAAABAAAAAQAAAAEAAAACAAAAAwAAAAMAAAACAAAABAAAAAQAAAAEAAAAAwAAAAMAAAAEAAAAAgAAAAIAAAAEAAAAAgAAAAMAAAAEAAAAAwAAAAQAAAACAAAAAwAAAAQAAAAEAAAAAwAAAAMAAAAEAAAAAwAAAAMAAAABAAAAAQAAAAIAAAADAAAAAgAAAAIAAAADAAAABAAAAAMAAAAEAAAAAgAAAAMAAAAEAAAAAwAAAAQAAAAEAAAABAAAAAMAAAAEAAAABAAAAAQAAAAEAAAABAAAAAMAAAADAAAABAAAAAQAAAACAAAABAAAAAQAAAABAAAAAQAAAAMAAAADAAAAAwAAAAMAAAACAAAAAwAAAAMAAAADAAAABAAAAAMAAAACAAAABAAAAAQAAAAEAAAABAAAAAQAAAACAAAABAAAAAMAAAAEAAAAAgAAAAQAAAADAAAAAwAAAAMAAAACAAAABAAAAAMAAAABAAAAAQAAAAMAAAADAAAAAgAAAAIAAAADAAAABAAAAAMAAAACAAAABAAAAAMAAAACAAAAAwAAAAQAAAAEAAAAAgAAAAQAAAAEAAAAAgAAAAMAAAAEAAAABAAAAAQAAAADAAAAAwAAAAIAAAADAAAABAAAAAMAAAABAAAAAQAAAAIAAAADAAAABAAAAAQAAAADAAAAAwAAAAMAAAAEAAAAAwAAAAMAAAADAAAAAwAAAAQAAAADAAAABAAAAAIAAAACAAAAAgAAAAQAAAADAAAABAAAAAMAAAADAAAABAAAAAQAAAACAAAABAAAAAEAAAABAAAAAQAAAAEAAAACAAAABAAAAAQAAAAEAAAAAwAAAAQAAAAEAAAABAAAAAMAAAACAAAAAgAAAAIAAAADAAAABAAAAAQAAAACAAAAAgAAAAMAAAACAAAAAgAAAAQAAAAEAAAABAAAAAQAAAACAAAAAwAAAAEAAAABAAAAAQAAAAEAAAADAAAABAAAAAMAAAACAAAABAAAAAIAAAADAAAAAwAAAAMAAAADAAAAAwAAAAQAAAAEAAAABAAAAAMAAAACAAAABAAAAAMAAAADAAAAAwAAAAQAAAAEAAAABAAAAAIAAAACAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAABAAAAAIAAAADAAAABAAAAAQAAAAEAAAABAAAAAMAAAADAAAABAAAAAIAAAAEAAAA",
+         "data":"AwAAAAIAAAADAAAABAAAAAQAAAACAAAAAgAAAAQAAAADAAAAAwAAAAIAAAADAAAAAwAAAAIAAAACAAAAAgAAAAQAAAADAAAABAAAAAIAAAAEAAAABAAAAAIAAAAEAAAAAwAAAAQAAAAEAAAAAgAAAAIAAAADAAAAAgAAAAIAAAAEAAAABAAAAAQAAAADAAAAAgAAAAQAAAAEAAAAAwAAAAMAAAADAAAAAwAAAAMAAAACAAAAAgAAAAMAAAACAAAAAwAAAAMAAAACAAAABAAAAAMAAAAEAAAAAgAAAAMAAAAEAAAABAAAAAQAAAADAAAABAAAAAQAAAAEAAAAAwAAAAMAAAADAAAABAAAAAIAAAACAAAABAAAAAMAAAADAAAABAAAAAMAAAAEAAAABAAAAAQAAAACAAAABAAAAAMAAAACAAAAAwAAAAIAAAAEAAAAAgAAAAIAAAAEAAAAAgAAAAQAAAACAAAAAgAAAAQAAAADAAAAAwAAAAMAAAAEAAAAAgAAAAIAAAAEAAAAAwAAAAMAAAACAAAABAAAAAQAAAABAAAAAQAAAAMAAAADAAAABAAAAAQAAAACAAAABAAAAAIAAAAEAAAABAAAAAMAAAACAAAAAwAAAAIAAAACAAAABAAAAAQAAAACAAAAAwAAAAQAAAAEAAAABAAAAAIAAAADAAAAAwAAAAIAAAACAAAABAAAAAMAAAABAAAAAQAAAAMAAAACAAAAAwAAAAIAAAACAAAAAwAAAAIAAAACAAAAAwAAAAQAAAAEAAAAAgAAAAQAAAACAAAAAgAAAAMAAAACAAAABAAAAAMAAAADAAAABAAAAAQAAAACAAAAAwAAAAQAAAADAAAABAAAAAMAAAABAAAAAQAAAAMAAAADAAAAAwAAAAQAAAADAAAABAAAAAMAAAAEAAAAAgAAAAMAAAACAAAAAwAAAAMAAAAEAAAAAgAAAAIAAAADAAAABAAAAAIAAAAEAAAAAwAAAAMAAAADAAAAAgAAAAQAAAAEAAAAAgAAAAQAAAABAAAAAQAAAAMAAAACAAAAAwAAAAMAAAACAAAABAAAAAMAAAACAAAABAAAAAMAAAADAAAABAAAAAIAAAADAAAAAgAAAAQAAAAEAAAABAAAAAMAAAAEAAAABAAAAAQAAAADAAAABAAAAAMAAAAEAAAAAwAAAAEAAAABAAAAAQAAAAEAAAADAAAAAwAAAAIAAAACAAAAAwAAAAIAAAAEAAAAAgAAAAQAAAADAAAAAwAAAAMAAAAEAAAAAwAAAAIAAAADAAAAAwAAAAEAAAABAAAAAQAAAAEAAAADAAAAAgAAAAMAAAADAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAABAAAAAQAAAAEAAAAAwAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAgAAAAQAAAAEAAAAAwAAAAIAAAAEAAAABAAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAgAAAAMAAAACAAAAAgAAAAQAAAAEAAAABAAAAAQAAAAEAAAAAgAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAQAAAAEAAAAEAAAAAgAAAAIAAAADAAAAAwAAAAIAAAAEAAAAAgAAAAIAAAACAAAAAgAAAAMAAAADAAAABAAAAAIAAAADAAAAAwAAAAQAAAACAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAwAAAAMAAAADAAAAAwAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAAAIAAAACAAAAAgAAAAIAAAADAAAAAgAAAAQAAAACAAAAAwAAAAIAAAADAAAAAwAAAAQAAAADAAAABAAAAAEAAAABAAAAAQAAAAEAAAACAAAAAwAAAAMAAAACAAAABAAAAAQAAAAEAAAAAwAAAAMAAAAEAAAAAgAAAAIAAAAEAAAAAgAAAAMAAAAEAAAAAwAAAAQAAAACAAAAAwAAAAQAAAAEAAAAAwAAAAMAAAAEAAAAAwAAAAMAAAABAAAAAQAAAAIAAAADAAAAAgAAAAIAAAADAAAABAAAAAMAAAAEAAAAAgAAAAMAAAAEAAAAAwAAAAQAAAAEAAAABAAAAAMAAAAEAAAABAAAAAQAAAAEAAAABAAAAAMAAAADAAAABAAAAAQAAAACAAAABAAAAAQAAAABAAAAAQAAAAMAAAADAAAAAwAAAAMAAAACAAAAAwAAAAMAAAADAAAABAAAAAMAAAACAAAABAAAAAQAAAAEAAAABAAAAAQAAAACAAAABAAAAAMAAAAEAAAAAgAAAAQAAAADAAAAAwAAAAMAAAACAAAABAAAAAMAAAABAAAAAQAAAAMAAAADAAAAAgAAAAIAAAADAAAABAAAAAMAAAACAAAABAAAAAMAAAACAAAAAwAAAAQAAAAEAAAAAgAAAAQAAAAEAAAAAgAAAAMAAAAEAAAABAAAAAQAAAADAAAAAwAAAAIAAAADAAAABAAAAAMAAAABAAAAAQAAAAIAAAADAAAABAAAAAQAAAADAAAAAwAAAAMAAAAEAAAAAwAAAAMAAAADAAAAAwAAAAQAAAADAAAABAAAAAIAAAACAAAAAgAAAAQAAAADAAAABAAAAAMAAAADAAAABAAAAAQAAAACAAAABAAAAAEAAAABAAAAAQAAAAEAAAACAAAABAAAAAQAAAAEAAAAAwAAAAQAAAAEAAAABAAAAAMAAAACAAAAAgAAAAIAAAADAAAABAAAAAQAAAACAAAAAgAAAAMAAAACAAAAAgAAAAQAAAAEAAAABAAAAAQAAAACAAAAAwAAAAEAAAABAAAAAQAAAAEAAAADAAAABAAAAAMAAAACAAAABAAAAAIAAAADAAAAAwAAAAMAAAADAAAAAwAAAAQAAAAEAAAABAAAAAMAAAACAAAABAAAAAMAAAADAAAAAwAAAAQAAAAEAAAABAAAAAIAAAACAAAAAQAAAAEAAAABAAAAAQAAAAEAAAABAAAABAAAAAIAAAADAAAABAAAAAQAAAAEAAAABAAAAAMAAAADAAAABAAAAAIAAAAEAAAA",
          "encoding":"base64",
          "height":20,
          "id":4,
@@ -18,7 +18,7 @@
         }, 
         {
          "compression":"",
-         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARAAAAAAAAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+         "data":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAABoAAAAbAAAAHAAAAB0AAAAeAAAAAAAAAAAAAAAAAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAGAAAAAAAAAAAAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAAAAAAAAAAAAAAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAAAAAAAAAAAAAAAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAADAAAAAAAAAAAAAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAAAAAAAAAAAAAAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
          "encoding":"base64",
          "height":20,
          "id":5,
@@ -34,7 +34,7 @@
  "nextobjectid":1,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.11.2",
+ "tiledversion":"1.11.1-99-gec89c545",
  "tileheight":64,
  "tilesets":[
         {
@@ -102,8 +102,49 @@
          "tilewidth":64
         }, 
         {
-         "columns":8,
+         "columns":1,
          "firstgid":6,
+         "image":"texturas\/objetos\/tendaLLD.png",
+         "imageheight":192,
+         "imagewidth":64,
+         "margin":0,
+         "name":"tendaLLD",
+         "spacing":0,
+         "tilecount":3,
+         "tileheight":64,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
+         "tilewidth":64
+        }, 
+        {
+         "columns":8,
+         "firstgid":9,
          "image":"texturas\/objetos\/arvores-verdes.png",
          "imageheight":128,
          "imagewidth":512,
@@ -111,6 +152,164 @@
          "name":"arvores-verdes",
          "spacing":0,
          "tilecount":16,
+         "tileheight":64,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":4,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":5,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":6,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":7,
+                 "properties":[
+                        {
+                         "name":"colides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":8,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":9,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":10,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":11,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":12,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":13,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":14,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":15,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
+         "tilewidth":64
+        }, 
+        {
+         "columns":6,
+         "firstgid":25,
+         "image":"texturas\/objetos\/tenda.png",
+         "imageheight":384,
+         "imagewidth":384,
+         "margin":0,
+         "name":"tenda",
+         "spacing":0,
+         "tilecount":36,
          "tileheight":64,
          "tiles":[
                 {
@@ -209,7 +408,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -218,7 +417,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -245,7 +444,7 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -254,25 +453,38 @@
                         {
                          "name":"collides",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
-                }],
-         "tilewidth":64
-        }, 
-        {
-         "columns":1,
-         "firstgid":22,
-         "image":"texturas\/objetos\/tendaLLD.png",
-         "imageheight":192,
-         "imagewidth":64,
-         "margin":0,
-         "name":"tendaLLD",
-         "spacing":0,
-         "tilecount":3,
-         "tileheight":64,
-         "tiles":[
+                }, 
                 {
-                 "id":0,
+                 "id":16,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":17,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":18,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":19,
                  "properties":[
                         {
                          "name":"collides",
@@ -281,7 +493,7 @@
                         }]
                 }, 
                 {
-                 "id":1,
+                 "id":20,
                  "properties":[
                         {
                          "name":"collides",
@@ -290,12 +502,139 @@
                         }]
                 }, 
                 {
-                 "id":2,
+                 "id":21,
                  "properties":[
                         {
                          "name":"collides",
                          "type":"bool",
                          "value":true
+                        }]
+                }, 
+                {
+                 "id":22,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":23,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":24,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":25,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":26,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":27,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":28,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":29,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                },
+            
+                {
+                 "id":30,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":31,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":32,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":33,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":34,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":35,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
                         }]
                 }],
          "tilewidth":64
