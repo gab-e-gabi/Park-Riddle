@@ -4,6 +4,21 @@ export default class abertura extends Phaser.Scene {
   }
 
   create () {
+    
+    this.load.spritesheet('tela-cheia', 'assets/tela-cheia.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    })
+        this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
+      if (this.scale.isFullscreen) {
+        this.scale.stopFullscreen();
+        this.telaCheia.setFrame(0);
+      } else {
+        this.scale.startFullscreen();
+        this.telaCheia.setFrame(1);
+      }
+    }).setScrollFactor(0);
+
     this.salas = [
       { x: 200, y: 200, numero: '1' },
       { x: 300, y: 200, numero: '2' },

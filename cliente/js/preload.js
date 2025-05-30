@@ -37,10 +37,13 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     })
+        this.load.spritesheet('tela-cheia', 'assets/tela-cheia.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    })
     
     this.load.image('fundo', 'assets/abertura-fundo.png')
-    this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
-    this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
+    this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
     this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
     this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')

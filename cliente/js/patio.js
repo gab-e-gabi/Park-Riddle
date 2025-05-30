@@ -6,6 +6,7 @@ export default class abertura extends Phaser.Scene {
     super('patio')
     this.threshold = 1
     this.direcaoAtual = 'cima'
+    this.personagemLocalAcao = false
   }
 
   init () { }
@@ -13,7 +14,8 @@ export default class abertura extends Phaser.Scene {
   preload () {
 
     this.load.image('lanterna', 'assets/luz.png')
-    this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
+    this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
+    this.textures.generate('particula-chuva', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
 
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
@@ -47,11 +49,9 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 96,
       frameHeight: 96
     })
-    this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
 
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
-    this.load.image('grama', 'assets/mapa/texturas/chao/grama.png')
-    this.load.image('pedras', 'assets/mapa/texturas/chao/pedras.png')
+    this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
     this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
     this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
     this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
@@ -84,15 +84,15 @@ export default class abertura extends Phaser.Scene {
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
-    this.tilesetGrama = this.tilemapMapa.addTilesetImage('grama')
+    this.tilesetChao = this.tilemapMapa.addTilesetImage('chao')
     this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores-verdes')
-    this.tilesetPedras = this.tilemapMapa.addTilesetImage('pedras')
     this.tilesetTendasLLD = this.tilemapMapa.addTilesetImage('tendaLLD')
     this.tilesetTendas = this.tilemapMapa.addTilesetImage('tenda')
     //
 
     //Diz qual imagem esta em qual camada
-    this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetGrama, this.tilesetPedras])
+    this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetChao])
+    this.layerCaminho = this.tilemapMapa.createLayer('caminho', [this.tilesetChao])
 
     this.lanternaLocal = this.add.image(0, 0, 'lanterna')
     this.lanternaLocal
@@ -335,6 +335,33 @@ export default class abertura extends Phaser.Scene {
 
     this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores, this.tilesetTendas])
 
+    // Círculo de visão
+    this.visao = this.add.graphics()
+    .fillStyle(0xffffff, 0)
+    .fillCircle(0, 0, 300);
+
+    // Máscara
+    this.mascaraVisao = this.visao.createGeometryMask();
+    
+    // Aplica a máscara apenas no layerObjetos
+    this.layerObjetos.setMask(this.mascaraVisao);
+  
+	const width = this.scale.width + 300
+	const height = this.scale.height + 300
+
+	this.neblina = this.make.renderTexture({
+		width,
+		height
+	}, true)
+
+	this.neblina
+  .fill(0x000000, 0.5)
+  .setTint(0x0a2948)
+  .setPosition(this.personagemLocal.x, this.personagemLocal.y)
+  this.circ = this.add.circle(1000, 1200, 300)
+  this.neblina.erase(this.circ)
+
+    
     //Fisica do player
     this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
       .setBounds(
@@ -504,16 +531,17 @@ export default class abertura extends Phaser.Scene {
     this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
 
     //chuva
-    this.particulaChuva = this.add.particles(0, -512, 'particula-chuva', {
-      x: { min: 0, max: 1024 },
-      quantity: 50,
-      lifespan: 4000,
-      speedY: { min: 400, max: 1800 },
-      gravityX: 20,
-      scale: 0.6,
-      setGamma: { min: 0.5, max: 1 },
-    })
-      .setScrollFactor(0);
+    // this.particulaChuva = this.add.particles(0, -128, 'particula-chuva', {
+    //   x: { min: this.personagemLocal.x - 1200, max: this.personagemLocal.x},
+    //   quantity: 50,
+    //   lifespan: 4000,
+    //   speedY: { min: 400, max: 1800 },
+    //   gravityX: 20,
+    //   scale: 20,
+    //   // alpha: 1,
+    //   color: 0xffffff
+    // })
+    //   .setScrollFactor(0);
 
     this.joystick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
       x: 100,
@@ -550,6 +578,8 @@ export default class abertura extends Phaser.Scene {
 
   update () {
 
+    console.log(this.neblina.x, this.neblina.y, this.circ.x, this.circ.y)
+
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
@@ -579,6 +609,8 @@ export default class abertura extends Phaser.Scene {
     this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
     this.lanternaLocal.setRotation(this.ultimoAngulo)
     this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+    this.visao.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+    this.neblina.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
     if (( (this.threshold < force) && (force <= 1000) ) && (this.personagemLocalAcao != true)) {
 
