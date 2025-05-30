@@ -49,7 +49,6 @@ export default class abertura extends Phaser.Scene {
     this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
 
     this.load.image('lanterna', 'assets/luz.png')
-    this.load.image('mascaraLanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
 
     this.load.audio('chuva', 'assets/audio/chuva.wav')

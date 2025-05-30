@@ -3,6 +3,7 @@ import abertura from './abertura.js'
 import preload from './preload.js'
 import sala from './sala.js'
 import patio from './patio.js'
+import desafioEsquerda from './desafioEsquerda.js'
 import Win from './Win.js'
 import GameOver from './GameOver.js'
 
@@ -32,6 +33,7 @@ class Game extends Phaser.Game {
     this.scene.add('preload', preload)
     this.scene.add('sala', sala)
     this.scene.add('patio', patio)
+    this.scene.add('desafioEsquerda', desafioEsquerda)
     this.scene.add('Win', Win)
     this.scene.add('GameOver', GameOver)
     this.scene.start('abertura')

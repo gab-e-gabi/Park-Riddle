@@ -3,7 +3,7 @@
 export default class abertura extends Phaser.Scene {
 
   constructor() {
-    super('patio')
+    super('desafioEsquerda')
     this.threshold = 1
     this.direcaoAtual = 'cima'
     this.personagemLocalAcao = false
@@ -13,8 +13,6 @@ export default class abertura extends Phaser.Scene {
 
   preload() {
 
-    this.load.image('lanterna', 'assets/luz.png')
-    this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
     this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
 
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
@@ -25,11 +23,6 @@ export default class abertura extends Phaser.Scene {
     this.load.spritesheet('Dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
-    })
-
-    this.load.spritesheet('gato', 'assets/gato-teste.png', {
-      frameWidth: 32,
-      frameHeight: 33
     })
 
     this.load.spritesheet('tela-cheia', 'assets/tela-cheia.png', {
@@ -50,17 +43,8 @@ export default class abertura extends Phaser.Scene {
       frameHeight: 96
     })
 
-    this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
-    this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
-    this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
-    this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
-    this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
-
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
-    this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
-    this.load.audio('chuva', 'assets/audio/chuva.wav')
-    this.load.audio('passos', 'assets/audio/passos.mp3')
     this.load.audio('tiro', 'assets/audio/tiro.mp3')
 
     this.input.addPointer()
@@ -69,40 +53,7 @@ export default class abertura extends Phaser.Scene {
   create() {
 
     //Sons
-    this.trilha = this.sound.add("trilha-sonora", {
-      loop: true,
-      volume: 0.4,
-    }).play()
-    this.chuva = this.sound.add("chuva", {
-      loop: true,
-      volume: 0.2
-    }).play()
-    this.passos = this.sound.add('passos', {
-      volume: 0.5,
-    })
     this.tiroSom = this.sound.add('tiro')
-
-    this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
-    // Da um nome prar cada Tileset
-    this.tilesetChao = this.tilemapMapa.addTilesetImage('chao')
-    this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores-verdes')
-    this.tilesetTendasLLD = this.tilemapMapa.addTilesetImage('tendaLLD')
-    this.tilesetTendas = this.tilemapMapa.addTilesetImage('tenda')
-    //
-
-    //Diz qual imagem esta em qual camada
-    this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetChao])
-    this.layerCaminho = this.tilemapMapa.createLayer('caminho', [this.tilesetChao])
-
-    this.lanternaLocal = this.add.image(0, 0, 'lanterna')
-    this.lanternaLocal
-      .setAlpha(0.7)
-      .setBlendMode(Phaser.BlendModes.ADD)
-
-    this.lanternaRemota = this.add.image(0, 0, 'lanterna')
-    this.lanternaRemota
-      .setAlpha(0.7)
-      .setBlendMode(Phaser.BlendModes.ADD)
 
     if (this.game.jogadores.primeiro === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
@@ -323,38 +274,28 @@ export default class abertura extends Phaser.Scene {
         this.personagemRemoto.setFrame(dados.personagem.frame);
         this.angleRemoto = dados.personagem.lanterna
       }
-
-      if (dados.gatos) {
-        this.gatos.forEach((gato, i) => {
-          if (!dados.gatos[i].visible) {
-            gato.objeto.disableBody(true, true)
-          }
-        })
-      }
-    };
-
-    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores, this.tilesetTendas])
+    }
 
     //Fisica do player
     this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
-      .setBounds(
-        0,
-        0,
-        this.layerChao.width,
-        this.layerChao.height)
+    //   .setBounds(
+    //     0,
+    //     0,
+    //     this.layerChao.width,
+    //     this.layerChao.height)
 
-    this.physics.world.setBounds(
-      0,
-      0,
-      this.layerChao.width,
-      this.layerChao.height)
+    // this.physics.world.setBounds(
+    //   0,
+    //   0,
+    //   this.layerChao.width,
+    //   this.layerChao.height)
 
     this.personagemLocal.setSize(32, 48)
     this.personagemLocal.setOffset(16, 16)
     this.personagemLocal.setCollideWorldBounds(true)
 
-    this.layerObjetos.setCollisionByProperty({ collides: true })
-    this.physics.add.collider(this.personagemLocal, this.layerObjetos)
+    // this.layerObjetos.setCollisionByProperty({ collides: true })
+    // this.physics.add.collider(this.personagemLocal, this.layerObjetos)
 
     //Animacoes do personagem andando
     this.anims.create({
@@ -499,22 +440,6 @@ export default class abertura extends Phaser.Scene {
       frameRate: 12,
     })
 
-    //Camada para escurecer o fundo
-    this.noite = this.add.rectangle(1600, 1200, 1600, 1200, 0x472a66, 0.75)
-    this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
-    this.noite.depth = 99
-
-    //chuva
-    this.particulaChuva = this.add.particles(0, -128, 'particula-chuva', {
-      x: { min: this.personagemLocal.x - 1200, max: this.personagemLocal.x },
-      quantity: 50,
-      lifespan: 4000,
-      speedY: { min: 400, max: 1800 },
-      gravityX: 20,
-      scale: 0.6,
-    })
-      .setScrollFactor(0);
-
     this.joystick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
       x: 100,
       y: 360,
@@ -522,19 +447,6 @@ export default class abertura extends Phaser.Scene {
       base: this.add.sprite(120, 360, 'joystick', 0),
       thumb: this.add.sprite(120, 360, 'joystick', 1)
     })
-
-    this.gatos = [
-      { x: 100, y: 100 },
-      { x: 100, y: 200 },
-      { x: 200, y: 200 },
-      { x: 250, y: 300 },
-    ]
-
-    this.gatos.forEach((gato) => {
-      gato.objeto = this.physics.add.sprite(gato.x, gato.y, 'gato')
-      gato.objeto.play('gato-teste')
-      this.physics.add.overlap(this.personagemLocal, gato.objeto, (personagem, gato) => { gato.disableBody(true, true) }, null, this)
-    });
 
     this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
       if (this.scale.isFullscreen) {
@@ -574,16 +486,6 @@ export default class abertura extends Phaser.Scene {
       }
     }
 
-    if (this.personagemRemoto && typeof this.angleRemoto !== 'undefined') {
-      this.lanternaRemota.setPosition(this.personagemRemoto.x, this.personagemRemoto.y + 15)
-      this.lanternaRemota.setRotation(this.angleRemoto)
-    }
-    this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
-    this.lanternaLocal.setRotation(this.ultimoAngulo)
-    this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
-    // this.visao.setPosition(this.personagemLocal.x, this.personagemLocal.y)
-    // this.neblina.setPosition(this.personagemLocal.x, this.personagemLocal.y)
-
     if (((this.threshold < force) && (force <= 1000)) && (this.personagemLocalAcao != true)) {
 
       const velocityX = Math.round(Math.cos(angle) * this.speed)
@@ -611,7 +513,6 @@ export default class abertura extends Phaser.Scene {
       }
 
       this.personagemLocal.setVelocity(velocityX, velocityY)
-      this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
       this.barraStamina.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
@@ -666,20 +567,20 @@ export default class abertura extends Phaser.Scene {
           break
       }
 
-      //Altera pitch dos passos
-      let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
-      this.passos.setDetune(Modulado)
+    //   //Altera pitch dos passos
+    //   let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
+    //   this.passos.setDetune(Modulado)
 
-      //Retorna o frame atual na animação
-      this.frameAtual = this.personagemLocal.anims.currentFrame.index;
+    //   //Retorna o frame atual na animação
+    //   this.frameAtual = this.personagemLocal.anims.currentFrame.index;
 
-      //Frames do ernesto com o pé no chao
-      const pesNoChao = [4, 10]
+    //   //Frames do ernesto com o pé no chao
+    //   const pesNoChao = [4, 10]
 
-      //Toca som de passos quando o pé toca o chão
-      if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
-        this.passos.play()
-      }
+    //   //Toca som de passos quando o pé toca o chão
+    //   if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
+    //     this.passos.play()
+    //   }
 
     } else {
       // Se a força do joystick for baixa, o personagem para
@@ -700,7 +601,6 @@ export default class abertura extends Phaser.Scene {
                 frame: this.personagemLocal.frame.name,
                 lanterna: this.ultimoAngulo
               },
-              gatos: this.gatos.map(gato => (gato => ({ visible: gato.objeto.visible }))(gato)),
             })
           );
         }

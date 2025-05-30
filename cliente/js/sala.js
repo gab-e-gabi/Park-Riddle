@@ -25,7 +25,11 @@ export default class abertura extends Phaser.Scene {
       { x: 400, y: 200, numero: '3' },
       { x: 500, y: 200, numero: '4' },
       { x: 600, y: 200, numero: '5' },
-      { x: 700, y: 200, numero: '6' },
+      { x: 200, y: 400, numero: '6' },
+      { x: 300, y: 400, numero: '7' },
+      { x: 400, y: 400, numero: '8' },
+      { x: 500, y: 400, numero: '9' },
+      { x: 600, y: 400, numero: '10' },
     ];
 
     this.salas.forEach(sala => {
@@ -33,6 +37,8 @@ export default class abertura extends Phaser.Scene {
         .text(sala.x, sala.y, sala.numero)
         .setInteractive()
         .on("pointerdown", () => {
+
+          this.add.text(10, 10, 'Aguardando segundo jogador...')
           this.game.sala = sala.numero
           this.game.socket.emit("entrar-na-sala", this.game.sala);
         })
