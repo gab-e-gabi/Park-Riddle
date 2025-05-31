@@ -20,16 +20,16 @@ export default class abertura extends Phaser.Scene {
     }).setScrollFactor(0);
 
     this.salas = [
-      { x: 200, y: 200, numero: '1' },
-      { x: 300, y: 200, numero: '2' },
-      { x: 400, y: 200, numero: '3' },
-      { x: 500, y: 200, numero: '4' },
-      { x: 600, y: 200, numero: '5' },
-      { x: 200, y: 400, numero: '6' },
-      { x: 300, y: 400, numero: '7' },
-      { x: 400, y: 400, numero: '8' },
-      { x: 500, y: 400, numero: '9' },
-      { x: 600, y: 400, numero: '10' },
+      { x: 200, y: 150, numero: '1' },
+      { x: 300, y: 150, numero: '2' },
+      { x: 400, y: 150, numero: '3' },
+      { x: 500, y: 150, numero: '4' },
+      { x: 600, y: 150, numero: '5' },
+      { x: 200, y: 300, numero: '6' },
+      { x: 300, y: 300, numero: '7' },
+      { x: 400, y: 300, numero: '8' },
+      { x: 500, y: 300, numero: '9' },
+      { x: 600, y: 300, numero: '10' },
     ];
 
     this.salas.forEach(sala => {
