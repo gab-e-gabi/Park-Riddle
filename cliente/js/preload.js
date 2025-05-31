@@ -37,10 +37,12 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     })
-        this.load.spritesheet('tela-cheia', 'assets/tela-cheia.png', {
+        this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
       frameHeight: 32
     })
+    this.load.image('ponteiro', 'assets/UI/seta.png')
+
     
     this.load.image('fundo', 'assets/abertura-fundo.png')
     this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')

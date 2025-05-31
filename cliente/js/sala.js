@@ -5,7 +5,7 @@ export default class abertura extends Phaser.Scene {
 
   create () {
     
-    this.load.spritesheet('tela-cheia', 'assets/tela-cheia.png', {
+    this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
       frameHeight: 32
     })

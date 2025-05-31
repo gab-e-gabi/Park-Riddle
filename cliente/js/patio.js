@@ -16,27 +16,27 @@ export default class abertura extends Phaser.Scene {
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
     this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
-
+    
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
       frameHeight: 64
     })
-
+    
     this.load.spritesheet('Dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
     })
-
+    
     this.load.spritesheet('gato', 'assets/gato-teste.png', {
       frameWidth: 32,
       frameHeight: 33
     })
-
-    this.load.spritesheet('tela-cheia', 'assets/tela-cheia.png', {
+    
+    this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
       frameHeight: 32
     })
-
+    
     this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -49,6 +49,7 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 96,
       frameHeight: 96
     })
+    this.load.image('ponteiro', 'assets/UI/seta.png')
 
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
@@ -513,7 +514,9 @@ export default class abertura extends Phaser.Scene {
       gravityX: 20,
       scale: 0.6,
     })
-      .setScrollFactor(0);
+      .setScrollFactor(0)
+
+    this.ponteiro = this.physics.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'ponteiro').setDisplaySize(80, 64)
 
     this.joystick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
       x: 100,
@@ -547,7 +550,6 @@ export default class abertura extends Phaser.Scene {
     }).setScrollFactor(0);
   }
 
-
   update() {
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
@@ -574,15 +576,55 @@ export default class abertura extends Phaser.Scene {
       }
     }
 
-    if (this.personagemRemoto && typeof this.angleRemoto !== 'undefined') {
-      this.lanternaRemota.setPosition(this.personagemRemoto.x, this.personagemRemoto.y + 15)
-      this.lanternaRemota.setRotation(this.angleRemoto)
-    }
+    this.lanternaRemota.setPosition(this.personagemRemoto.x, this.personagemRemoto.y + 15)
+    this.lanternaRemota.setRotation(this.angleRemoto)
+
     this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
     this.lanternaLocal.setRotation(this.ultimoAngulo)
+
     this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
-    // this.visao.setPosition(this.personagemLocal.x, this.personagemLocal.y)
-    // this.neblina.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+
+    let pathFinder = Phaser.Math.Angle.Between(this.ponteiro.x, this.ponteiro.y, this.personagemRemoto.x, this.personagemRemoto.y)
+
+    this.ponteiro.setRotation(pathFinder)
+
+    const indicadorX = Math.round(Math.cos(pathFinder) * 120)
+    const indicadorY = Math.round(Math.sin(pathFinder) * 120)
+
+    const dist = Phaser.Math.Distance.Between(
+      this.ponteiro.x, this.ponteiro.y,
+      this.personagemRemoto.x, this.personagemRemoto.y
+    )
+
+    const modDistancia = (dist/30) 
+    this.ponteiro.setDisplaySize(80 - modDistancia, 64 - modDistancia)
+
+    if (dist < 10) {
+      this.ponteiro.setVelocity(0, 0);
+    } else {
+      this.ponteiro.setVelocity(indicadorX, indicadorY)
+    }
+
+    const cam = this.cameras.main;
+    const left = cam.worldView.left;
+    const top = cam.worldView.top;
+    const right = cam.worldView.right;
+    const bottom = cam.worldView.bottom;
+
+    const remotoNaTela =
+    this.personagemRemoto.x >= left &&
+    this.personagemRemoto.x <= right &&
+    this.personagemRemoto.y >= top &&
+    this.personagemRemoto.y <= bottom;
+
+    if (!remotoNaTela) {
+      this.ponteiro.setAlpha(1);
+    } else {
+      this.ponteiro.setAlpha(0);
+    }
+
+  this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
+  this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
 
     if (((this.threshold < force) && (force <= 1000)) && (this.personagemLocalAcao != true)) {
 
