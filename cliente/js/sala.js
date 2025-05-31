@@ -34,15 +34,14 @@ export default class abertura extends Phaser.Scene {
 
     this.salas.forEach(sala => {
       sala.botao = this.add
-        .text(sala.x, sala.y, sala.numero)
+        .sprite(sala.x, sala.y, "numeros", sala.numero - 1)
         .setInteractive()
         .on("pointerdown", () => {
-
-          this.add.text(10, 10, 'Aguardando segundo jogador...')
-          this.game.sala = sala.numero
+          this.add.text(10, 10, 'Aguardando segundo jogador...');
+          this.game.sala = sala.numero;
           this.game.socket.emit("entrar-na-sala", this.game.sala);
-        })
-    })
+        });
+    });
     this.game.socket.on("jogadores", (jogadores) => {
       if (jogadores.segundo) {
         this.game.jogadores = jogadores;
