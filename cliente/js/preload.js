@@ -33,6 +33,10 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 33
     })
+    this.load.spritesheet('fantasmas', 'assets/fantasmas.png', {
+      frameWidth: 50,
+      frameHeight: 64)
+    })
     this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
       frameWidth: 64,
       frameHeight: 64

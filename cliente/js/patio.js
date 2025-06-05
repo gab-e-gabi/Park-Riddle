@@ -27,6 +27,11 @@ export default class abertura extends Phaser.Scene {
       frameHeight: 64
     })
     
+    this.load.spritesheet('fantasmas', 'assets/fantasmas.png', {
+      frameWidth: 50,
+      frameHeight: 64
+    })
+
     this.load.spritesheet('gato', 'assets/gato-teste.png', {
       frameWidth: 32,
       frameHeight: 33
