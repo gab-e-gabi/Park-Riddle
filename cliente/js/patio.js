@@ -21,6 +21,10 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     })
+    this.load.spritesheet('fumaca', 'assets/fumaca.png', {
+      frameWidth:32,
+      frameHeight: 32
+    })
 
     this.load.spritesheet('Dan', 'assets/dan.png', {
       frameWidth: 64,
@@ -43,6 +47,10 @@ export default class abertura extends Phaser.Scene {
     })
 
     this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('pista', 'assets/UI/hintUI.png', {
       frameWidth: 64,
       frameHeight: 64
     })
@@ -170,24 +178,6 @@ export default class abertura extends Phaser.Scene {
       this.barraStaminaFundo = this.add.circle(0, 0, 700 / 50, 0x000000)
       this.barraStaminaFundo.depth = 100
 
-      this.particulaAcaoRemota = this.physics.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'bullet')
-        .setDisplaySize(5, 5)
-        .setTint(0xffff00)
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setSize(10, 10)
-        .setVisible(false)
-        .setActive(false)
-      this.particulaAcaoRemota.depth = 100
-
-      this.particulaAcaoLocal = this.physics.add.image(this.personagemLocal.x, this.personagemLocal.y, 'bullet')
-        .setDisplaySize(5, 5)
-        .setTint(0xffff00)
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setSize(10, 10)
-        .setVisible(false)
-        .setActive(false)
-      this.particulaAcaoLocal.depth = 100
-
       //Botão de corrida
       this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0)
         .setInteractive()
@@ -203,10 +193,72 @@ export default class abertura extends Phaser.Scene {
           this.personagemLocal.movimento = 'andando'
         })
         .depth = 100
-      this.fazAcao = function () {
-        true
-      }
 
+      //Botão de Ação
+      this.botaoAcao = this.add.sprite(750, 350, 'pista', 0)
+        .setInteractive()
+        .setScrollFactor(0)
+      this.botaoAcao.depth = 100
+
+      //Animação do Cachimbo
+      this.particulaAcaoLocal = this.physics.add.sprite(0, 0, 'fumaca', 0)
+        .setVisible(false)
+        .setActive(false)
+      this.particulaAcaoLocal.depth = 99
+      this.particulaAcaoLocal.movendo = false
+
+      this.particulaAcaoRemota = this.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'bullet')
+        .setDisplaySize(5, 5)
+        .setTint(0xffff00)
+        .setBlendMode(Phaser.BlendModes.ADD)
+      this.particulaAcaoRemota.depth = 99
+
+      this.botaoAcao.on('pointerdown', () => {
+
+        if (!this.particulaAcaoLocal.visible) {
+          this.botaoAcao.setFrame(1)
+          this.personagemLocalAcao = true
+          this.personagemLocal.setVelocity(0)
+
+          //TEMPORARIO - não modificar
+          // this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
+          // this.personagemLocal.on('animationcomplete', () => {
+          //   this.personagemLocalAcao = false
+          //   this.botaoAcao.setFrame(0)
+          // })
+
+          if (this.particulaAcaoLocal.movendo == false) {
+            this.particulaAcaoLocal.movendo = true
+
+            this.time.delayedCall(600, () => {
+              this.particulaAcaoLocal
+                .setPosition(this.personagemLocal.x, this.personagemLocal.y)
+                .setFrame(0)
+                .setVisible(true)
+                .setActive(true)
+                this.time.delayedCall(150, () => {
+                  this.particulaAcaoLocal.setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 50, Math.round(Math.sin(this.ultimoAngulo) * 50))
+                })
+              this.time.delayedCall(600, () => {
+                this.particulaAcaoLocal.anims.play('fumaca-desfazendo')
+                this.particulaAcaoLocal.on('animationcomplete', () => {
+
+                  //TEMPORARIO - não modificar
+                  this.botaoAcao.setFrame(0)
+                  this.personagemLocalAcao = false
+                  //
+
+                  this.particulaAcaoLocal
+                    .setVisible(false)
+                    .setActive(false)
+                    .setVelocity(0)
+                    .movendo = false
+                })
+              })
+            })
+          }
+        }
+      })
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
       this.game.localConnection = new RTCPeerConnection(this.game.iceServers);
       this.game.dadosJogo = this.game.localConnection.createDataChannel(
@@ -254,7 +306,7 @@ export default class abertura extends Phaser.Scene {
 
       this.personagemLocal = this.physics.add.sprite(1000, 1248, 'Dan')
       this.personagemRemoto = this.add.sprite(936, 1248, 'ernesto')
-      this.speed = 90
+      this.speed = 300
       this.frameRate = 18
       this.personagemLocal.stamina = 650
       this.personagemLocal.cansado = false
@@ -288,13 +340,9 @@ export default class abertura extends Phaser.Scene {
       this.botaoAcao = this.add.sprite(750, 350, 'tiro', 0)
         .setInteractive()
         .setScrollFactor(0)
-
-      this.botaoAcao
-        .on('pointerdown', () => {
-          this.botaoAcao.setFrame(1)
-        })
       this.botaoAcao.depth = 100
-
+      
+      //Animação de tiro
       this.particulaAcaoLocal = this.physics.add.image(0, 0, 'bullet')
         .setDisplaySize(5, 5)
         .setTint(0xffff00)
@@ -302,18 +350,12 @@ export default class abertura extends Phaser.Scene {
         .setSize(10, 10)
         .setVisible(false)
         .setActive(false)
-      this.particulaAcaoLocal.depth = 100
+      this.particulaAcaoLocal.depth = 99
       this.particulaAcaoLocal.movendo = false
 
-      //Animação de tiro
-      this.particulaAcaoRemota = this.physics.add.image(0, 0, 'bullet')
-        .setDisplaySize(5, 5)
-        .setTint(0xffff00)
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setSize(10, 10)
-        .setVisible(false)
-        .setActive(false)
-      this.particulaAcaoRemota.depth = 100
+      this.particulaAcaoRemota = this.add.sprite(0, 0, 'fumaca', 0)
+      this.particulaAcaoRemota.depth = 99
+
       this.botaoAcao.on('pointerdown', () => {
 
         if (!this.particulaAcaoLocal.visible) {
@@ -378,19 +420,6 @@ export default class abertura extends Phaser.Scene {
       if (dados.particula) {
         this.particulaAcaoRemota.x = dados.particula.x;
         this.particulaAcaoRemota.y = dados.particula.y;
-        this.particulaAcaoRemota.setVisible(dados.particula.visible);
-        this.particulaAcaoRemota.setActive(dados.particula.active);
-        if (this.particulaAcaoRemota.body && dados.particula.velocity) {
-          this.particulaAcaoRemota.body.setVelocity(
-            dados.particula.velocity.x,
-            dados.particula.velocity.y
-          );
-        }
-      }
-
-      if (dados.particulaAcao) {
-        this.particulaAcaoRemota.x = dados.particulaAcao.x
-        this.particulaAcaoRemota.y = dados.particulaAcao.y
       }
 
       if (dados.gatos) {
@@ -568,6 +597,12 @@ export default class abertura extends Phaser.Scene {
       frameRate: 12,
     })
 
+    this.anims.create({
+      key: 'fumaca-desfazendo',
+      frames: this.anims.generateFrameNumbers('fumaca', {start: 0, end: 4}),
+      frameRate: 6,
+    })
+
     //Camada para escurecer o fundo
     this.noite = this.add.rectangle(1600, 1200, 1600, 1200, 0x472a66, 0.75)
     this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
@@ -580,9 +615,8 @@ export default class abertura extends Phaser.Scene {
       lifespan: 4000,
       speedY: { min: 400, max: 1800 },
       gravityX: 20,
-      scale: 0.6,
     })
-      .setScrollFactor(0)
+    .setScrollFactor(0)
 
     this.ponteiro = this.physics.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'ponteiro').setDisplaySize(80, 64)
 
@@ -817,12 +851,6 @@ export default class abertura extends Phaser.Scene {
               particula: {
                 x: this.particulaAcaoLocal.x,
                 y: this.particulaAcaoLocal.y,
-                visible: this.particulaAcaoLocal.visible,
-                active: this.particulaAcaoLocal.active,
-                velocity: {
-                  x: this.particulaAcaoLocal.body.velocity.x,
-                  y: this.particulaAcaoLocal.body.velocity.y
-                }
               },
               gatos: this.gatos.map(gato => ({ visible: gato.objeto.visible })),
             })
