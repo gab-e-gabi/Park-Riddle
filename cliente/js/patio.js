@@ -77,7 +77,7 @@ export default class abertura extends Phaser.Scene {
     //Sons
     this.trilha = this.sound.add("trilha-sonora", {
       loop: true,
-      volume: 0.4,
+      volume: 0.1,
     }).play()
     this.chuva = this.sound.add("chuva", {
       loop: true,
@@ -169,6 +169,9 @@ export default class abertura extends Phaser.Scene {
 
       this.barraStaminaFundo = this.add.circle(0, 0, 700 / 50, 0x000000)
       this.barraStaminaFundo.depth = 100
+
+      this.particulaAcaoRemota = this.add.circle(this.personagemRemoto.x, this.personagemRemoto.y, 30, 0xff00ff)
+      this.particulaAcaoLocal = this.add.circle(this.personagemLocal.x, this.personagemLocal.y, 30, 0xff00ff)
 
       //Botão de corrida
       this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0)
@@ -273,41 +276,61 @@ export default class abertura extends Phaser.Scene {
 
       this.botaoAcao
         .on('pointerdown', () => {
-          this.personagemLocalAcao = true
           this.botaoAcao.setFrame(1)
         })
       this.botaoAcao.depth = 100
 
+      this.particulaAcaoLocal = this.physics.add.image(0, 0, 'bullet')
+        .setDisplaySize(5, 5)
+        .setTint(0xffff00)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setSize(10, 10)
+        .setVisible(false)
+        .setActive(false)
+      this.particulaAcaoLocal.depth = 100
+      this.particulaAcaoLocal.movendo = false
+
       //Animação de tiro
+      this.particulaAcaoRemota = this.add.circle(0, 0, 30, 0xff00ff)
       this.botaoAcao.on('pointerdown', () => {
 
-        this.botaoAcao.setFrame(1)
-        this.personagemLocalAcao = true
-        this.personagemLocal.setVelocity(0)
+        if (!this.particulaAcaoLocal.visible) {
+          this.botaoAcao.setFrame(1)
+          this.personagemLocalAcao = true
+          this.personagemLocal.setVelocity(0)
+          
+          this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
+          if (!this.tiroSom.isPlaying) {
+            this.tiroSom.play()
+          }
 
-        this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
-        if (!this.tiroSom.isPlaying) {
-          this.tiroSom.play()
-        }
-
-        this.personagemLocal.on('animationcomplete', () => {
-          this.personagemLocalAcao = false
-          this.botaoAcao.setFrame(0)
-          this.tiroSom.stop()
-        })
-
-        this.time.delayedCall(700, () => {
-          this.bullet = this.physics.add.image(this.personagemLocal.x, this.personagemLocal.y, 'bullet')
-            .setDisplaySize(4, 4)
-            .setTint(0xffe600)
-            .setBlendMode(Phaser.BlendModes.ADD)
-            .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
-            .setSize(10, 10)
-
-          this.time.delayedCall(600, () => {
-            this.bullet.destroy()
+          this.personagemLocal.on('animationcomplete', () => {
+            this.personagemLocalAcao = false
+            this.botaoAcao.setFrame(0)
+            this.tiroSom.stop()
           })
-        })
+          
+          if (this.particulaAcaoLocal.movendo == false) {
+            this.particulaAcaoLocal.movendo = true
+
+            this.time.delayedCall(700, () => {
+              this.cameras.main.shake(100, 0.02)
+              this.particulaAcaoLocal
+              .setPosition(this.personagemLocal.x, this.personagemLocal.y)
+              .setVisible(true)
+              .setActive(true)
+              .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
+
+              this.time.delayedCall(600, () => {
+                this.particulaAcaoLocal
+                .setVisible(false)
+                .setActive(false)
+                .setVelocity(0)
+                .movendo = false
+              })
+            })
+          }
+        }
       })
     } else {
       window.alert("Sala cheia!")
@@ -328,6 +351,16 @@ export default class abertura extends Phaser.Scene {
         this.personagemRemoto.y = dados.personagem.y;
         this.personagemRemoto.setFrame(dados.personagem.frame);
         this.angleRemoto = dados.personagem.lanterna
+      }
+
+      if (dados.particula) {
+        this.particulaAcaoRemota.x = dados.particula.x;
+        this.particulaAcaoRemota.y = dados.particula.y;
+      }
+
+      if (dados.particulaAcao) {
+        this.particulaAcaoRemota.x = dados.particulaAcao.x
+        this.particulaAcaoRemota.y = dados.particulaAcao.y
       }
 
       if (dados.gatos) {
@@ -560,6 +593,16 @@ export default class abertura extends Phaser.Scene {
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
+    // Acha o aungulo mais próximo da direção do joystick
+    let o = 0
+    if (this.joystick.angle < 0) {
+      o = (this.joystick.angle % 360 + 360) % 360;
+    } else {
+      o = this.joystick.angle
+    }
+    const closest = (arr, n) => arr.sort((a, b) => Math.abs(a - n) - Math.abs(b - n))[0];
+    this.direcao = closest([0, 45, 90, 135, 180, 225, 270, 315, 360], o)
+
     if (angle != 0) {
       this.ultimoAngulo = angle
     }
@@ -663,16 +706,9 @@ export default class abertura extends Phaser.Scene {
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
 
-      // Acha o aungulo mais próximo da direção do joystick
-      let o = undefined
-      if (this.joystick.angle < 0) {
-        o = (this.joystick.angle % 360 + 360) % 360;
-      } else {
-        o = this.joystick.angle
+      if(this.personagemLocal.texture.key == 'Dan' && this.personagemLocal.movimento == 'correndo') {
+        console.log('ok')
       }
-      const closest = (arr, n) => arr.sort((a, b) => Math.abs(a - n) - Math.abs(b - n))[0];
-      this.direcao = closest([0, 45, 90, 135, 180, 225, 270, 315, 360], o)
-
       // Animação do personagem conforme a direção do movimento
       switch (this.direcao) {
         case 0:
@@ -713,6 +749,7 @@ export default class abertura extends Phaser.Scene {
           break
       }
 
+
       //Altera pitch dos passos
       let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
       this.passos.setDetune(Modulado)
@@ -746,6 +783,10 @@ export default class abertura extends Phaser.Scene {
                 y: this.personagemLocal.y,
                 frame: this.personagemLocal.frame.name,
                 lanterna: this.ultimoAngulo
+              },
+              particula: {
+                x: this.particulaAcaoLocal.x,
+                y: this.particulaAcaoLocal.y
               },
               gatos: this.gatos.map(gato => (gato => ({ visible: gato.objeto.visible }))(gato)),
             })
