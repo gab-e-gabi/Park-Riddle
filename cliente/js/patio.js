@@ -2,31 +2,31 @@
 /*eslint no-undef: "error"*/
 export default class abertura extends Phaser.Scene {
 
-  constructor() {
+  constructor () {
     super('patio')
     this.threshold = 1
     this.direcaoAtual = 'cima'
     this.personagemLocalAcao = false
   }
 
-  init() { }
+  init () { }
 
-  preload() {
+  preload () {
 
     this.load.image('lanterna', 'assets/luz.png')
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
     this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
-    
+
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
       frameHeight: 64
     })
-    
+
     this.load.spritesheet('Dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
     })
-    
+
     this.load.spritesheet('fantasmas', 'assets/fantasmas.png', {
       frameWidth: 50,
       frameHeight: 64
@@ -36,12 +36,12 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 33
     })
-    
+
     this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
       frameHeight: 32
     })
-    
+
     this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -72,7 +72,7 @@ export default class abertura extends Phaser.Scene {
     this.input.addPointer()
   }
 
-  create() {
+  create () {
 
     //Sons
     this.trilha = this.sound.add("trilha-sonora", {
@@ -170,8 +170,23 @@ export default class abertura extends Phaser.Scene {
       this.barraStaminaFundo = this.add.circle(0, 0, 700 / 50, 0x000000)
       this.barraStaminaFundo.depth = 100
 
-      this.particulaAcaoRemota = this.add.circle(this.personagemRemoto.x, this.personagemRemoto.y, 30, 0xff00ff)
-      this.particulaAcaoLocal = this.add.circle(this.personagemLocal.x, this.personagemLocal.y, 30, 0xff00ff)
+      this.particulaAcaoRemota = this.physics.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'bullet')
+        .setDisplaySize(5, 5)
+        .setTint(0xffff00)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setSize(10, 10)
+        .setVisible(false)
+        .setActive(false)
+      this.particulaAcaoRemota.depth = 100
+
+      this.particulaAcaoLocal = this.physics.add.image(this.personagemLocal.x, this.personagemLocal.y, 'bullet')
+        .setDisplaySize(5, 5)
+        .setTint(0xffff00)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setSize(10, 10)
+        .setVisible(false)
+        .setActive(false)
+      this.particulaAcaoLocal.depth = 100
 
       //Botão de corrida
       this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0)
@@ -291,14 +306,21 @@ export default class abertura extends Phaser.Scene {
       this.particulaAcaoLocal.movendo = false
 
       //Animação de tiro
-      this.particulaAcaoRemota = this.add.circle(0, 0, 30, 0xff00ff)
+      this.particulaAcaoRemota = this.physics.add.image(0, 0, 'bullet')
+        .setDisplaySize(5, 5)
+        .setTint(0xffff00)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setSize(10, 10)
+        .setVisible(false)
+        .setActive(false)
+      this.particulaAcaoRemota.depth = 100
       this.botaoAcao.on('pointerdown', () => {
 
         if (!this.particulaAcaoLocal.visible) {
           this.botaoAcao.setFrame(1)
           this.personagemLocalAcao = true
           this.personagemLocal.setVelocity(0)
-          
+
           this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
           if (!this.tiroSom.isPlaying) {
             this.tiroSom.play()
@@ -309,24 +331,24 @@ export default class abertura extends Phaser.Scene {
             this.botaoAcao.setFrame(0)
             this.tiroSom.stop()
           })
-          
+
           if (this.particulaAcaoLocal.movendo == false) {
             this.particulaAcaoLocal.movendo = true
 
             this.time.delayedCall(700, () => {
               this.cameras.main.shake(100, 0.02)
               this.particulaAcaoLocal
-              .setPosition(this.personagemLocal.x, this.personagemLocal.y)
-              .setVisible(true)
-              .setActive(true)
-              .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
+                .setPosition(this.personagemLocal.x, this.personagemLocal.y)
+                .setVisible(true)
+                .setActive(true)
+                .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
 
               this.time.delayedCall(600, () => {
                 this.particulaAcaoLocal
-                .setVisible(false)
-                .setActive(false)
-                .setVelocity(0)
-                .movendo = false
+                  .setVisible(false)
+                  .setActive(false)
+                  .setVelocity(0)
+                  .movendo = false
               })
             })
           }
@@ -356,6 +378,14 @@ export default class abertura extends Phaser.Scene {
       if (dados.particula) {
         this.particulaAcaoRemota.x = dados.particula.x;
         this.particulaAcaoRemota.y = dados.particula.y;
+        this.particulaAcaoRemota.setVisible(dados.particula.visible);
+        this.particulaAcaoRemota.setActive(dados.particula.active);
+        if (this.particulaAcaoRemota.body && dados.particula.velocity) {
+          this.particulaAcaoRemota.body.setVelocity(
+            dados.particula.velocity.x,
+            dados.particula.velocity.y
+          );
+        }
       }
 
       if (dados.particulaAcao) {
@@ -588,7 +618,7 @@ export default class abertura extends Phaser.Scene {
     }).setScrollFactor(0);
   }
 
-  update() {
+  update () {
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
@@ -644,7 +674,7 @@ export default class abertura extends Phaser.Scene {
       this.personagemRemoto.x, this.personagemRemoto.y
     )
 
-    const modDistancia = (dist/30) 
+    const modDistancia = (dist / 30)
     this.ponteiro.setDisplaySize(80 - modDistancia, 64 - modDistancia)
 
     if (dist < 10) {
@@ -660,10 +690,10 @@ export default class abertura extends Phaser.Scene {
     const bottom = cam.worldView.bottom;
 
     const remotoNaTela =
-    this.personagemRemoto.x >= left &&
-    this.personagemRemoto.x <= right &&
-    this.personagemRemoto.y >= top &&
-    this.personagemRemoto.y <= bottom;
+      this.personagemRemoto.x >= left &&
+      this.personagemRemoto.x <= right &&
+      this.personagemRemoto.y >= top &&
+      this.personagemRemoto.y <= bottom;
 
     if (!remotoNaTela) {
       this.ponteiro.setAlpha(1);
@@ -671,8 +701,8 @@ export default class abertura extends Phaser.Scene {
       this.ponteiro.setAlpha(0);
     }
 
-  this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
-  this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
+    this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
+    this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
 
     if (((this.threshold < force) && (force <= 1000)) && (this.personagemLocalAcao != true)) {
 
@@ -706,7 +736,7 @@ export default class abertura extends Phaser.Scene {
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
 
-      if(this.personagemLocal.texture.key == 'Dan' && this.personagemLocal.movimento == 'correndo') {
+      if (this.personagemLocal.texture.key == 'Dan' && this.personagemLocal.movimento == 'correndo') {
         console.log('ok')
       }
       // Animação do personagem conforme a direção do movimento
@@ -786,9 +816,15 @@ export default class abertura extends Phaser.Scene {
               },
               particula: {
                 x: this.particulaAcaoLocal.x,
-                y: this.particulaAcaoLocal.y
+                y: this.particulaAcaoLocal.y,
+                visible: this.particulaAcaoLocal.visible,
+                active: this.particulaAcaoLocal.active,
+                velocity: {
+                  x: this.particulaAcaoLocal.body.velocity.x,
+                  y: this.particulaAcaoLocal.body.velocity.y
+                }
               },
-              gatos: this.gatos.map(gato => (gato => ({ visible: gato.objeto.visible }))(gato)),
+              gatos: this.gatos.map(gato => ({ visible: gato.objeto.visible })),
             })
           );
         }
