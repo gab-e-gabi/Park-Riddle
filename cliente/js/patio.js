@@ -17,6 +17,8 @@ export default class abertura extends Phaser.Scene {
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
     this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
 
+    this.textures.generate('pista-obj', { data: ['1'], pixelWidth: 30, pixelHeight: 30 });
+
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -34,11 +36,6 @@ export default class abertura extends Phaser.Scene {
     this.load.spritesheet('fantasmas', 'assets/fantasmas.png', {
       frameWidth: 50,
       frameHeight: 64
-    })
-
-    this.load.spritesheet('gato', 'assets/gato-teste.png', {
-      frameWidth: 32,
-      frameHeight: 33
     })
 
     this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
@@ -215,6 +212,27 @@ export default class abertura extends Phaser.Scene {
 
       this.botaoAcao.on('pointerdown', () => {
 
+        //Acha a pista mais proxima
+        let distancia_pista = 0
+        let mais_proxima = 10000
+        let sobra_pista = 0
+        // let tem_pista = false
+
+        this.pistas.forEach((pista,) => {
+          if (pista.objeto.visible) {
+            // tem_pista = true
+            sobra_pista = 1
+            distancia_pista = Phaser.Math.Distance.Between(this.personagemLocal.x, this.personagemLocal.y, pista.x, pista.y)
+
+            if (distancia_pista < mais_proxima) {
+              mais_proxima = distancia_pista
+              this.maisProximaAngulo = Phaser.Math.Angle.Between(this.personagemLocal.x, this.personagemLocal.y, pista.x, pista.y)
+            }
+          // } else if (!tem_pista) {
+          //   sobra_pista = 0
+          }
+        });
+
         if (!this.particulaAcaoLocal.visible) {
           this.botaoAcao.setFrame(1)
           this.personagemLocalAcao = true
@@ -237,7 +255,7 @@ export default class abertura extends Phaser.Scene {
                 .setVisible(true)
                 .setActive(true)
                 this.time.delayedCall(150, () => {
-                  this.particulaAcaoLocal.setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 50, Math.round(Math.sin(this.ultimoAngulo) * 50))
+                  this.particulaAcaoLocal.setVelocity(Math.round(Math.cos(this.maisProximaAngulo)) * 50 * sobra_pista, Math.round(Math.sin(this.maisProximaAngulo) * 50 * sobra_pista))
                 })
               this.time.delayedCall(600, () => {
                 this.particulaAcaoLocal.anims.play('fumaca-desfazendo')
@@ -420,12 +438,13 @@ export default class abertura extends Phaser.Scene {
       if (dados.particula) {
         this.particulaAcaoRemota.x = dados.particula.x;
         this.particulaAcaoRemota.y = dados.particula.y;
+        this.particulaAcaoRemota.setFrame(dados.particula.frame);
       }
 
-      if (dados.gatos) {
-        this.gatos.forEach((gato, i) => {
-          if (!dados.gatos[i].visible) {
-            gato.objeto.disableBody(true, true)
+      if (dados.pistas) {
+        this.pistas.forEach((pista, i) => {
+          if (!dados.pistas[i].visible) {
+            pista.objeto.disableBody(true, true)
           }
         })
       }
@@ -628,17 +647,15 @@ export default class abertura extends Phaser.Scene {
       thumb: this.add.sprite(120, 360, 'joystick', 1)
     })
 
-    this.gatos = [
-      { x: 100, y: 100 },
-      { x: 100, y: 200 },
-      { x: 200, y: 200 },
-      { x: 250, y: 300 },
+    this.pistas = [
+      { x: 1000, y: 1000 },
+      { x: 1050, y: 1000 },
+      { x: 1100, y: 1000 },
     ]
 
-    this.gatos.forEach((gato) => {
-      gato.objeto = this.physics.add.sprite(gato.x, gato.y, 'gato')
-      gato.objeto.play('gato-teste')
-      this.physics.add.overlap(this.personagemLocal, gato.objeto, (personagem, gato) => { gato.disableBody(true, true) }, null, this)
+    this.pistas.forEach((pista) => {
+      pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'pista-obj')
+      this.physics.add.overlap(this.personagemLocal, pista.objeto, (personagem, pista) => { pista.disableBody(true, true) }, null, this)
     });
 
     this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
@@ -649,7 +666,9 @@ export default class abertura extends Phaser.Scene {
         this.scale.startFullscreen();
         this.telaCheia.setFrame(1);
       }
-    }).setScrollFactor(0);
+    })
+    .setScrollFactor(0)
+    .depth = 100
   }
 
   update () {
@@ -839,7 +858,7 @@ export default class abertura extends Phaser.Scene {
 
     try {
       if (this.game.dadosJogo.readyState === "open") {
-        if (this.personagemLocal && this.gatos) {
+        if (this.personagemLocal && this.pistas) {
           this.game.dadosJogo.send(
             JSON.stringify({
               personagem: {
@@ -851,8 +870,9 @@ export default class abertura extends Phaser.Scene {
               particula: {
                 x: this.particulaAcaoLocal.x,
                 y: this.particulaAcaoLocal.y,
+                frame: this.particulaAcaoLocal.frame.name
               },
-              gatos: this.gatos.map(gato => ({ visible: gato.objeto.visible })),
+              pistas: this.pistas.map(pista => ({ visible: pista.objeto.visible })),
             })
           );
         }
