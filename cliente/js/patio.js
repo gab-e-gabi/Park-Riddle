@@ -216,11 +216,9 @@ export default class abertura extends Phaser.Scene {
         let distancia_pista = 0
         let mais_proxima = 10000
         let sobra_pista = 0
-        // let tem_pista = false
 
         this.pistas.forEach((pista,) => {
           if (pista.objeto.visible) {
-            // tem_pista = true
             sobra_pista = 1
             distancia_pista = Phaser.Math.Distance.Between(this.personagemLocal.x, this.personagemLocal.y, pista.x, pista.y)
 
@@ -228,8 +226,6 @@ export default class abertura extends Phaser.Scene {
               mais_proxima = distancia_pista
               this.maisProximaAngulo = Phaser.Math.Angle.Between(this.personagemLocal.x, this.personagemLocal.y, pista.x, pista.y)
             }
-          // } else if (!tem_pista) {
-          //   sobra_pista = 0
           }
         });
 
@@ -238,33 +234,30 @@ export default class abertura extends Phaser.Scene {
           this.personagemLocalAcao = true
           this.personagemLocal.setVelocity(0)
 
-          //TEMPORARIO - não modificar
-          // this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
-          // this.personagemLocal.on('animationcomplete', () => {
-          //   this.personagemLocalAcao = false
-          //   this.botaoAcao.setFrame(0)
-          // })
+          this.personagemLocal.anims.play(`personagem-acao-${this.direcaoAtual}`, true)
+          this.personagemLocal.anims.yoyo = true
+          this.personagemLocal.on('animationcomplete', () => {
+            this.personagemLocalAcao = false
+            this.botaoAcao.setFrame(0)
+          })
 
           if (this.particulaAcaoLocal.movendo == false) {
             this.particulaAcaoLocal.movendo = true
 
-            this.time.delayedCall(600, () => {
+            this.time.delayedCall(1000, () => {
+              this.personagemLocal.anims.pause()
               this.particulaAcaoLocal
                 .setPosition(this.personagemLocal.x, this.personagemLocal.y)
                 .setFrame(0)
                 .setVisible(true)
                 .setActive(true)
                 this.time.delayedCall(150, () => {
-                  this.particulaAcaoLocal.setVelocity(Math.round(Math.cos(this.maisProximaAngulo)) * 50 * sobra_pista, Math.round(Math.sin(this.maisProximaAngulo) * 50 * sobra_pista))
+                  this.personagemLocal.anims.resume()
+                  this.particulaAcaoLocal.setVelocity(Math.round(Math.cos(this.maisProximaAngulo)) * 35 * sobra_pista, Math.round(Math.sin(this.maisProximaAngulo) * 35 * sobra_pista))
                 })
-              this.time.delayedCall(600, () => {
+              this.time.delayedCall(1000, () => {
                 this.particulaAcaoLocal.anims.play('fumaca-desfazendo')
                 this.particulaAcaoLocal.on('animationcomplete', () => {
-
-                  //TEMPORARIO - não modificar
-                  this.botaoAcao.setFrame(0)
-                  this.personagemLocalAcao = false
-                  //
 
                   this.particulaAcaoLocal
                     .setVisible(false)
@@ -387,6 +380,7 @@ export default class abertura extends Phaser.Scene {
           }
 
           this.personagemLocal.on('animationcomplete', () => {
+            console.log('completa')
             this.personagemLocalAcao = false
             this.botaoAcao.setFrame(0)
             this.tiroSom.stop()
@@ -398,12 +392,20 @@ export default class abertura extends Phaser.Scene {
             this.time.delayedCall(700, () => {
               this.cameras.main.shake(100, 0.02)
               this.particulaAcaoLocal
-                .setPosition(this.personagemLocal.x, this.personagemLocal.y)
-                .setVisible(true)
-                .setActive(true)
-                .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
+              .setPosition(this.personagemLocal.x, this.personagemLocal.y)
+              .setVisible(true)
+              .setActive(true)
+              .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
+
+              const frame_tiro = this.anims.get(`personagem-acao-${this.direcaoAtual}`).getFrameAt(8)
+              this.personagemLocal.anims.setCurrentFrame(frame_tiro)
+              this.personagemLocal.anims.reverse()
+
 
               this.time.delayedCall(600, () => {
+                console.log(this.personagemLocal.anims.currentFrame.index)
+
+                console.log('terminou')
                 this.particulaAcaoLocal
                   .setVisible(false)
                   .setActive(false)
