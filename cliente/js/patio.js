@@ -28,7 +28,7 @@ export default class abertura extends Phaser.Scene {
       frameHeight: 32
     })
 
-    this.load.spritesheet('Dan', 'assets/dan.png', {
+    this.load.spritesheet('dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
     })
@@ -160,7 +160,7 @@ export default class abertura extends Phaser.Scene {
       });
 
       this.personagemLocal = this.physics.add.sprite(936, 1248, 'ernesto')
-      this.personagemRemoto = this.add.sprite(1000, 1248, 'Dan')
+      this.personagemRemoto = this.add.sprite(1000, 1248, 'dan')
       this.speed = 75
       this.frameRate = 18
       this.personagemLocal.stamina = 650
@@ -247,7 +247,7 @@ export default class abertura extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
               this.personagemLocal.anims.pause()
               this.particulaAcaoLocal
-                .setPosition(this.personagemLocal.x, this.personagemLocal.y)
+                .setPosition(this.personagemLocal.x + Math.cos(this.ultimoAngulo)*3, this.personagemLocal.y + Math.sin(this.ultimoAngulo)*3)
                 .setFrame(0)
                 .setVisible(true)
                 .setActive(true)
@@ -315,7 +315,7 @@ export default class abertura extends Phaser.Scene {
         this.game.localConnection.addIceCandidate(candidate);
       });
 
-      this.personagemLocal = this.physics.add.sprite(1000, 1248, 'Dan')
+      this.personagemLocal = this.physics.add.sprite(1000, 1248, 'dan')
       this.personagemRemoto = this.add.sprite(936, 1248, 'ernesto')
       this.speed = 300
       this.frameRate = 18
@@ -361,7 +361,7 @@ export default class abertura extends Phaser.Scene {
         .setSize(10, 10)
         .setVisible(false)
         .setActive(false)
-      this.particulaAcaoLocal.depth = 99
+      this.particulaAcaoLocal.depth = 100
       this.particulaAcaoLocal.movendo = false
 
       this.particulaAcaoRemota = this.add.sprite(0, 0, 'fumaca', 0)
@@ -525,7 +525,6 @@ export default class abertura extends Phaser.Scene {
       repeat: -1
     })
 
-
     // Animações do personagem parado
     this.anims.create({
       key: 'personagem-parado-baixo',
@@ -617,6 +616,51 @@ export default class abertura extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 195, end: 207 }),
       frameRate: 12,
     })
+
+    //Animações dan correndo
+    if (this.personagemLocal.texture.key == 'dan') {
+      console.log('Criando animações do Dan')
+      this.anims.create({
+        key: 'dan-correndo-baixo',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 208, end: 220 }),
+        frameRate: 18,
+      })
+      this.anims.create({
+        key: 'dan-correndo-cima',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 221, end: 233 }),
+        frameRate: 18,
+      })
+      this.anims.create({
+        key: 'dan-correndo-esquerda',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 234, end: 246 }),
+        frameRate: 18,
+      })
+      this.anims.create({
+        key: 'dan-correndo-direita',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 247, end: 259 }),
+        frameRate: 18,
+      })
+      this.anims.create({
+        key: 'dan-correndo-cima-esquerda',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 260, end: 272 }),
+        frameRate: 18,
+      })
+      this.anims.create({
+        key: 'dan-correndo-cima-direita',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 273, end: 285 }),
+        frameRate: 18,
+      })
+      this.anims.create({
+        key: 'dan-correndo-baixo-esquerda',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 286, end: 298 }),
+        frameRate: 18,
+      })
+      this.anims.create({
+        key: 'dan-correndo-baixo-direita',
+        frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 299, end: 311 }),
+        frameRate: 18,
+      })
+    }
 
     this.anims.create({
       key: 'fumaca-desfazendo',
@@ -787,53 +831,10 @@ export default class abertura extends Phaser.Scene {
 
       this.personagemLocal.setVelocity(velocityX, velocityY)
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
+
       this.barraStamina.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
-
-      if (this.personagemLocal.texture.key == 'Dan' && this.personagemLocal.movimento == 'correndo') {
-        console.log('ok')
-      }
-      // Animação do personagem conforme a direção do movimento
-      switch (this.direcao) {
-        case 0:
-          this.personagemLocal.anims.play('personagem-andando-direita', true)
-          this.direcaoAtual = 'direita'
-          break
-        case 45:
-          this.personagemLocal.anims.play('personagem-andando-baixo-direita', true)
-          this.direcaoAtual = 'baixo-direita'
-          break
-        case 90:
-          this.personagemLocal.anims.play('personagem-andando-baixo', true)
-          this.direcaoAtual = 'baixo'
-          break
-        case 135:
-          this.personagemLocal.anims.play('personagem-andando-baixo-esquerda', true)
-          this.direcaoAtual = 'baixo-esquerda'
-          break
-        case 180:
-          this.personagemLocal.anims.play('personagem-andando-esquerda', true)
-          this.direcaoAtual = 'esquerda'
-          break
-        case 225:
-          this.personagemLocal.anims.play('personagem-andando-cima-esquerda', true)
-          this.direcaoAtual = 'cima-esquerda'
-          break
-        case 270:
-          this.personagemLocal.anims.play('personagem-andando-cima', true)
-          this.direcaoAtual = 'cima'
-          break
-        case 315:
-          this.personagemLocal.anims.play('personagem-andando-cima-direita', true)
-          this.direcaoAtual = 'cima-direita'
-          break
-        case 360:
-          this.personagemLocal.anims.play('personagem-andando-direita', true)
-          this.direcaoAtual = 'direita'
-          break
-      }
-
 
       //Altera pitch dos passos
       let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
@@ -848,6 +849,89 @@ export default class abertura extends Phaser.Scene {
       //Toca som de passos quando o pé toca o chão
       if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
         this.passos.play()
+      }
+
+      //Animações somente para o Dan
+      if (this.personagemLocal.texture.key == 'dan' && this.personagemLocal.movimento == 'correndo') {
+
+        switch (this.direcao) {
+          case 0:
+            this.personagemLocal.anims.play('dan-correndo-direita', true)
+            this.direcaoAtual = 'direita'
+            break
+          case 45:
+            this.personagemLocal.anims.play('dan-correndo-baixo-direita', true)
+            this.direcaoAtual = 'baixo-direita'
+            break
+          case 90:
+            this.personagemLocal.anims.play('dan-correndo-baixo', true)
+            this.direcaoAtual = 'baixo'
+            break
+          case 135:
+            this.personagemLocal.anims.play('dan-correndo-baixo-esquerda', true)
+            this.direcaoAtual = 'baixo-esquerda'
+            break
+          case 180:
+            this.personagemLocal.anims.play('dan-correndo-esquerda', true)
+            this.direcaoAtual = 'esquerda'
+            break
+          case 225:
+            this.personagemLocal.anims.play('dan-correndo-cima-esquerda', true)
+            this.direcaoAtual = 'cima-esquerda'
+            break
+          case 270:
+            this.personagemLocal.anims.play('dan-correndo-cima', true)
+            this.direcaoAtual = 'cima'
+            break
+          case 315:
+            this.personagemLocal.anims.play('dan-correndo-cima-direita', true)
+            this.direcaoAtual = 'cima-direita'
+            break
+          case 360:
+            this.personagemLocal.anims.play('dan-correndo-direita', true)
+            this.direcaoAtual = 'direita'
+            break
+        }
+      } else {
+        // Animação do personagem conforme a direção do movimento
+        switch (this.direcao) {
+          case 0:
+            this.personagemLocal.anims.play('personagem-andando-direita', true)
+            this.direcaoAtual = 'direita'
+            break
+          case 45:
+            this.personagemLocal.anims.play('personagem-andando-baixo-direita', true)
+            this.direcaoAtual = 'baixo-direita'
+            break
+          case 90:
+            this.personagemLocal.anims.play('personagem-andando-baixo', true)
+            this.direcaoAtual = 'baixo'
+            break
+          case 135:
+            this.personagemLocal.anims.play('personagem-andando-baixo-esquerda', true)
+            this.direcaoAtual = 'baixo-esquerda'
+            break
+          case 180:
+            this.personagemLocal.anims.play('personagem-andando-esquerda', true)
+            this.direcaoAtual = 'esquerda'
+            break
+          case 225:
+            this.personagemLocal.anims.play('personagem-andando-cima-esquerda', true)
+            this.direcaoAtual = 'cima-esquerda'
+            break
+          case 270:
+            this.personagemLocal.anims.play('personagem-andando-cima', true)
+            this.direcaoAtual = 'cima'
+            break
+          case 315:
+            this.personagemLocal.anims.play('personagem-andando-cima-direita', true)
+            this.direcaoAtual = 'cima-direita'
+            break
+          case 360:
+            this.personagemLocal.anims.play('personagem-andando-direita', true)
+            this.direcaoAtual = 'direita'
+            break
+        }
       }
 
     } else {
