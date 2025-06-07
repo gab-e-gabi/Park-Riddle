@@ -185,7 +185,7 @@ export default class abertura extends Phaser.Scene {
           this.personagemLocal.movimento = 'correndo'
         })
         .on('pointerup', () => {
-          this.speed = 90
+          this.speed = 75
           this.frameRate = 18
           this.personagemLocal.movimento = 'andando'
         })
@@ -227,7 +227,7 @@ export default class abertura extends Phaser.Scene {
               this.maisProximaAngulo = Phaser.Math.Angle.Between(this.personagemLocal.x, this.personagemLocal.y, pista.x, pista.y)
             }
           }
-        });
+        })
 
         if (!this.particulaAcaoLocal.visible) {
           this.botaoAcao.setFrame(1)
@@ -380,7 +380,6 @@ export default class abertura extends Phaser.Scene {
           }
 
           this.personagemLocal.on('animationcomplete', () => {
-            console.log('completa')
             this.personagemLocalAcao = false
             this.botaoAcao.setFrame(0)
             this.tiroSom.stop()
@@ -397,15 +396,14 @@ export default class abertura extends Phaser.Scene {
               .setActive(true)
               .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
 
-              const frame_tiro = this.anims.get(`personagem-acao-${this.direcaoAtual}`).getFrameAt(8)
-              this.personagemLocal.anims.setCurrentFrame(frame_tiro)
-              this.personagemLocal.anims.reverse()
+              this.time.delayedCall(100, () => {
+                const frame_tiro = this.anims.get(`personagem-acao-${this.direcaoAtual}`).getFrameAt(8)
+                this.personagemLocal.anims.setCurrentFrame(frame_tiro)
+                this.personagemLocal.anims.reverse()
+              })
 
 
               this.time.delayedCall(600, () => {
-                console.log(this.personagemLocal.anims.currentFrame.index)
-
-                console.log('terminou')
                 this.particulaAcaoLocal
                   .setVisible(false)
                   .setActive(false)
@@ -619,7 +617,6 @@ export default class abertura extends Phaser.Scene {
 
     //Animações dan correndo
     if (this.personagemLocal.texture.key == 'dan') {
-      console.log('Criando animações do Dan')
       this.anims.create({
         key: 'dan-correndo-baixo',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 208, end: 220 }),
@@ -736,7 +733,7 @@ export default class abertura extends Phaser.Scene {
       this.ultimoAngulo = angle
     }
 
-    if (this.personagemLocal.movimento == 'andando' && this.personagemLocal.stamina != 650) {
+    if ((this.personagemLocal.movimento == 'andando' && this.personagemLocal.stamina != 650) ) {
       this.personagemLocal.stamina += 1
       this.barraStamina.radius = this.personagemLocal.stamina / 50
 
