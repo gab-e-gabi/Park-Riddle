@@ -10,7 +10,7 @@ export default {
     default: 'arcade',
     arcade: {
       gravity: { x: 0, y: 0 },
-      debug: false // <<<<< pfvr deixar true
+      debug: true // <<<<< pfvr deixar true
     }
   },
   scale: {
