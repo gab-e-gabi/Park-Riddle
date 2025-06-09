@@ -6,7 +6,7 @@ export default class Abertura extends Phaser.Scene {
 
   preload() {
     this.load.image('fundo', 'assets/abertura-fundo.png')
-    this.load.spritesheet('botao', 'assets/botao.png', {
+    this.load.spritesheet('botao', 'assets/UI/botao.png', {
       frameWidth: 153,
       frameHeight: 59
     })

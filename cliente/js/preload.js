@@ -13,13 +13,17 @@ export default class abertura extends Phaser.Scene {
   }
 
   preload () {
-    this.load.spritesheet('botao', 'assets/botao.png', {
+    this.load.spritesheet('botao', 'assets/UI/botao.png', {
       frameWidth: 64,
       frameHeight: 64
     })
-    this.load.spritesheet('numeros', 'assets/numeros.png', {
+    this.load.spritesheet('numeros', 'assets/UI/numeros.png', {
       frameWidth: 96,
       frameHeight: 96
+    });
+    this.load.spritesheet('lupa', 'assets/UI/lupa.png', {
+      frameWidth: 32,
+      frameHeight: 32
     });
     this.load.spritesheet('Dan', 'assets/dan.png', {
       frameWidth: 64,
