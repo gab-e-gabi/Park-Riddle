@@ -17,8 +17,6 @@ export default class abertura extends Phaser.Scene {
     this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
     this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
 
-    this.textures.generate('pista-obj', { data: ['1'], pixelWidth: 30, pixelHeight: 30 });
-
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -77,6 +75,7 @@ export default class abertura extends Phaser.Scene {
     this.load.audio('chuva', 'assets/audio/chuva.wav')
     this.load.audio('passos', 'assets/audio/passos.mp3')
     this.load.audio('tiro', 'assets/audio/tiro.mp3')
+    this.load.audio('som-fantasma', 'assets/audio/somFantasma.mp3')
 
     this.input.addPointer()
   }
@@ -96,6 +95,7 @@ export default class abertura extends Phaser.Scene {
       volume: 0.5,
     })
     this.tiroSom = this.sound.add('tiro')
+    this.fantasmaSom = this.sound.add('som-fantasma')
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
@@ -205,7 +205,7 @@ export default class abertura extends Phaser.Scene {
       this.particulaAcaoLocal = this.physics.add.sprite(0, 0, 'fumaca', 0)
         .setVisible(false)
         .setActive(false)
-      this.particulaAcaoLocal.depth = 99
+      this.particulaAcaoLocal.depth = 100
       this.particulaAcaoLocal.movendo = false
 
       this.particulaAcaoRemota = this.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'bullet')
@@ -220,6 +220,7 @@ export default class abertura extends Phaser.Scene {
         let distancia_pista = 0
         let mais_proxima = 10000
         let sobra_pista = 0
+        this.maisProximaAngulo = 0
 
         this.pistas.forEach((pista,) => {
           if (pista.objeto.visible) {
@@ -251,18 +252,17 @@ export default class abertura extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
               this.personagemLocal.anims.pause()
               this.particulaAcaoLocal
-                .setPosition(this.personagemLocal.x + Math.cos(this.ultimoAngulo) * 40, this.personagemLocal.y + Math.sin(this.ultimoAngulo) * 40)
+                .setPosition(this.personagemLocal.x + Math.cos(this.ultimoAngulo) * 30, this.personagemLocal.y + Math.sin(this.ultimoAngulo) * 30)
                 .setFrame(0)
                 .setVisible(true)
                 .setActive(true)
               this.time.delayedCall(150, () => {
                 this.personagemLocal.anims.resume()
-                this.particulaAcaoLocal.setVelocity(Math.round(Math.cos(this.maisProximaAngulo)) * 35 * sobra_pista, Math.round(Math.sin(this.maisProximaAngulo) * 35 * sobra_pista))
+                this.particulaAcaoLocal.setVelocity(Math.cos(this.maisProximaAngulo) * 35 * sobra_pista, Math.sin(this.maisProximaAngulo) * 35 * sobra_pista)
               })
               this.time.delayedCall(1000, () => {
                 this.particulaAcaoLocal.anims.play('fumaca-desfazendo')
                 this.particulaAcaoLocal.on('animationcomplete', () => {
-
                   this.particulaAcaoLocal
                     .setVisible(false)
                     .setActive(false)
@@ -276,9 +276,7 @@ export default class abertura extends Phaser.Scene {
       })
 
 
-      // this.fantasmaRemoto = this.add.sprite(0, 0, 'fantasma')
-      // this.fantasma = this.add.sprite(0, 0, 'fantasma').setAlpha(0)
-
+      this.fantasmaRemoto = this.add.sprite(0, 0, 'fantasma')
 
 
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
@@ -405,7 +403,7 @@ export default class abertura extends Phaser.Scene {
                 .setPosition(this.personagemLocal.x, this.personagemLocal.y)
                 .setVisible(true)
                 .setActive(true)
-                .setVelocity(Math.round(Math.cos(this.ultimoAngulo)) * 1000, Math.round(Math.sin(this.ultimoAngulo) * 1000))
+                .setVelocity(Math.cos(this.ultimoAngulo) * 1000, Math.sin(this.ultimoAngulo) * 1000)
 
               this.time.delayedCall(100, () => {
                 const frame_tiro = this.anims.get(`personagem-acao-${this.direcaoAtual}`).getFrameAt(8)
@@ -426,24 +424,38 @@ export default class abertura extends Phaser.Scene {
         }
       })
 
+      this.fantasma = this.physics.add.sprite(0, 0, 'fantasma').setVisible(false)
+      this.fantasma.visivel = false
+      this.fantasma.atacando = false
 
-
-      this.fantasma = this.physics.add.sprite(this.personagemLocal.x, this.personagemLocal.y, 'fantasma')
-      .setVisible(true)
-
-      this.physics.add.overlap(this.fantasma, this.particulaAcaoLocal, () => {
-        this.fantasma.emit('invisivel')
-        this.fantasma.setVisible(false)
+      this.time.delayedCall(1000, () => { //Primeiro fantasma >>>>> 60s
+        this.fantasma.visivel = true
+        this.fantasma.atacando = true
       })
 
-      this.fantasma.on('invisivel', () => {
-        this.time.delayedCall(2000, () => {
-          this.fantasma.setVisible(true)
+      this.physics.add.overlap(this.fantasma, this.particulaAcaoLocal, () => {
+
+        this.fantasma.anims.play('fantasma-acertado', true).yoyo=true
+
+        this.fantasma.on('animationcomplete', () => {
+          this.fantasma.emit('invisivel')
         })
       })
 
+      this.fantasma.on('invisivel', () => {
+        this.fantasma.setFrame(0)
+        this.fantasmaAngulo = 0
+        this.fantasmaDistancia = 150
+        this.fantasma.visivel = false
 
-
+        
+        this.time.delayedCall(1000, () => { //tempo de spawn dos fantasmas >>>> 30s
+          this.fantasma
+            .setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
+          this.fantasma.visivel = true
+          this.fantasma.atacando = true
+          })
+        })
 
     } else {
       window.alert("Sala cheia!")
@@ -476,6 +488,7 @@ export default class abertura extends Phaser.Scene {
         this.fantasmaRemoto.x = dados.fantasma.x,
         this.fantasmaRemoto.y = dados.fantasma.y,
         this.fantasmaRemoto.visible = dados.fantasma.visivel
+        this.fantasmaRemoto.setFrame(dados.fantasma.frame)
       }
 
       if (dados.pistas) {
@@ -658,41 +671,49 @@ export default class abertura extends Phaser.Scene {
         key: 'dan-correndo-baixo',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 208, end: 220 }),
         frameRate: 18,
-      })
+        repeat:-1
+        })
       this.anims.create({
         key: 'dan-correndo-cima',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 221, end: 233 }),
         frameRate: 18,
+        repeat: -1
       })
       this.anims.create({
         key: 'dan-correndo-esquerda',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 234, end: 246 }),
         frameRate: 18,
+        repeat: -1
       })
       this.anims.create({
         key: 'dan-correndo-direita',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 247, end: 259 }),
         frameRate: 18,
+        repeat: -1
       })
       this.anims.create({
         key: 'dan-correndo-cima-esquerda',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 260, end: 272 }),
         frameRate: 18,
+        repeat: -1
       })
       this.anims.create({
         key: 'dan-correndo-cima-direita',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 273, end: 285 }),
         frameRate: 18,
+        repeat: -1
       })
       this.anims.create({
         key: 'dan-correndo-baixo-esquerda',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 286, end: 298 }),
         frameRate: 18,
+        repeat: -1
       })
       this.anims.create({
         key: 'dan-correndo-baixo-direita',
         frames: this.anims.generateFrameNumbers(this.personagemLocal.texture.key, { start: 299, end: 311 }),
         frameRate: 18,
+        repeat: -1
       })
     }
 
@@ -700,6 +721,12 @@ export default class abertura extends Phaser.Scene {
       key: 'fumaca-desfazendo',
       frames: this.anims.generateFrameNumbers('fumaca', { start: 0, end: 4 }),
       frameRate: 6,
+    })
+    this.anims.create({
+      key: 'fantasma-acertado',
+      frames: this.anims.generateFrameNumbers('fantasma', {start: 0, end: 1}),
+      frameRate: 12,
+      repeat: 3
     })
 
     //Camada para escurecer o fundo
@@ -734,7 +761,7 @@ export default class abertura extends Phaser.Scene {
     ]
 
     this.pistas.forEach((pista) => {
-      pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'pista-obj')
+      pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'lupa')
       this.physics.add.overlap(this.personagemLocal, pista.objeto, (personagem, pista) => { pista.disableBody(true, true) }, null, this)
     });
 
@@ -753,7 +780,7 @@ export default class abertura extends Phaser.Scene {
   }
 
   update() {
-
+    
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
@@ -837,6 +864,23 @@ export default class abertura extends Phaser.Scene {
 
     this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
     this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
+
+    if (this.personagemLocal.texture.key == 'dan' && this.fantasma.atacando) {
+      this.fantasmaSom.play()
+
+      Phaser.Math.RotateAroundDistance(this.fantasma, this.personagemRemoto.x, this.personagemRemoto.y, this.fantasmaAngulo, this.fantasmaDistancia);
+      this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00001);
+      this.fantasmaDistancia -= 0.1
+
+      if (this.fantasmaDistancia < -20) {
+        this.fantasma.atacando = false
+        this.fantasma.emit('invisivel')
+        //ernesto toma dano
+      }
+    }
+      if (this.personagemLocal.texture.key == 'ernesto' && this.fantasmaRemoto.visivel) {
+        this.fantasmaSom.play()
+      }
 
     if (((this.threshold < force) && (force <= 1000)) && (this.personagemLocalAcao != true)) {
 
@@ -993,14 +1037,21 @@ export default class abertura extends Phaser.Scene {
                 y: this.particulaAcaoLocal.y,
                 frame: this.particulaAcaoLocal.frame.name
               },
-              // fantasma:{
-              //   x: this.fantasma.x,
-              //   y: this.fantasma.y,
-              //   visivel: this.fantasma.visible
-              // },
               pistas: this.pistas.map(pista => ({ visible: pista.objeto.visible })),
             })
           );
+        }
+        if (this.fantasma) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              fantasma:{
+                x: this.fantasma.x,
+                y: this.fantasma.y,
+                visivel: this.fantasma.visivel,
+                frame: this.fantasma.frame.name
+              },
+            })
+          )
         }
       }
     } catch (error) {
