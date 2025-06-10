@@ -1,6 +1,6 @@
 /*global Phaser*/
 /*eslint no-undef: "error"*/
-export default class abertura extends Phaser.Scene {
+export default class patio extends Phaser.Scene {
 
   constructor() {
     super('patio')
@@ -76,7 +76,7 @@ export default class abertura extends Phaser.Scene {
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
     this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
-    this.load.audio('chuva', 'assets/audio/chuva.wav')
+    this.load.audio('chuva', 'assets/audio/chuva.mp3')
     this.load.audio('passos', 'assets/audio/passos.mp3')
     this.load.audio('tiro', 'assets/audio/tiro.mp3')
     this.load.audio('som-fantasma', 'assets/audio/somFantasma.mp3')
@@ -222,8 +222,6 @@ export default class abertura extends Phaser.Scene {
 
       this.botaoAcao.on('pointerdown', () => {
 
-        console.log(this.fantasmaRemoto.visible)
-
         //Acha a pista mais proxima
         let distancia_pista = 0
         let mais_proxima = 10000
@@ -287,15 +285,18 @@ export default class abertura extends Phaser.Scene {
 
       //vida
 
-      this.vidas = this.add.sprite(80, 30, 'vidas').setScrollFactor(0).setDisplaySize(90, 24).depth = 100
+      this.vidas = this.add.sprite(80, 30, 'vidas').setScrollFactor(0).setDisplaySize(90, 24)
+      this.vidas.depth = 100
 
-      let vidas = 3
+      var vidas = 0
       this.vidas.on('dano', () => {
-        if (vidas == 1) {
+        if (vidas == 2) {
           console.log('morreu')
+          this.flagMorte = true
         } else {
-          vidas -= 1
-          this.vidas.setFrame(vidas-1)
+          console.log(vidas)
+          vidas += 1
+          this.vidas.setFrame(vidas)
         }       
       })
 
@@ -517,6 +518,10 @@ export default class abertura extends Phaser.Scene {
             pista.objeto.disableBody(true, true)
           }
         })
+      }
+
+      if (dados.flagMorte) {
+        this.flagMorte = dados.flagMorte
       }
     };
 
@@ -887,12 +892,11 @@ export default class abertura extends Phaser.Scene {
     if (this.personagemLocal.texture.key == 'dan' && this.fantasma.atacando) {
       
       if (!this.fantasmaSom.isPlaying) {
-        console.log('ok')
         this.fantasmaSom.play()
       }
       Phaser.Math.RotateAroundDistance(this.fantasma, this.personagemRemoto.x, this.personagemRemoto.y, this.fantasmaAngulo, this.fantasmaDistancia);
       this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00002);
-      this.fantasmaDistancia -= 0.1
+      this.fantasmaDistancia -= 0.5
 
       if (this.fantasmaDistancia < -20) {
         this.fantasma.atacando = false
@@ -902,16 +906,17 @@ export default class abertura extends Phaser.Scene {
     }
 
       if (this.personagemLocal.texture.key == 'ernesto') {
-        console.log(this.fantasmaRemotoDistancia)
         //Vida de ernesto
-        this.fantasmaRemotoDistancia = Phaser.Math.Distance.Between(this.personagemLocal, this.fantasmaRemoto)
-
-        if (this.fantasmaRemotoDistancia < -20) {
-          this.vidas.emit('dano')
+        let temp = Math.round(Phaser.Math.Distance.BetweenPoints(this.personagemLocal, this.fantasmaRemoto))
+        if (this.fantasmaRemotoDistancia != temp) {
+          this.fantasmaRemotoDistancia = temp
+          if (this.fantasmaRemotoDistancia == 0 ) {
+            this.vidas.emit('dano')
+          }
         }
 
+
         if (this.fantasmaRemoto.visible && !this.fantasmaSom.isPlaying) {
-          console.log('ok')
           this.fantasmaSom.play()
           }
       }
@@ -1087,9 +1092,23 @@ export default class abertura extends Phaser.Scene {
             })
           )
         }
+
+        if (this.flagMorte) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              flagMorte: this.flagMorte
+            })
+          )
+        }
       }
     } catch (error) {
       console.error(error);
+    }
+    
+    if (this.flagMorte == true) {
+      this.sound.stopAll()
+      this.scene.stop()
+      this.scene.start('GameOver')
     }
   }
 }

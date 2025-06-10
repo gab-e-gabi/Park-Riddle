@@ -1,4 +1,4 @@
-export default class abertura extends Phaser.Scene {
+export default class GameOver extends Phaser.Scene {
 
   constructor () {
     super('GameOver')
@@ -6,9 +6,18 @@ export default class abertura extends Phaser.Scene {
 
   init () { }
 
-  preload () { }
+  preload () {
+    this.load.image('game-over', 'assets/GameOver.png')
+  }
 
-  create () { }
+  create () {
+    this.imagemFinal = this.add.image(0, 0, 'game-over').setInteractive()
+    .on('pointerdown', () => {
+      window.location.reload();
+    })
+    this.cameras.main.startFollow(this.imagemFinal)
+
+   }
 
   update () { }
 }

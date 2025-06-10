@@ -1,4 +1,4 @@
-export default class abertura extends Phaser.Scene {
+export default class sala extends Phaser.Scene {
   constructor () {
     super('sala')
   }

@@ -1,4 +1,4 @@
-export default class abertura extends Phaser.Scene {
+export default class preload extends Phaser.Scene {
 
   constructor () {
     super('preload')
@@ -21,55 +21,75 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 96,
       frameHeight: 96
     });
-    this.load.spritesheet('lupa', 'assets/UI/lupa.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    });
-    this.load.spritesheet('Dan', 'assets/dan.png', {
-      frameWidth: 64,
-      frameHeight: 64
-    }),
+
+    this.load.image('lanterna', 'assets/luz.png')
+    this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
+    this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
+
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
       frameHeight: 64
-    }),
-    this.load.spritesheet('gato', 'assets/gato-teste.png', {
+    })
+    this.load.spritesheet('fumaca', 'assets/fumaca.png', {
       frameWidth: 32,
-      frameHeight: 33
+      frameHeight: 32
     })
-    this.load.spritesheet('fantasmas', 'assets/fantasmas.png', {
-      frameWidth: 50,
-      frameHeight: 64
+    this.load.spritesheet('lupa', 'assets/UI/lupa.png', {
+      frameWidth: 32,
+      frameHeight: 32
     })
-    this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
-    frameWidth: 64,
-    frameHeight: 64
-    })
-    this.load.spritesheet('corrida', 'assets/UI/runUI.png', {
+
+    this.load.spritesheet('dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
     })
+
+    this.load.spritesheet('fantasma', 'assets/fantasmas.png', {
+      frameWidth: 50,
+      frameHeight: 64
+    })
+
     this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
       frameHeight: 32
     })
 
-this.load.image('ponteiro', 'assets/UI/seta.png')
+    this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('pista', 'assets/UI/hintUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('corrida', 'assets/UI/runUI.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    })
+    this.load.spritesheet('joystick', 'assets/UI/joystick.png', {
+      frameWidth: 96,
+      frameHeight: 96
+    })
+    this.load.spritesheet('vidas', 'assets/UI/vidas.png', {
+      frameWidth: 45,
+      frameHeight: 12
+    })
+    this.load.image('ponteiro', 'assets/UI/seta.png')
 
+    this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
+    this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
+    this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
+    this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
+    this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
 
-this.load.image('fundo', 'assets/abertura-fundo.png')
-this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
-this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
-this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
-this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
+    this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
-this.load.image('lanterna', 'assets/luz.png')
-this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
-
-this.load.audio('chuva', 'assets/audio/chuva.wav')
-this.load.audio('trilha-sonora', 'assets/audio/trilha-sonora.mp3')
-this.load.audio('passos', 'assets/audio/passos.mp3')
-this.load.audio('tiro', 'assets/audio/tiro.mp3')
+    this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
+    this.load.audio('chuva', 'assets/audio/chuva.mp3')
+    this.load.audio('passos', 'assets/audio/passos.mp3')
+    this.load.audio('tiro', 'assets/audio/tiro.mp3')
+    this.load.audio('som-fantasma', 'assets/audio/somFantasma.mp3')
+    this.load.audio('pega-pista', 'assets/audio/pegaPista.mp3')  
   }
 
 create() {
