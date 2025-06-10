@@ -61,6 +61,10 @@ export default class abertura extends Phaser.Scene {
       frameWidth: 96,
       frameHeight: 96
     })
+    this.load.spritesheet('vidas', 'assets/UI/vidas.png', {
+      frameWidth: 45,
+      frameHeight: 12
+    })
     this.load.image('ponteiro', 'assets/UI/seta.png')
 
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
@@ -76,6 +80,7 @@ export default class abertura extends Phaser.Scene {
     this.load.audio('passos', 'assets/audio/passos.mp3')
     this.load.audio('tiro', 'assets/audio/tiro.mp3')
     this.load.audio('som-fantasma', 'assets/audio/somFantasma.mp3')
+    this.load.audio('pega-pista', 'assets/audio/pegaPista.mp3')
 
     this.input.addPointer()
   }
@@ -96,6 +101,7 @@ export default class abertura extends Phaser.Scene {
     })
     this.tiroSom = this.sound.add('tiro')
     this.fantasmaSom = this.sound.add('som-fantasma')
+    this.pistaSom = this.sound.add('pega-pista')
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
@@ -216,6 +222,8 @@ export default class abertura extends Phaser.Scene {
 
       this.botaoAcao.on('pointerdown', () => {
 
+        console.log(this.fantasmaRemoto.visible)
+
         //Acha a pista mais proxima
         let distancia_pista = 0
         let mais_proxima = 10000
@@ -275,9 +283,21 @@ export default class abertura extends Phaser.Scene {
         }
       })
 
-
       this.fantasmaRemoto = this.add.sprite(0, 0, 'fantasma')
 
+      //vida
+
+      this.vidas = this.add.sprite(80, 30, 'vidas').setScrollFactor(0).setDisplaySize(90, 24).depth = 100
+
+      let vidas = 3
+      this.vidas.on('dano', () => {
+        if (vidas == 1) {
+          console.log('morreu')
+        } else {
+          vidas -= 1
+          this.vidas.setFrame(vidas-1)
+        }       
+      })
 
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
       this.game.localConnection = new RTCPeerConnection(this.game.iceServers);
@@ -762,7 +782,7 @@ export default class abertura extends Phaser.Scene {
 
     this.pistas.forEach((pista) => {
       pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'lupa')
-      this.physics.add.overlap(this.personagemLocal, pista.objeto, (personagem, pista) => { pista.disableBody(true, true) }, null, this)
+      this.physics.add.overlap(this.personagemLocal, pista.objeto, (personagem, pista) => { pista.disableBody(true, true), this.pistaSom.play()}, null, this)
     });
 
     this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
@@ -776,7 +796,6 @@ export default class abertura extends Phaser.Scene {
     })
       .setScrollFactor(0)
       .depth = 100
-
   }
 
   update() {
@@ -866,10 +885,13 @@ export default class abertura extends Phaser.Scene {
     this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
 
     if (this.personagemLocal.texture.key == 'dan' && this.fantasma.atacando) {
-      this.fantasmaSom.play()
-
+      
+      if (!this.fantasmaSom.isPlaying) {
+        console.log('ok')
+        this.fantasmaSom.play()
+      }
       Phaser.Math.RotateAroundDistance(this.fantasma, this.personagemRemoto.x, this.personagemRemoto.y, this.fantasmaAngulo, this.fantasmaDistancia);
-      this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00001);
+      this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00002);
       this.fantasmaDistancia -= 0.1
 
       if (this.fantasmaDistancia < -20) {
@@ -878,8 +900,20 @@ export default class abertura extends Phaser.Scene {
         //ernesto toma dano
       }
     }
-      if (this.personagemLocal.texture.key == 'ernesto' && this.fantasmaRemoto.visivel) {
-        this.fantasmaSom.play()
+
+      if (this.personagemLocal.texture.key == 'ernesto') {
+        console.log(this.fantasmaRemotoDistancia)
+        //Vida de ernesto
+        this.fantasmaRemotoDistancia = Phaser.Math.Distance.Between(this.personagemLocal, this.fantasmaRemoto)
+
+        if (this.fantasmaRemotoDistancia < -20) {
+          this.vidas.emit('dano')
+        }
+
+        if (this.fantasmaRemoto.visible && !this.fantasmaSom.isPlaying) {
+          console.log('ok')
+          this.fantasmaSom.play()
+          }
       }
 
     if (((this.threshold < force) && (force <= 1000)) && (this.personagemLocalAcao != true)) {
