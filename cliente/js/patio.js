@@ -40,6 +40,8 @@ export default class patio extends Phaser.Scene {
       frameHeight: 64
     })
 
+    this.load.image('mascara', 'assets/mascaraPlayer.png')
+
     this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
       frameHeight: 32
@@ -69,7 +71,7 @@ export default class patio extends Phaser.Scene {
 
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
-    this.load.image('arvores-verdes', 'assets/mapa/texturas/objetos/arvores-verdes.png')
+    this.load.image('arvores', 'assets/mapa/texturas/objetos/arvores.png')
     this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
     this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
 
@@ -106,7 +108,7 @@ export default class patio extends Phaser.Scene {
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
     this.tilesetChao = this.tilemapMapa.addTilesetImage('chao')
-    this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores-verdes')
+    this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores')
     this.tilesetTendasLLD = this.tilemapMapa.addTilesetImage('tendaLLD')
     this.tilesetTendas = this.tilemapMapa.addTilesetImage('tenda')
     //
@@ -114,16 +116,18 @@ export default class patio extends Phaser.Scene {
     //Diz qual imagem esta em qual camada
     this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetChao])
     this.layerCaminho = this.tilemapMapa.createLayer('caminho', [this.tilesetChao])
-
+    
     this.lanternaLocal = this.add.image(0, 0, 'lanterna')
     this.lanternaLocal
       .setAlpha(0.7)
       .setBlendMode(Phaser.BlendModes.ADD)
-
-    this.lanternaRemota = this.add.image(0, 0, 'lanterna')
-    this.lanternaRemota
+      
+      this.lanternaRemota = this.add.image(0, 0, 'lanterna')
+      this.lanternaRemota
       .setAlpha(0.7)
       .setBlendMode(Phaser.BlendModes.ADD)
+      
+      this.layerPlayerSobrepoe = this.tilemapMapa.createLayer('playerSobrepoe', [this.tilesetArvores])
 
     if (this.game.jogadores.primeiro === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
@@ -218,7 +222,7 @@ export default class patio extends Phaser.Scene {
         .setDisplaySize(5, 5)
         .setTint(0xffff00)
         .setBlendMode(Phaser.BlendModes.ADD)
-      this.particulaAcaoRemota.depth = 99
+      this.particulaAcaoRemota.depth = 100
 
       this.botaoAcao.on('pointerdown', () => {
 
@@ -282,23 +286,25 @@ export default class patio extends Phaser.Scene {
       })
 
       this.fantasmaRemoto = this.add.sprite(0, 0, 'fantasma')
+      this.fantasmaRemoto.depth = 99
+
 
       //vida
 
       this.vidas = this.add.sprite(80, 30, 'vidas').setScrollFactor(0).setDisplaySize(90, 24)
       this.vidas.depth = 100
 
-      var vidas = 0
-      this.vidas.on('dano', () => {
-        if (vidas == 2) {
-          console.log('morreu')
-          this.flagMorte = true
-        } else {
-          console.log(vidas)
-          vidas += 1
-          this.vidas.setFrame(vidas)
-        }       
-      })
+      // var vidas = 0
+      // this.vidas.on('dano', () => {
+      //   if (vidas == 2) {
+      //     console.log('morreu')
+      //     this.flagMorte = true
+      //   } else {
+      //     console.log(vidas)
+      //     vidas += 1
+      //     this.vidas.setFrame(vidas)
+      //   }       
+      // })
 
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
       this.game.localConnection = new RTCPeerConnection(this.game.iceServers);
@@ -541,12 +547,17 @@ export default class patio extends Phaser.Scene {
       this.layerChao.width,
       this.layerChao.height)
 
-    this.personagemLocal.setSize(32, 48)
-    this.personagemLocal.setOffset(16, 16)
+    this.personagemLocal.setSize(40, 2)
+    this.personagemLocal.setOffset(12, 6)
     this.personagemLocal.setCollideWorldBounds(true)
 
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.physics.add.collider(this.personagemLocal, this.layerObjetos)
+
+    this.imagemMascara = this.add.image(0, 0, 'mascara').setVisible(false)
+    this.mascara = this.imagemMascara.createBitmapMask()
+    this.mascara.invertAlpha = true
+    this.layerObjetos.setMask(this.mascara)
 
     //Animacoes do personagem andando
     this.anims.create({
@@ -957,17 +968,13 @@ export default class patio extends Phaser.Scene {
       //Altera pitch dos passos
       let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
       this.passos.setDetune(Modulado)
-
-      //Retorna o frame atual na animação
       this.frameAtual = this.personagemLocal.anims.currentFrame.index;
-
-      //Frames do ernesto com o pé no chao
       const pesNoChao = [4, 10]
-
-      //Toca som de passos quando o pé toca o chão
       if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
         this.passos.play()
       }
+
+      this.imagemMascara.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
       //Animações somente para o Dan
       if (this.personagemLocal.texture.key == 'dan' && this.personagemLocal.movimento == 'correndo') {
