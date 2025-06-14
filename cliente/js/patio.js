@@ -126,8 +126,22 @@ export default class patio extends Phaser.Scene {
       this.lanternaRemota
       .setAlpha(0.7)
       .setBlendMode(Phaser.BlendModes.ADD)
-      
-      this.layerPlayerSobrepoe = this.tilemapMapa.createLayer('playerSobrepoe', [this.tilesetArvores])
+
+    this.pistas = [
+      { x: 160, y: 740 },
+      { x: 480, y: 1000 },
+      { x: 960, y: 1115 },
+      { x: 1570, y: 780 },
+      { x: 1470, y: 180 },
+      { x:600, y: 400},
+    ]
+    this.areaColeta = this.physics.add.image(0, 0, null).setSize(32, 40).setVisible(false)
+    this.pistas.forEach((pista) => {
+      pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'lupa')
+      this.physics.add.overlap(this.areaColeta, pista.objeto, (personagem, pista) => { pista.disableBody(true, true), this.pistaSom.play()}, null, this)
+    });
+    
+    this.layerPlayerSobrepoe = this.tilemapMapa.createLayer('playerSobrepoe', [this.tilesetArvores])
 
     if (this.game.jogadores.primeiro === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
@@ -179,6 +193,10 @@ export default class patio extends Phaser.Scene {
       this.frameRate = 18
       this.personagemLocal.stamina = 650
       this.personagemLocal.cansado = false
+
+      this.tempoUltimoDano = 0
+      this.invulneravel = false
+      this.tempoInvulnerabilidade = 1000
 
       this.barraStaminaMeio = this.add.circle(0, 0, 150 / 50, 0x000000)
       this.barraStaminaMeio.depth = 102
@@ -294,17 +312,18 @@ export default class patio extends Phaser.Scene {
       this.vidas = this.add.sprite(80, 30, 'vidas').setScrollFactor(0).setDisplaySize(90, 24)
       this.vidas.depth = 100
 
-      // var vidas = 0
-      // this.vidas.on('dano', () => {
-      //   if (vidas == 2) {
-      //     console.log('morreu')
-      //     this.flagMorte = true
-      //   } else {
-      //     console.log(vidas)
-      //     vidas += 1
-      //     this.vidas.setFrame(vidas)
-      //   }       
-      // })
+      var vidas = 0
+      this.vidas.on('dano', () => {
+        if (vidas == 2) {
+          console.log('morreu')
+          // this.flagMorte = true
+          vidas = -1
+        } else {
+          console.log(vidas)
+          vidas += 1
+          this.vidas.setFrame(vidas)
+        }
+      })
 
     } else if (this.game.jogadores.segundo === this.game.socket.id) {
       this.game.localConnection = new RTCPeerConnection(this.game.iceServers);
@@ -353,7 +372,7 @@ export default class patio extends Phaser.Scene {
 
       this.personagemLocal = this.physics.add.sprite(1000, 1248, 'dan')
       this.personagemRemoto = this.add.sprite(936, 1248, 'ernesto')
-      this.speed = 300
+      this.speed = 90
       this.frameRate = 18
       this.personagemLocal.stamina = 650
       this.personagemLocal.cansado = false
@@ -372,7 +391,7 @@ export default class patio extends Phaser.Scene {
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
-          this.speed = 150
+          this.speed = 170
           this.frameRate = 25
           this.personagemLocal.movimento = 'correndo'
         })
@@ -508,6 +527,7 @@ export default class patio extends Phaser.Scene {
       if (dados.particula) {
         this.particulaAcaoRemota.x = dados.particula.x;
         this.particulaAcaoRemota.y = dados.particula.y;
+        this.particulaAcaoRemota.visible = dados.particula.visivel
         this.particulaAcaoRemota.setFrame(dados.particula.frame);
       }
 
@@ -781,6 +801,7 @@ export default class patio extends Phaser.Scene {
       .setScrollFactor(0)
 
     this.ponteiro = this.physics.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'ponteiro').setDisplaySize(80, 64)
+    this.ponteiro.depth = 100
 
     this.joystick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
       x: 100,
@@ -789,17 +810,6 @@ export default class patio extends Phaser.Scene {
       base: this.add.sprite(120, 360, 'joystick', 0),
       thumb: this.add.sprite(120, 360, 'joystick', 1)
     })
-
-    this.pistas = [
-      { x: 1000, y: 1000 },
-      { x: 1050, y: 1000 },
-      { x: 1100, y: 1000 },
-    ]
-
-    this.pistas.forEach((pista) => {
-      pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'lupa')
-      this.physics.add.overlap(this.personagemLocal, pista.objeto, (personagem, pista) => { pista.disableBody(true, true), this.pistaSom.play()}, null, this)
-    });
 
     this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
       if (this.scale.isFullscreen) {
@@ -912,20 +922,26 @@ export default class patio extends Phaser.Scene {
       if (this.fantasmaDistancia < -20) {
         this.fantasma.atacando = false
         this.fantasma.emit('invisivel')
-        //ernesto toma dano
       }
     }
 
       if (this.personagemLocal.texture.key == 'ernesto') {
-        //Vida de ernesto
-        let temp = Math.round(Phaser.Math.Distance.BetweenPoints(this.personagemLocal, this.fantasmaRemoto))
-        if (this.fantasmaRemotoDistancia != temp) {
-          this.fantasmaRemotoDistancia = temp
-          if (this.fantasmaRemotoDistancia == 0 ) {
-            this.vidas.emit('dano')
-          }
-        }
 
+      const agora = this.time.now;
+      const distancia = Phaser.Math.Distance.BetweenPoints(this.personagemLocal, this.fantasmaRemoto);
+
+      if (this.fantasmaRemoto.visible &&
+        distancia < 10 && // tolerância de colisão
+        !this.invulneravel
+      ) {
+        this.vidas.emit('dano');
+        this.invulneravel = true;
+        this.tempoUltimoDano = agora;
+      }
+
+      if (this.invulneravel && agora - this.tempoUltimoDano > this.tempoInvulnerabilidade) {
+        this.invulneravel = false;
+}
 
         if (this.fantasmaRemoto.visible && !this.fantasmaSom.isPlaying) {
           this.fantasmaSom.play()
@@ -960,6 +976,9 @@ export default class patio extends Phaser.Scene {
 
       this.personagemLocal.setVelocity(velocityX, velocityY)
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
+      this.areaColeta.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+      
+      this.imagemMascara.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
       this.barraStamina.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
@@ -974,7 +993,6 @@ export default class patio extends Phaser.Scene {
         this.passos.play()
       }
 
-      this.imagemMascara.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
       //Animações somente para o Dan
       if (this.personagemLocal.texture.key == 'dan' && this.personagemLocal.movimento == 'correndo') {
@@ -1081,7 +1099,8 @@ export default class patio extends Phaser.Scene {
               particula: {
                 x: this.particulaAcaoLocal.x,
                 y: this.particulaAcaoLocal.y,
-                frame: this.particulaAcaoLocal.frame.name
+                frame: this.particulaAcaoLocal.frame.name,
+                visivel: this.particulaAcaoLocal.visible
               },
               pistas: this.pistas.map(pista => ({ visible: pista.objeto.visible })),
             })
