@@ -147,7 +147,7 @@ export default class patio extends Phaser.Scene {
         this.pistaSom.play(),
         this.pistasEncontradas += 1,
         contador.text = `Pistas: ${this.pistasEncontradas} / 6`
-        if (this.pistasEncontradas == 1) {
+        if (this.pistasEncontradas == 6) {
           this.flagVenceu = true
         }
       }, null, this)
