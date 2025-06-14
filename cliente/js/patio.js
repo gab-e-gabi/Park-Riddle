@@ -136,10 +136,22 @@ export default class patio extends Phaser.Scene {
       { x:600, y: 400},
     ]
     this.areaColeta = this.physics.add.image(0, 0, null).setSize(32, 40).setVisible(false)
+    
+    let contador = this.add.text(38, 45, 'Pistas: 0 / 6', { fontFamily: 'Arial', fontSize: 16, color: '#ffff00' }).setScrollFactor(0)
+    contador.depth = 100
+    this.pistasEncontradas = 0
     this.pistas.forEach((pista) => {
       pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'lupa')
-      this.physics.add.overlap(this.areaColeta, pista.objeto, (personagem, pista) => { pista.disableBody(true, true), this.pistaSom.play()}, null, this)
-    });
+      this.physics.add.overlap(this.areaColeta, pista.objeto, (personagem, pista) => {
+        pista.disableBody(true, true),
+        this.pistaSom.play(),
+        this.pistasEncontradas += 1,
+        contador.text = `Pistas: ${this.pistasEncontradas} / 6`
+        if (this.pistasEncontradas == 1) {
+          this.flagVenceu = true
+        }
+      }, null, this)
+    })
     
     this.layerPlayerSobrepoe = this.tilemapMapa.createLayer('playerSobrepoe', [this.tilesetArvores])
 
@@ -250,7 +262,7 @@ export default class patio extends Phaser.Scene {
         let sobra_pista = 0
         this.maisProximaAngulo = 0
 
-        this.pistas.forEach((pista,) => {
+        this.pistas.forEach((pista) => {
           if (pista.objeto.visible) {
             sobra_pista = 1
             distancia_pista = Phaser.Math.Distance.Between(this.personagemLocal.x, this.personagemLocal.y, pista.x, pista.y)
@@ -545,9 +557,19 @@ export default class patio extends Phaser.Scene {
           }
         })
       }
+      if (dados.pistasEncontradas) {
+        this.pistasRecebidas = dados.pistasEncontradas
+        if (this.pistasRecebidas > this.pistasEncontradas) {
+          this.pistasEncontradas = this.pistasRecebidas
+          contador.text = `Pistas: ${this.pistasEncontradas} / 6`
+        }
+      }
 
       if (dados.flagMorte) {
         this.flagMorte = dados.flagMorte
+      }
+      if (dados.flagVenceu) {
+        this.flagVenceu = dados.flagVenceu
       }
     };
 
@@ -1094,7 +1116,7 @@ export default class patio extends Phaser.Scene {
                 x: this.personagemLocal.x,
                 y: this.personagemLocal.y,
                 frame: this.personagemLocal.frame.name,
-                lanterna: this.ultimoAngulo
+                lanterna: this.ultimoAngulo,
               },
               particula: {
                 x: this.particulaAcaoLocal.x,
@@ -1103,6 +1125,7 @@ export default class patio extends Phaser.Scene {
                 visivel: this.particulaAcaoLocal.visible
               },
               pistas: this.pistas.map(pista => ({ visible: pista.objeto.visible })),
+              pistasEncontradas: this.pistasEncontradas
             })
           );
         }
@@ -1126,6 +1149,13 @@ export default class patio extends Phaser.Scene {
             })
           )
         }
+        if (this.flagVenceu) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              flagVenceu: this.flagVenceu
+            })
+          )
+        }
       }
     } catch (error) {
       console.error(error);
@@ -1135,6 +1165,11 @@ export default class patio extends Phaser.Scene {
       this.sound.stopAll()
       this.scene.stop()
       this.scene.start('GameOver')
+    }
+    if (this.flagVenceu == true) {
+      this.sound.stopAll()
+      this.scene.stop()
+      this.scene.start('Win')
     }
   }
 }

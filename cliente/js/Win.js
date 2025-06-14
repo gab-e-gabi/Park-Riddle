@@ -1,11 +1,20 @@
 /*global Phaser, axios*/
 /*eslint no-undef: "error"*/
-export default class finalFeliz extends Phaser.Scene {
+export default class Win extends Phaser.Scene {
   constructor () {
-    super("finalFeliz");
+    super("Win");
+  }
+
+  preload () {
+    this.load.image('abertura-fundo', 'assets/abertura-fundo.png')
   }
 
   create () {
+    this.imagemFinal = this.add.image(0, 0, 'abertura-fundo')
+    this.cameras.main.startFollow(this.imagemFinal)
+
+
+
     globalThis.google.accounts.id.initialize({
       client_id:
         "331191695151-ku8mdhd76pc2k36itas8lm722krn0u64.apps.googleusercontent.com",
