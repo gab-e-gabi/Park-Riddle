@@ -83,6 +83,7 @@ export default class patio extends Phaser.Scene {
     this.load.audio('tiro', 'assets/audio/tiro.mp3')
     this.load.audio('som-fantasma', 'assets/audio/somFantasma.mp3')
     this.load.audio('pega-pista', 'assets/audio/pegaPista.mp3')
+    this.load.audio('ernesto-machucado', 'assets/audio/ernesto-machucado.mp3')
 
     this.input.addPointer()
   }
@@ -101,8 +102,13 @@ export default class patio extends Phaser.Scene {
     this.passos = this.sound.add('passos', {
       volume: 0.5,
     })
+    this.fantasmaSom = this.sound.add('som-fantasma', {
+      volume: 0.3
+    })
+    this.machucadoSom = this.sound.add('ernesto-machucado', {
+      volume: 0.3
+    })
     this.tiroSom = this.sound.add('tiro')
-    this.fantasmaSom = this.sound.add('som-fantasma')
     this.pistaSom = this.sound.add('pega-pista')
 
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
@@ -208,7 +214,7 @@ export default class patio extends Phaser.Scene {
 
       this.tempoUltimoDano = 0
       this.invulneravel = false
-      this.tempoInvulnerabilidade = 1000
+      this.tempoInvulnerabilidade = 2000
 
       this.barraStaminaMeio = this.add.circle(0, 0, 150 / 50, 0x000000)
       this.barraStaminaMeio.depth = 102
@@ -326,10 +332,10 @@ export default class patio extends Phaser.Scene {
 
       var vidas = 0
       this.vidas.on('dano', () => {
+        this.machucadoSom.play()
         if (vidas == 2) {
           console.log('morreu')
           // this.flagMorte = true
-          vidas = -1
         } else {
           console.log(vidas)
           vidas += 1
@@ -482,11 +488,14 @@ export default class patio extends Phaser.Scene {
         }
       })
 
-      this.fantasma = this.physics.add.sprite(0, 0, 'fantasma').setVisible(false)
+      this.fantasma = this.physics.add.sprite(100, -100, 'fantasma').setVisible(false)
       this.fantasma.visivel = false
       this.fantasma.atacando = false
 
       this.time.delayedCall(1000, () => { //Primeiro fantasma >>>>> 60s
+        this.fantasma.setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
+        this.fantasmaAngulo = 0
+        this.fantasmaDistancia = 150
         this.fantasma.visivel = true
         this.fantasma.atacando = true
       })
@@ -494,22 +503,19 @@ export default class patio extends Phaser.Scene {
       this.physics.add.overlap(this.fantasma, this.particulaAcaoLocal, () => {
 
         this.fantasma.anims.play('fantasma-acertado', true).yoyo=true
-
         this.fantasma.on('animationcomplete', () => {
           this.fantasma.emit('invisivel')
         })
       })
-
+      
       this.fantasma.on('invisivel', () => {
         this.fantasma.setFrame(0)
-        this.fantasmaAngulo = 0
-        this.fantasmaDistancia = 150
         this.fantasma.visivel = false
-
         
-        this.time.delayedCall(1000, () => { //tempo de spawn dos fantasmas >>>> 30s
-          this.fantasma
-            .setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
+        this.time.delayedCall(3000, () => { //tempo de spawn dos fantasmas >>>> 30s
+          this.fantasma.setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
+          this.fantasmaAngulo = 0
+          this.fantasmaDistancia = 150
           this.fantasma.visivel = true
           this.fantasma.atacando = true
           })
@@ -814,13 +820,19 @@ export default class patio extends Phaser.Scene {
 
     //chuva
     this.particulaChuva = this.add.particles(0, -128, 'particula-chuva', {
-      x: { min: this.personagemLocal.x - 1200, max: this.personagemLocal.x },
-      quantity: 50,
-      lifespan: 4000,
-      speedY: { min: 400, max: 1800 },
-      gravityX: 20,
+      x: { min: this.personagemLocal.x - 1200, max: this.personagemLocal.x + 1200},
+      quantity: 50, // mais gotas
+      lifespan: 3500,
+      speedY: { min: 900, max: 2200 }, // mais rápido
+      speedX: { min: -120, max: 120 }, // vento lateral
+      angle: { min: 85, max: 95 },
+      scaleY: { min: 2.5, max: 5.5 }, // gotas maiores
+      scaleX: { min: 0.5, max: 1 },
+      alpha: { min: 0.7, max: 1 }, // mais opacas
+      blendMode: 'ADD' // mais brilho
     })
-      .setScrollFactor(0)
+      // .setScrollFactor(0)
+      this.particulaChuva.depth = 99
 
     this.ponteiro = this.physics.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'ponteiro').setDisplaySize(80, 64)
     this.ponteiro.depth = 100
@@ -832,6 +844,7 @@ export default class patio extends Phaser.Scene {
       base: this.add.sprite(120, 360, 'joystick', 0),
       thumb: this.add.sprite(120, 360, 'joystick', 1)
     })
+    this.joystick.depth = 100
 
     this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
       if (this.scale.isFullscreen) {
@@ -844,6 +857,7 @@ export default class patio extends Phaser.Scene {
     })
       .setScrollFactor(0)
       .depth = 100
+
   }
 
   update() {
@@ -938,10 +952,10 @@ export default class patio extends Phaser.Scene {
         this.fantasmaSom.play()
       }
       Phaser.Math.RotateAroundDistance(this.fantasma, this.personagemRemoto.x, this.personagemRemoto.y, this.fantasmaAngulo, this.fantasmaDistancia);
-      this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00002);
-      this.fantasmaDistancia -= 0.5
+      this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00003);
+      this.fantasmaDistancia -= 0.1
 
-      if (this.fantasmaDistancia < -20) {
+      if (this.fantasmaDistancia < 5) {
         this.fantasma.atacando = false
         this.fantasma.emit('invisivel')
       }
