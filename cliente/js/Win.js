@@ -6,11 +6,11 @@ export default class Win extends Phaser.Scene {
   }
 
   preload () {
-    this.load.image('abertura-fundo', 'assets/abertura-fundo.png')
+    this.load.image('final-feliz', 'assets/final-feliz.png')
   }
 
   create () {
-    this.imagemFinal = this.add.image(0, 0, 'abertura-fundo')
+    this.imagemFinal = this.add.image(0, 0, 'final-feliz')
     this.cameras.main.startFollow(this.imagemFinal)
 
 
