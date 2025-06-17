@@ -4,7 +4,8 @@ export default class sala extends Phaser.Scene {
   }
 
   create () {
-    
+    this.add.image(400, 225, 'fundo-sala');
+
     this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
       frameHeight: 32

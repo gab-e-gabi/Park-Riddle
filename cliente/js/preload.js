@@ -54,6 +54,8 @@ export default class preload extends Phaser.Scene {
       frameHeight: 32
     })
 
+    this.load.image('fundo-sala', 'assets/fundo-sala.png')
+
     this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
       frameWidth: 64,
       frameHeight: 64
