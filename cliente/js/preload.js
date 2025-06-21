@@ -81,7 +81,6 @@ export default class preload extends Phaser.Scene {
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
     this.load.image('arvores', 'assets/mapa/texturas/objetos/arvores.png')
-    this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
     this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)

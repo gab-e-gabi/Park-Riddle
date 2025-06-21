@@ -17,29 +17,30 @@ export default class Abertura extends Phaser.Scene {
 
     this.add.image(400, 225, 'fundo')
 
-    this.botao = this.add.sprite(400, 400, 'botao')
+    this.botao = this.add.image(400, 400, 'botao')
 
-    this.anims.create({
-      key: 'botao',
-      frames: this.anims.generateFrameNumbers('botao', { start: 0, end: 7 }),
-      frameRate: 10
-    })
 
     this.botao.setInteractive().on('pointerdown', () => {
-      this.botao.play('botao')
+      if (navigator.vibrate) {
+        navigator.vibrate(100)
+      } else {
+        console.log('Vibração não suportada')
+      }
       navigator.mediaDevices
         .getUserMedia({ video: false, audio: true })
         .then((stream) => {
           this.game.midias = stream
         })
         .catch((error) => console.error(error))
-        })
+        
+      })
 
-      if ('vibrate' in navigator) {
+    this.botao.on('pointerup', () => {
+      if (navigator.vibrate) {
         navigator.vibrate(100)
+      } else {
+        console.log('Vibração não suportada')
       }
-
-    this.botao.on('animationcomplete', () => {
       this.scene.stop()
       this.scene.start('preload')
     })

@@ -72,8 +72,7 @@ export default class patio extends Phaser.Scene {
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
     this.load.image('arvores', 'assets/mapa/texturas/objetos/arvores.png')
-    this.load.image('tendaLLD', 'assets/mapa/texturas/objetos/tendaLLD.png')
-    this.load.image('tenda', 'assets/mapa/texturas/objetos/tenda.png')
+    this.load.image('tendas', 'assets/mapa/texturas/objetos/tenda.png')
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
@@ -115,8 +114,7 @@ export default class patio extends Phaser.Scene {
     // Da um nome prar cada Tileset
     this.tilesetChao = this.tilemapMapa.addTilesetImage('chao')
     this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores')
-    this.tilesetTendasLLD = this.tilemapMapa.addTilesetImage('tendaLLD')
-    this.tilesetTendas = this.tilemapMapa.addTilesetImage('tenda')
+    this.tilesetTendas = this.tilemapMapa.addTilesetImage('tendas')
     //
 
     //Diz qual imagem esta em qual camada
@@ -159,7 +157,7 @@ export default class patio extends Phaser.Scene {
       }, null, this)
     })
     
-    this.layerPlayerSobrepoe = this.tilemapMapa.createLayer('playerSobrepoe', [this.tilesetArvores])
+    this.layerPlayerSobrepoe = this.tilemapMapa.createLayer('playerSobrepoe', [this.tilesetTendas, this.tilesetArvores])
 
     if (this.game.jogadores.primeiro === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
@@ -230,6 +228,7 @@ export default class patio extends Phaser.Scene {
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
+          console.log(this.personagemLocal.x, this.personagemLocal.y)
           this.speed = 150
           this.frameRate = 25
           this.personagemLocal.movimento = 'correndo'
@@ -579,8 +578,24 @@ export default class patio extends Phaser.Scene {
       }
     };
 
-    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores, this.tilesetTendas])
+    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
+    this.layerTendas = this.tilemapMapa.createLayer('tendas', [this.tilesetTendas])
 
+    // Desenha círculos ao redor dos tiles com propriedade meio == true
+    this.layerTendas.forEachTile(tile => {
+      if (tile.properties && tile.properties.lado === true) {
+        const worldX = tile.getCenterX();
+        const worldY = tile.getCenterY();
+        const tamanho = 80
+        this.colisaoTenda = [
+          this.physics.add.staticImage(worldX, worldY).setSize(tamanho*2,tamanho*2).setCircle(tamanho),
+          this.physics.add.staticImage(worldX, worldY+64).setSize(tamanho,tamanho).setCircle(tamanho/2),
+          this.physics.add.staticImage(worldX, worldY-48).setSize(tamanho + 16,tamanho + 16).setCircle((tamanho + 16)/2)
+        ]
+
+        this.physics.add.collider(this.personagemLocal, this.colisaoTenda)
+      }
+    });
     //Fisica do player
     this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
       .setBounds(
@@ -600,12 +615,14 @@ export default class patio extends Phaser.Scene {
     this.personagemLocal.setCollideWorldBounds(true)
 
     this.layerObjetos.setCollisionByProperty({ collides: true })
-    this.physics.add.collider(this.personagemLocal, this.layerObjetos)
+    this.layerTendas.setCollisionByProperty({ collides: true })
+    this.physics.add.collider(this.personagemLocal, [this.layerObjetos, this.layerTendas])
 
     this.imagemMascara = this.add.image(0, 0, 'mascara').setVisible(false)
     this.mascara = this.imagemMascara.createBitmapMask()
     this.mascara.invertAlpha = true
     this.layerObjetos.setMask(this.mascara)
+    this.layerTendas.setMask(this.mascara)
 
     //Animacoes do personagem andando
     this.anims.create({
@@ -857,11 +874,11 @@ export default class patio extends Phaser.Scene {
     })
       .setScrollFactor(0)
       .depth = 100
-
+    
   }
 
   update() {
-    
+
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
 
