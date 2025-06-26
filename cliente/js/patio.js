@@ -40,7 +40,8 @@ export default class patio extends Phaser.Scene {
       frameHeight: 64
     })
 
-    this.load.image('mascara', 'assets/mascaraPlayer.png')
+    this.load.image('mascaraPersonagem', 'assets/mascaraPlayer.png')
+    this.load.image('mascaraLanterna', 'assets/mascaraLanterna.png')
 
     this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
       frameWidth: 32,
@@ -123,16 +124,18 @@ export default class patio extends Phaser.Scene {
     
     this.lanternaLocal = this.add.image(0, 0, 'lanterna')
     this.lanternaLocal
+    .setAlpha(0.7)
+    .setBlendMode(Phaser.BlendModes.ADD)
+      
+    this.lanternaRemota = this.add.image(0, 0, 'lanterna')
+    this.lanternaRemota
       .setAlpha(0.7)
       .setBlendMode(Phaser.BlendModes.ADD)
       
-      this.lanternaRemota = this.add.image(0, 0, 'lanterna')
-      this.lanternaRemota
-      .setAlpha(0.7)
-      .setBlendMode(Phaser.BlendModes.ADD)
+    this.layerSombras = this.tilemapMapa.createLayer('sombras', [this.tilesetArvores])
 
-    this.pistas = [
-      { x: 160, y: 740 },
+      this.pistas = [
+        { x: 160, y: 740 },
       { x: 480, y: 1000 },
       { x: 960, y: 1115 },
       { x: 1570, y: 780 },
@@ -618,11 +621,18 @@ export default class patio extends Phaser.Scene {
     this.layerTendas.setCollisionByProperty({ collides: true })
     this.physics.add.collider(this.personagemLocal, [this.layerObjetos, this.layerTendas])
 
-    this.imagemMascara = this.add.image(0, 0, 'mascara').setVisible(false)
-    this.mascara = this.imagemMascara.createBitmapMask()
-    this.mascara.invertAlpha = true
-    this.layerObjetos.setMask(this.mascara)
-    this.layerTendas.setMask(this.mascara)
+    this.imagemMascaraPersonagem = this.add.image(0, 0, 'mascaraPersonagem').setVisible(false)
+    this.imagemMascaraLanterna = this.add.image(0, 0, 'mascaraLanterna').setVisible(false)
+    
+    this.mascaraPersonagem = this.imagemMascaraPersonagem.createBitmapMask()
+    this.mascaraPersonagem.invertAlpha=true
+    
+    this.mascaraLanterna = this.imagemMascaraLanterna.createBitmapMask()
+    this.mascaraLanterna.invertAlpha=true
+
+    this.layerSombras.setMask(this.mascaraLanterna)
+    this.layerObjetos.setMask(this.mascaraPersonagem)
+    this.layerTendas.setMask(this.mascaraPersonagem)
 
     //Animacoes do personagem andando
     this.anims.create({
@@ -1031,7 +1041,9 @@ export default class patio extends Phaser.Scene {
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
       this.areaColeta.setPosition(this.personagemLocal.x, this.personagemLocal.y)
       
-      this.imagemMascara.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+      this.imagemMascaraPersonagem.setPosition(this.personagemLocal.x, this.personagemLocal.y)
+      this.imagemMascaraLanterna.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
+      this.imagemMascaraLanterna.setRotation(this.ultimoAngulo)
 
       this.barraStamina.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
