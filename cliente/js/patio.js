@@ -94,12 +94,16 @@ export default class patio extends Phaser.Scene {
     this.trilha = this.sound.add("trilha-sonora", {
       loop: true,
       volume: 0.1,
-    }).play()
-    this.chuva = this.sound.add("chuva", {
+    })
+    this.trilha.play()
+
+    this.chuvaSom = this.sound.add("chuva", {
       loop: true,
       volume: 0.2
-    }).play()
-    this.passos = this.sound.add('passos', {
+    })
+    this.chuvaSom.play()
+
+    this.passosSom = this.sound.add('passos', {
       volume: 0.5,
     })
     this.fantasmaSom = this.sound.add('som-fantasma', {
@@ -110,14 +114,14 @@ export default class patio extends Phaser.Scene {
     })
     this.tiroSom = this.sound.add('tiro')
     this.pistaSom = this.sound.add('pega-pista')
-
+    
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
     this.tilesetChao = this.tilemapMapa.addTilesetImage('chao')
     this.tilesetArvores = this.tilemapMapa.addTilesetImage('arvores')
     this.tilesetTendas = this.tilemapMapa.addTilesetImage('tendas')
     //
-
+    
     //Diz qual imagem esta em qual camada
     this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetChao])
     this.layerCaminho = this.tilemapMapa.createLayer('caminho', [this.tilesetChao])
@@ -126,14 +130,14 @@ export default class patio extends Phaser.Scene {
     this.lanternaLocal
     .setAlpha(0.7)
     .setBlendMode(Phaser.BlendModes.ADD)
-      
+    
     this.lanternaRemota = this.add.image(0, 0, 'lanterna')
     this.lanternaRemota
       .setAlpha(0.7)
       .setBlendMode(Phaser.BlendModes.ADD)
       
-    this.layerSombras = this.tilemapMapa.createLayer('sombras', [this.tilesetArvores])
-
+      this.layerSombras = this.tilemapMapa.createLayer('sombras', [this.tilesetArvores,this.tilesetTendas])
+      
       this.pistas = [
         { x: 160, y: 740 },
       { x: 480, y: 1000 },
@@ -143,9 +147,11 @@ export default class patio extends Phaser.Scene {
       { x:600, y: 400},
     ]
     this.areaColeta = this.physics.add.image(0, 0, null).setSize(32, 40).setVisible(false)
-    
+
+    // Contador de pistas
     let contador = this.add.text(38, 45, 'Pistas: 0 / 6', { fontFamily: 'Arial', fontSize: 16, color: '#ffff00' }).setScrollFactor(0)
     contador.depth = 100
+
     this.pistasEncontradas = 0
     this.pistas.forEach((pista) => {
       pista.objeto = this.physics.add.sprite(pista.x, pista.y, 'lupa')
@@ -161,19 +167,19 @@ export default class patio extends Phaser.Scene {
     })
     
     this.layerPlayerSobrepoe = this.tilemapMapa.createLayer('playerSobrepoe', [this.tilesetTendas, this.tilesetArvores])
-
+    
     if (this.game.jogadores.primeiro === this.game.socket.id) {
       this.game.remoteConnection = new RTCPeerConnection(this.game.iceServers);
       this.game.dadosJogo = this.game.remoteConnection.createDataChannel(
         "dadosJogo",
         { negotiated: true, id: 0 },
       );
-
+      
       this.game.remoteConnection.onicecandidate = ({ candidate }) => {
         candidate &&
-          this.game.socket.emit("candidate", this.game.sala, candidate);
+        this.game.socket.emit("candidate", this.game.sala, candidate);
       };
-
+      
       this.game.remoteConnection.ontrack = ({ streams: [stream] }) => {
         this.game.audio.srcObject = stream;
       };
@@ -244,7 +250,7 @@ export default class patio extends Phaser.Scene {
         .depth = 100
 
       //Botão de Ação
-      this.botaoAcao = this.add.sprite(750, 350, 'pista', 0)
+      this.botaoAcao = this.add.sprite(750, 350, 'pista', 0, )
         .setInteractive()
         .setScrollFactor(0)
       this.botaoAcao.depth = 100
@@ -407,7 +413,7 @@ export default class patio extends Phaser.Scene {
       this.barraStaminaFundo.depth = 100
 
       //Botão de corrida
-      this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0)
+      this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0, )
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
@@ -423,7 +429,7 @@ export default class patio extends Phaser.Scene {
         .depth = 100
 
       //Botão de Ação
-      this.botaoAcao = this.add.sprite(750, 350, 'tiro', 0)
+      this.botaoAcao = this.add.sprite(750, 350, 'tiro', 0, )
         .setInteractive()
         .setScrollFactor(0)
       this.botaoAcao.depth = 100
@@ -604,14 +610,14 @@ export default class patio extends Phaser.Scene {
       .setBounds(
         0,
         0,
-        this.layerChao.width,
-        this.layerChao.height)
+        1920, 
+        1280)
 
     this.physics.world.setBounds(
       0,
-      0,
-      this.layerChao.width,
-      this.layerChao.height)
+      -16,
+      1920, 
+      1260)
 
     this.personagemLocal.setSize(40, 2)
     this.personagemLocal.setOffset(12, 6)
@@ -841,7 +847,7 @@ export default class patio extends Phaser.Scene {
     })
 
     //Camada para escurecer o fundo
-    this.noite = this.add.rectangle(1600, 1200, 1600, 1200, 0x472a66, 0.75)
+    this.noite = this.add.rectangle(960, 640, 1920, 1280, 0x472a66, 0.75)
     this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
     this.noite.depth = 99
 
@@ -849,7 +855,7 @@ export default class patio extends Phaser.Scene {
     this.particulaChuva = this.add.particles(0, -128, 'particula-chuva', {
       x: { min: this.personagemLocal.x - 1200, max: this.personagemLocal.x + 1200},
       quantity: 50, // mais gotas
-      lifespan: 3500,
+      lifespan: 2000,
       speedY: { min: 900, max: 2200 }, // mais rápido
       speedX: { min: -120, max: 120 }, // vento lateral
       angle: { min: 85, max: 95 },
@@ -868,8 +874,8 @@ export default class patio extends Phaser.Scene {
       x: 100,
       y: 360,
       radius: 50, // Raio do joystick
-      base: this.add.sprite(120, 360, 'joystick', 0),
-      thumb: this.add.sprite(120, 360, 'joystick', 1)
+      base: this.add.sprite(120, 360, 'joystick', 0, ),
+      thumb: this.add.sprite(120, 360, 'joystick', 1, )
     })
     this.joystick.depth = 100
 
@@ -884,7 +890,30 @@ export default class patio extends Phaser.Scene {
     })
       .setScrollFactor(0)
       .depth = 100
-    
+
+    // const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
+    const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    this.physics.add.overlap(entradaTendaE, this.personagemLocal, () => {
+      this.personagemLocal.setPosition(360, 2000)
+      this.physics.world.setBounds(
+        0,
+        1450,
+        1920,
+        1280
+      )
+      this.cameras.main.setBounds(
+        -50,
+        1450,
+        260,
+        680
+      )
+      this.lanternaLocal.setVisible(false)
+      this.lanternaRemota.setVisible(false)
+      this.trilha.stop()
+      this.chuvaSom.stop()
+      this.particulaChuva.quantity = 0
+      this.particulaChuva.alpha = 0
+    })
   }
 
   update() {
@@ -928,8 +957,6 @@ export default class patio extends Phaser.Scene {
 
     this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
     this.lanternaLocal.setRotation(this.ultimoAngulo)
-
-    this.noite.setPosition(this.personagemLocal.x, this.personagemLocal.y)
 
     let pathFinder = Phaser.Math.Angle.Between(this.ponteiro.x, this.ponteiro.y, this.personagemRemoto.x, this.personagemRemoto.y)
 
@@ -1051,11 +1078,11 @@ export default class patio extends Phaser.Scene {
 
       //Altera pitch dos passos
       let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
-      this.passos.setDetune(Modulado)
+      this.passosSom.setDetune(Modulado)
       this.frameAtual = this.personagemLocal.anims.currentFrame.index;
       const pesNoChao = [4, 10]
       if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
-        this.passos.play()
+        this.passosSom.play()
       }
 
 
