@@ -7,6 +7,7 @@ export default class patio extends Phaser.Scene {
     this.threshold = 1
     this.direcaoAtual = 'cima'
     this.personagemLocalAcao = false
+    this.flagDentro = false
   }
 
   init() { }
@@ -79,7 +80,9 @@ export default class patio extends Phaser.Scene {
 
     this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
     this.load.audio('chuva', 'assets/audio/chuva.mp3')
+    this.load.audio('chuvaInterior', 'assets/audio/chuvaInterior.mp3')
     this.load.audio('passos', 'assets/audio/passos.mp3')
+    this.load.audio('passosMadeira', 'assets/audio/passosMadeira.mp3')
     this.load.audio('tiro', 'assets/audio/tiro.mp3')
     this.load.audio('som-fantasma', 'assets/audio/somFantasma.mp3')
     this.load.audio('pega-pista', 'assets/audio/pegaPista.mp3')
@@ -89,7 +92,6 @@ export default class patio extends Phaser.Scene {
   }
 
   create() {
-
     //Sons
     this.trilha = this.sound.add("trilha-sonora", {
       loop: true,
@@ -103,8 +105,16 @@ export default class patio extends Phaser.Scene {
     })
     this.chuvaSom.play()
 
+    this.chuvaInteriorSom = this.sound.add("chuvaInterior", {
+      loop: true,
+      volume: 0.5
+    })
+
     this.passosSom = this.sound.add('passos', {
       volume: 0.5,
+    })
+    this.passosMadeiraSom = this.sound.add('passosMadeira', {
+      volume: 0.7,
     })
     this.fantasmaSom = this.sound.add('som-fantasma', {
       volume: 0.3
@@ -128,14 +138,19 @@ export default class patio extends Phaser.Scene {
     
     this.lanternaLocal = this.add.image(0, 0, 'lanterna')
     this.lanternaLocal
-    .setAlpha(0.7)
-    .setBlendMode(Phaser.BlendModes.ADD)
+      .setAlpha(0.7)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setTint(0xfffabe)
+      .setDisplaySize(512, 128)
     
     this.lanternaRemota = this.add.image(0, 0, 'lanterna')
     this.lanternaRemota
       .setAlpha(0.7)
       .setBlendMode(Phaser.BlendModes.ADD)
-      
+      .setTint(0xfffabe)
+      .setDisplaySize(512, 128)
+
+
       this.layerSombras = this.tilemapMapa.createLayer('sombras', [this.tilesetArvores,this.tilesetTendas])
       
       this.pistas = [
@@ -517,6 +532,7 @@ export default class patio extends Phaser.Scene {
       })
       
       this.fantasma.on('invisivel', () => {
+        this.fantasma.setPosition(-2000, -2000)
         this.fantasma.setFrame(0)
         this.fantasma.visivel = false
         
@@ -547,6 +563,7 @@ export default class patio extends Phaser.Scene {
         this.personagemRemoto.x = dados.personagem.x;
         this.personagemRemoto.y = dados.personagem.y;
         this.personagemRemoto.setFrame(dados.personagem.frame);
+        this.personagemRemoto.estaDentro = dados.personagem.estaDentro
         this.angleRemoto = dados.personagem.lanterna
       }
 
@@ -558,10 +575,16 @@ export default class patio extends Phaser.Scene {
       }
 
       if (dados.fantasma){
-        this.fantasmaRemoto.x = dados.fantasma.x,
-        this.fantasmaRemoto.y = dados.fantasma.y,
-        this.fantasmaRemoto.visible = dados.fantasma.visivel
-        this.fantasmaRemoto.setFrame(dados.fantasma.frame)
+        if (!this.flagDentro) {
+          this.fantasmaRemoto.x = dados.fantasma.x,
+          this.fantasmaRemoto.y = dados.fantasma.y,
+          this.fantasmaRemoto.visible = dados.fantasma.visivel
+          this.fantasmaRemoto.setFrame(dados.fantasma.frame)
+        } else {
+          this.fantasmaRemoto.x = -2000,
+          this.fantasmaRemoto.y = -2000,
+          this.fantasmaRemoto.visible = false  
+        }
       }
 
       if (dados.pistas) {
@@ -629,6 +652,7 @@ export default class patio extends Phaser.Scene {
 
     this.imagemMascaraPersonagem = this.add.image(0, 0, 'mascaraPersonagem').setVisible(false)
     this.imagemMascaraLanterna = this.add.image(0, 0, 'mascaraLanterna').setVisible(false)
+    this.imagemMascaraLanterna.setSize(512, 128)
     
     this.mascaraPersonagem = this.imagemMascaraPersonagem.createBitmapMask()
     this.mascaraPersonagem.invertAlpha=true
@@ -893,27 +917,112 @@ export default class patio extends Phaser.Scene {
 
     // const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
     const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
+
+    let flagFade = false
+
     this.physics.add.overlap(entradaTendaE, this.personagemLocal, () => {
-      this.personagemLocal.setPosition(360, 2000)
-      this.physics.world.setBounds(
-        0,
-        1450,
-        1920,
-        1280
-      )
-      this.cameras.main.setBounds(
-        -50,
-        1450,
-        260,
-        680
-      )
-      this.lanternaLocal.setVisible(false)
-      this.lanternaRemota.setVisible(false)
-      this.trilha.stop()
-      this.chuvaSom.stop()
-      this.particulaChuva.quantity = 0
-      this.particulaChuva.alpha = 0
+
+
+      if (!flagFade) {
+        this.cameras.main.fadeOut(1000)
+        flagFade = true
+
+        this.cameras.main.on('camerafadeoutcomplete', () => {
+          this.cameras.main.fadeIn(1200);
+
+          this.personagemLocal.setPosition(350, 2000)
+          this.physics.world.setBounds(
+            0,
+            1450,
+            1920,
+            1280
+          )
+          this.cameras.main.setBounds(
+            -50,
+            1450,
+            260,
+            680
+          )
+
+          this.flagDentro = true
+
+          if (this.personagemLocal.texture.key == 'ernesto') {
+            this.lanternaLocal.setTint(0x2d2d96).setDisplaySize(320, 128)
+            this.imagemMascaraLanterna.setDisplaySize(320, 128)
+            this.lanternaRemota.setVisible(false)
+          }
+
+          if (this.personagemLocal.texture.key == 'dan') {
+            this.lanternaLocal.setVisible(false)
+            this.lanternaRemota.setTint(0x2d2d96).setDisplaySize(320, 128)
+            this.imagemMascaraLanterna.setDisplaySize(0, 0)
+          }
+
+          flagFade = false
+
+          this.ponteiro.setVisible(false)
+          this.fantasmaSom.stop()
+          this.trilha.stop()
+          this.chuvaSom.stop()
+          this.chuvaInteriorSom.play()
+        })
+
+        this.particulaChuva.quantity = 0
+
+      }
     })
+
+    this.physics.add.overlap(saidaTendaE, this.personagemLocal, () => {
+
+      if (!flagFade) {
+        this.cameras.main.fadeOut(1000)
+        flagFade = true
+
+        this.cameras.main.on('camerafadeoutcomplete', () => {
+          this.cameras.main.fadeIn(1200);
+
+          this.personagemLocal.setPosition(288, 400)
+          this.physics.world.setBounds(
+            0,
+            -16,
+            1920,
+            1260
+          )
+          this.cameras.main.setBounds(
+            0,
+            0,
+            1920,
+            1280
+          )
+
+          this.flagDentro = false
+
+          if (this.personagemLocal.texture.key == 'ernesto') {
+            this.lanternaLocal.setTint(0xfffabe).setDisplaySize(512, 128)
+            this.imagemMascaraLanterna.setDisplaySize(512, 128)
+            this.lanternaRemota.setVisible(true)
+          }
+
+          if (this.personagemLocal.texture.key == 'dan') {
+            this.lanternaLocal.setVisible(true)
+            this.lanternaRemota.setTint(0xfffabe).setDisplaySize(512, 128)
+            this.imagemMascaraLanterna.setDisplaySize(512, 128)
+          }
+
+          flagFade = false
+
+          this.ponteiro.setVisible(true)
+          this.trilha.play()
+          this.chuvaSom.play()
+          this.chuvaInteriorSom.stop()
+        })
+
+        this.particulaChuva.quantity = 50
+
+      }
+    })
+
   }
 
   update() {
@@ -958,53 +1067,51 @@ export default class patio extends Phaser.Scene {
     this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
     this.lanternaLocal.setRotation(this.ultimoAngulo)
 
-    let pathFinder = Phaser.Math.Angle.Between(this.ponteiro.x, this.ponteiro.y, this.personagemRemoto.x, this.personagemRemoto.y)
+      let pathFinder = Phaser.Math.Angle.Between(this.ponteiro.x, this.ponteiro.y, this.personagemRemoto.x, this.personagemRemoto.y)
 
-    this.ponteiro.setRotation(pathFinder)
+      this.ponteiro.setRotation(pathFinder)
 
-    const indicadorX = Math.round(Math.cos(pathFinder) * 120)
-    const indicadorY = Math.round(Math.sin(pathFinder) * 120)
+      const indicadorX = Math.round(Math.cos(pathFinder) * 120)
+      const indicadorY = Math.round(Math.sin(pathFinder) * 120)
 
-    const dist = Phaser.Math.Distance.Between(
-      this.ponteiro.x, this.ponteiro.y,
-      this.personagemRemoto.x, this.personagemRemoto.y
-    )
+      const dist = Phaser.Math.Distance.Between(
+        this.ponteiro.x, this.ponteiro.y,
+        this.personagemRemoto.x, this.personagemRemoto.y
+      )
 
-    const modDistancia = (dist / 30)
-    this.ponteiro.setDisplaySize(80 - modDistancia, 64 - modDistancia)
+      const modDistancia = (dist / 30)
+      this.ponteiro.setDisplaySize(80 - modDistancia, 64 - modDistancia)
 
-    if (dist < 10) {
-      this.ponteiro.setVelocity(0, 0);
-    } else {
-      this.ponteiro.setVelocity(indicadorX, indicadorY)
-    }
-
-    const cam = this.cameras.main;
-    const left = cam.worldView.left;
-    const top = cam.worldView.top;
-    const right = cam.worldView.right;
-    const bottom = cam.worldView.bottom;
-
-    const remotoNaTela =
+      if (dist < 10) {
+        this.ponteiro.setVelocity(0, 0);
+      } else {
+        this.ponteiro.setVelocity(indicadorX, indicadorY)
+      }
+      
+      const cam = this.cameras.main;
+      const left = cam.worldView.left;
+      const top = cam.worldView.top;
+      const right = cam.worldView.right;
+      const bottom = cam.worldView.bottom;
+      
+      const remotoNaTela =
       this.personagemRemoto.x >= left &&
       this.personagemRemoto.x <= right &&
       this.personagemRemoto.y >= top &&
       this.personagemRemoto.y <= bottom;
-
-    if (!remotoNaTela) {
-      this.ponteiro.setAlpha(1);
-    } else {
-      this.ponteiro.setAlpha(0);
-    }
-
-    this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
-    this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
+      
+      if (!remotoNaTela) {
+        this.ponteiro.setVisible(true)
+        .setActive(true)
+      } else {
+        this.ponteiro.setVisible(false)
+        .setActive(false)
+      }
+      this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
+      this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
 
     if (this.personagemLocal.texture.key == 'dan' && this.fantasma.atacando) {
       
-      if (!this.fantasmaSom.isPlaying) {
-        this.fantasmaSom.play()
-      }
       Phaser.Math.RotateAroundDistance(this.fantasma, this.personagemRemoto.x, this.personagemRemoto.y, this.fantasmaAngulo, this.fantasmaDistancia);
       this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00003);
       this.fantasmaDistancia -= 0.1
@@ -1033,7 +1140,7 @@ export default class patio extends Phaser.Scene {
         this.invulneravel = false;
 }
 
-        if (this.fantasmaRemoto.visible && !this.fantasmaSom.isPlaying) {
+        if (this.fantasmaRemoto.visible && !this.fantasmaSom.isPlaying && !this.flagDentro) {
           this.fantasmaSom.play()
           }
       }
@@ -1077,12 +1184,18 @@ export default class patio extends Phaser.Scene {
       this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
 
       //Altera pitch dos passos
-      let Modulado = Math.floor(Math.random() * (1200 - 300 + 1)) + 300;
+      let Modulado = Math.floor(Math.random() * (2200 - 0 + 1));
       this.passosSom.setDetune(Modulado)
+      this.passosMadeiraSom.setDetune(Modulado)
+
       this.frameAtual = this.personagemLocal.anims.currentFrame.index;
       const pesNoChao = [4, 10]
       if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
-        this.passosSom.play()
+        if (!this.flagDentro) {
+          this.passosSom.play()
+        } else {
+          this.passosMadeiraSom.play()
+        }
       }
 
 
@@ -1187,6 +1300,7 @@ export default class patio extends Phaser.Scene {
                 y: this.personagemLocal.y,
                 frame: this.personagemLocal.frame.name,
                 lanterna: this.ultimoAngulo,
+                estaDentro: this.flagDentro
               },
               particula: {
                 x: this.particulaAcaoLocal.x,
