@@ -610,7 +610,7 @@ export default class patio extends Phaser.Scene {
       }
     };
 
-    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores])
+    this.layerObjetos = this.tilemapMapa.createLayer('objetos', [this.tilesetArvores, this.tilesetTendas])
     this.layerTendas = this.tilemapMapa.createLayer('tendas', [this.tilesetTendas])
 
     // Desenha círculos ao redor dos tiles com propriedade meio == true
@@ -648,7 +648,8 @@ export default class patio extends Phaser.Scene {
 
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.layerTendas.setCollisionByProperty({ collides: true })
-    this.physics.add.collider(this.personagemLocal, [this.layerObjetos, this.layerTendas])
+    this.layerPlayerSobrepoe.setCollisionByProperty({ collides: true })
+    this.physics.add.collider(this.personagemLocal, [this.layerObjetos, this.layerTendas, this.layerPlayerSobrepoe])
 
     this.imagemMascaraPersonagem = this.add.image(0, 0, 'mascaraPersonagem').setVisible(false)
     this.imagemMascaraLanterna = this.add.image(0, 0, 'mascaraLanterna').setVisible(false)
@@ -917,11 +918,15 @@ export default class patio extends Phaser.Scene {
 
     // const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
     const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.3).setBlendMode(Phaser.BlendModes.ADD)
+
     const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
 
     let flagFade = false
 
     this.physics.add.overlap(entradaTendaE, this.personagemLocal, () => {
+      this.personagemLocal.setSize(40, 12)
+      this.personagemLocal.setOffset(12, 24)
 
 
       if (!flagFade) {
@@ -931,7 +936,7 @@ export default class patio extends Phaser.Scene {
         this.cameras.main.on('camerafadeoutcomplete', () => {
           this.cameras.main.fadeIn(1200);
 
-          this.personagemLocal.setPosition(350, 2000)
+          this.personagemLocal.setPosition(355, 2000)
           this.physics.world.setBounds(
             0,
             1450,
@@ -961,7 +966,6 @@ export default class patio extends Phaser.Scene {
 
           flagFade = false
 
-          this.ponteiro.setVisible(false)
           this.fantasmaSom.stop()
           this.trilha.stop()
           this.chuvaSom.stop()
@@ -974,6 +978,9 @@ export default class patio extends Phaser.Scene {
     })
 
     this.physics.add.overlap(saidaTendaE, this.personagemLocal, () => {
+      this.personagemLocal.setSize(40, 2)
+      this.personagemLocal.setOffset(12, 6)
+
 
       if (!flagFade) {
         this.cameras.main.fadeOut(1000)
@@ -1012,7 +1019,6 @@ export default class patio extends Phaser.Scene {
 
           flagFade = false
 
-          this.ponteiro.setVisible(true)
           this.trilha.play()
           this.chuvaSom.play()
           this.chuvaInteriorSom.stop()
@@ -1021,6 +1027,7 @@ export default class patio extends Phaser.Scene {
         this.particulaChuva.quantity = 50
 
       }
+
     })
 
   }
@@ -1100,7 +1107,7 @@ export default class patio extends Phaser.Scene {
       this.personagemRemoto.y >= top &&
       this.personagemRemoto.y <= bottom;
       
-      if (!remotoNaTela) {
+      if (!remotoNaTela && !this.flagDentro && !this.personagemRemoto.estaDentro) {
         this.ponteiro.setVisible(true)
         .setActive(true)
       } else {
