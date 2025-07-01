@@ -8,9 +8,14 @@ export default class patio extends Phaser.Scene {
     this.direcaoAtual = 'cima'
     this.personagemLocalAcao = false
     this.flagDentro = false
+    this.velocidade = undefined
   }
 
   init() { }
+
+log(args) {
+  console.log(args)
+}
 
   preload() {
 
@@ -70,11 +75,13 @@ export default class patio extends Phaser.Scene {
       frameHeight: 12
     })
     this.load.image('ponteiro', 'assets/UI/seta.png')
+    this.load.image('ler', 'assets/UI/interacaoLer.png')
 
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
     this.load.image('arvores', 'assets/mapa/texturas/objetos/arvores.png')
     this.load.image('tendas', 'assets/mapa/texturas/objetos/tenda.png')
+    this.load.image('enigma1', 'assets/enigma1.png')
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
@@ -229,7 +236,8 @@ export default class patio extends Phaser.Scene {
 
       this.personagemLocal = this.physics.add.sprite(936, 1248, 'ernesto')
       this.personagemRemoto = this.add.sprite(1000, 1248, 'dan')
-      this.speed = 75
+      this.velocidade = 75
+      this.speed = this.velocidade
       this.frameRate = 18
       this.personagemLocal.stamina = 650
       this.personagemLocal.cansado = false
@@ -252,23 +260,26 @@ export default class patio extends Phaser.Scene {
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
-          console.log(this.personagemLocal.x, this.personagemLocal.y)
-          this.speed = 150
-          this.frameRate = 25
-          this.personagemLocal.movimento = 'correndo'
+          if (!this.flagLendo) {
+            this.speed = this.velocidade *2
+            this.frameRate = 25
+            this.personagemLocal.movimento = 'correndo'
+          }
         })
         .on('pointerup', () => {
-          this.speed = 75
-          this.frameRate = 18
-          this.personagemLocal.movimento = 'andando'
+          if (!this.flagLendo) {
+            this.speed = this.velocidade
+            this.frameRate = 18
+            this.personagemLocal.movimento = 'andando'
+          }
         })
-        .depth = 100
+        .depth = 200
 
       //Botão de Ação
       this.botaoAcao = this.add.sprite(750, 350, 'pista', 0, )
         .setInteractive()
         .setScrollFactor(0)
-      this.botaoAcao.depth = 100
+      this.botaoAcao.depth = 200
 
       //Animação do Cachimbo
       this.particulaAcaoLocal = this.physics.add.sprite(0, 0, 'fumaca', 0)
@@ -413,7 +424,8 @@ export default class patio extends Phaser.Scene {
 
       this.personagemLocal = this.physics.add.sprite(1000, 1248, 'dan')
       this.personagemRemoto = this.add.sprite(936, 1248, 'ernesto')
-      this.speed = 90
+      this.velocidade = 90
+      this.speed = this.velocidade
       this.frameRate = 18
       this.personagemLocal.stamina = 650
       this.personagemLocal.cansado = false
@@ -432,22 +444,26 @@ export default class patio extends Phaser.Scene {
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
-          this.speed = 170
-          this.frameRate = 25
-          this.personagemLocal.movimento = 'correndo'
+          if (!this.flagLendo) {
+            this.speed = this.velocidade * 2
+            this.frameRate = 25
+            this.personagemLocal.movimento = 'correndo'
+          }
         })
         .on('pointerup', () => {
-          this.speed = 90
-          this.frameRate = 18
-          this.personagemLocal.movimento = 'andando'
+          if (!this.flagLendo) {
+            this.speed = this.velocidade
+            this.frameRate = 18
+            this.personagemLocal.movimento = 'andando'
+          }
         })
-        .depth = 100
+        .depth = 200
 
       //Botão de Ação
       this.botaoAcao = this.add.sprite(750, 350, 'tiro', 0, )
         .setInteractive()
         .setScrollFactor(0)
-      this.botaoAcao.depth = 100
+      this.botaoAcao.depth = 200
 
       //Animação de tiro
       this.particulaAcaoLocal = this.physics.add.image(0, 0, 'bullet')
@@ -544,6 +560,8 @@ export default class patio extends Phaser.Scene {
           this.fantasma.atacando = true
           })
         })
+
+    // this.physics.add.image(355, 2000)
 
     } else {
       window.alert("Sala cheia!")
@@ -902,7 +920,8 @@ export default class patio extends Phaser.Scene {
       base: this.add.sprite(120, 360, 'joystick', 0, ),
       thumb: this.add.sprite(120, 360, 'joystick', 1, )
     })
-    this.joystick.depth = 100
+    this.joystick.base.depth = 200
+    this.joystick.thumb.depth = 200
 
     this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
       if (this.scale.isFullscreen) {
@@ -916,9 +935,36 @@ export default class patio extends Phaser.Scene {
       .setScrollFactor(0)
       .depth = 100
 
-    // const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
-    const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
+    // const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.3).setBlendMode(Phaser.BlendModes.ADD)
+
+    this.papelEnigma1 = this.physics.add.image(355, 1750, 'enigma1').setDisplaySize(32, 40)
+    this.botaoLer = this.add.image(this.papelEnigma1.x, this.papelEnigma1.y, 'ler').setInteractive()
+    this.botaoLer.setVisible(false)
+    this.botaoLer.depth = 100
+
+    this.physics.add.overlap(this.papelEnigma1, this.areaColeta , () => {
+      this.time.delayedCall(100, () => {
+        this.botaoLer.setVisible(this.physics.overlap(this.papelEnigma1, this.areaColeta))
+      })
+    })
+    // if (this.physics.overlap(this.papelEnigma1, this.personagemLocal)) {
+
+    this.botaoLer.on('pointerdown', () => {
+      this.cameras.main.startFollow(this.papelEnigma1)
+      this.flagLendo = true
+      this.speed = 0
+      this.papelEnigma1.depth = 200
+
+      this.papelEnigma1.setDisplaySize(396, 520).setInteractive().on('pointerdown', () => {
+        this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
+        this.flagLendo = false
+        this.speed = this.velocidade
+        this.papelEnigma1.setDisplaySize(32, 40).setInteractive(false)
+        this.papelEnigma1.depth = 99
+      })
+    })
 
     const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
 
@@ -1174,7 +1220,7 @@ export default class patio extends Phaser.Scene {
           this.barraStaminaFundo.setAlpha(1)
           this.barraStaminaMeio.setAlpha(1)
           this.barraStamina.setFillStyle(0x9a3706)
-          this.speed = 75
+          this.speed = this.velocidade
         }
       }
 
