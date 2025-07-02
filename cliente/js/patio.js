@@ -13,10 +13,6 @@ export default class patio extends Phaser.Scene {
 
   init() { }
 
-log(args) {
-  console.log(args)
-}
-
   preload() {
 
     this.load.image('lanterna', 'assets/luz.png')
@@ -82,6 +78,8 @@ log(args) {
     this.load.image('arvores', 'assets/mapa/texturas/objetos/arvores.png')
     this.load.image('tendas', 'assets/mapa/texturas/objetos/tenda.png')
     this.load.image('enigma1', 'assets/enigma1.png')
+    this.load.image('marcacao', 'assets/mapa/texturas/objetos/marcacao.png')
+    this.load.image('banco', 'assets/mapa/texturas/objetos/banco.png')
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
@@ -935,11 +933,57 @@ log(args) {
       .setScrollFactor(0)
       .depth = 100
 
-    const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
-    // const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    // const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
+    const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.3).setBlendMode(Phaser.BlendModes.ADD)
 
-    this.papelEnigma1 = this.physics.add.image(355, 1750, 'enigma1').setDisplaySize(32, 40)
+    this.numPosicao = [
+      {x: 250, y: 1850, n: 6},
+      {x: 290, y: 1850, n: 5},
+      {x: 330, y: 1850, n: 2},
+      {x: 370, y: 1850, n: 1},
+      {x: 410, y: 1850, n: 4},
+      {x: 450, y: 1850, n: 3},
+    ]
+    
+    
+    this.numPosicao.forEach((marcador) => {
+      marcador.objeto = this.physics.add.image(marcador.x, marcador.y, 'marcacao')
+      // .setMask(this.mascaraLanterna)
+      this.physics.add.overlap(marcador.objeto, () => {
+        console.log(marcador.n)
+      })
+    })
+
+    this.bancoPosicao = [
+      {x: 250, y: 1650, n: 1},
+      {x: 290, y: 1650, n: 2},
+      {x: 330, y: 1650, n: 3},
+      {x: 370, y: 1650, n: 4},
+      {x: 410, y: 1650, n: 5},
+      {x: 450, y: 1650, n: 6},
+    ]
+
+    this.bancoPosicao.forEach((banco) => {
+      banco.objeto = this.add.image(0,0 , 'banco')
+      banco.numero = this.add.text(0,0 , banco.n)
+      banco.container = this.add.container(banco.x, banco.y)
+      banco.container.setSize(16, 16).add(banco.objeto).add(banco.numero)
+      this.physics.add.existing(banco.container)
+
+      this.physics.add.collider(banco.container, this.personagemLocal, () => {
+        this.time.delayedCall(100, () => {
+          banco.container.body.setVelocity(0)
+          console.log(banco.n)
+        })
+      })
+      // .setMask(this.mascaraLanterna)
+      this.physics.add.overlap(banco.objeto, this.personagemLocal, () => {
+        console.log(banco.numCorreto)
+      })
+    })
+
+    this.papelEnigma1 = this.physics.add.image(350, 1750, 'enigma1').setDisplaySize(32, 40)
     this.botaoLer = this.add.image(this.papelEnigma1.x, this.papelEnigma1.y, 'ler').setInteractive()
     this.botaoLer.setVisible(false)
     this.botaoLer.depth = 100
@@ -949,7 +993,6 @@ log(args) {
         this.botaoLer.setVisible(this.physics.overlap(this.papelEnigma1, this.areaColeta))
       })
     })
-    // if (this.physics.overlap(this.papelEnigma1, this.personagemLocal)) {
 
     this.botaoLer.on('pointerdown', () => {
       this.cameras.main.startFollow(this.papelEnigma1)
@@ -973,6 +1016,8 @@ log(args) {
     this.physics.add.overlap(entradaTendaE, this.personagemLocal, () => {
       this.personagemLocal.setSize(40, 12)
       this.personagemLocal.setOffset(12, 24)
+      this.mascaraLanterna.invertAlpha = false
+
 
 
       if (!flagFade) {
