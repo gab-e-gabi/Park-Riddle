@@ -937,49 +937,55 @@ export default class patio extends Phaser.Scene {
     const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.3).setBlendMode(Phaser.BlendModes.ADD)
 
-    this.numPosicao = [
-      {x: 250, y: 1850, n: 6},
-      {x: 290, y: 1850, n: 5},
-      {x: 330, y: 1850, n: 2},
-      {x: 370, y: 1850, n: 1},
-      {x: 410, y: 1850, n: 4},
-      {x: 450, y: 1850, n: 3},
-    ]
-    
-    
-    this.numPosicao.forEach((marcador) => {
-      marcador.objeto = this.physics.add.image(marcador.x, marcador.y, 'marcacao')
-      // .setMask(this.mascaraLanterna)
-      this.physics.add.overlap(marcador.objeto, () => {
-        console.log(marcador.n)
-      })
-    })
-
     this.bancoPosicao = [
-      {x: 250, y: 1650, n: 1},
-      {x: 290, y: 1650, n: 2},
-      {x: 330, y: 1650, n: 3},
-      {x: 370, y: 1650, n: 4},
-      {x: 410, y: 1650, n: 5},
-      {x: 450, y: 1650, n: 6},
+      {x: 250, y: 1650, n: 1, cod: 6},
+      {x: 290, y: 1650, n: 2, cod: 5},
+      {x: 330, y: 1650, n: 3, cod: 2},
+      {x: 370, y: 1650, n: 4, cod: 1},
+      {x: 410, y: 1650, n: 5, cod: 4},
+      {x: 450, y: 1650, n: 6, cod: 3},
     ]
+
+    this.bancosContainers = []
+    this.spots = []
 
     this.bancoPosicao.forEach((banco) => {
       banco.objeto = this.add.image(0,0 , 'banco')
       banco.numero = this.add.text(0,0 , banco.n)
-      banco.container = this.add.container(banco.x, banco.y)
-      banco.container.setSize(16, 16).add(banco.objeto).add(banco.numero)
+
+      banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
+      banco.container.setSize(20, 26)
+      banco.container.numero = banco.n
       this.physics.add.existing(banco.container)
+      banco.container.body.pushable = false
+
+      this.bancosContainers.push(banco.container)
+
+      this.bancosContainers.forEach((bancosColisao) => {
+        this.physics.add.collider(banco.container.body, bancosColisao.body)
+      })
+
+      banco.spot = this.physics.add.image(banco.x, banco.y + 200, 'marcacao')
+      banco.spot.numero = banco.cod
+      this.spots.push(banco.spot)
+
+
+      this.physics.add.overlap(this.spots, banco.container, () => {
+        console.log(banco.container.numero, this.spots )
+        if (banco.container.numero == banco.spot.numero) {
+          console.log('ok')
+        }
+      })
 
       this.physics.add.collider(banco.container, this.personagemLocal, () => {
-        this.time.delayedCall(100, () => {
-          banco.container.body.setVelocity(0)
-          console.log(banco.n)
+        banco.container.body.pushable = true
+        banco.container.body.setVelocity(0)
+
+        this.time.delayedCall(150, () => {
+          if (banco.container.body.touching.none) {
+            banco.container.body.pushable = false
+          }
         })
-      })
-      // .setMask(this.mascaraLanterna)
-      this.physics.add.overlap(banco.objeto, this.personagemLocal, () => {
-        console.log(banco.numCorreto)
       })
     })
 
@@ -1014,8 +1020,8 @@ export default class patio extends Phaser.Scene {
     let flagFade = false
 
     this.physics.add.overlap(entradaTendaE, this.personagemLocal, () => {
-      this.personagemLocal.setSize(40, 12)
-      this.personagemLocal.setOffset(12, 24)
+      this.personagemLocal.setSize(32, 12)
+      this.personagemLocal.setOffset(16, 24)
       this.mascaraLanterna.invertAlpha = false
 
 
