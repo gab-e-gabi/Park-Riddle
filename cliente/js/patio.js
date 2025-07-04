@@ -603,6 +603,13 @@ export default class patio extends Phaser.Scene {
         }
       }
 
+      if (dados.bancos) {
+        this.bancosContainersEstaticos.forEach((banco, i) => {
+          banco.x = dados.bancos[i].x;
+          banco.y = dados.bancos[i].y;
+        });
+      }
+
       if (dados.pistas) {
         this.pistas.forEach((pista, i) => {
           if (!dados.pistas[i].visible) {
@@ -936,58 +943,108 @@ export default class patio extends Phaser.Scene {
     // const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
     const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.3).setBlendMode(Phaser.BlendModes.ADD)
-
-    this.bancoPosicao = [
-      {x: 250, y: 1650, n: 1, cod: 6},
-      {x: 290, y: 1650, n: 2, cod: 5},
-      {x: 330, y: 1650, n: 3, cod: 2},
-      {x: 370, y: 1650, n: 4, cod: 1},
-      {x: 410, y: 1650, n: 5, cod: 4},
-      {x: 450, y: 1650, n: 6, cod: 3},
+    this.bordasProtecao = [
+      this.physics.add.staticImage(150, 1750, null).setVisible(false).setSize(16, 400),
+      this.physics.add.staticImage(355, 1950, null).setVisible(false).setSize(400, 16),
+      this.physics.add.staticImage(355, 1550, null).setVisible(false).setSize(400, 16),
+      this.physics.add.staticImage(550, 1750, null).setVisible(false).setSize(16, 400)
     ]
 
-    this.bancosContainers = []
-    this.spots = []
+    this.bancoPosicao = [
+      {x: 250, y: 1650, n: 4, cod: 6},
+      {x: 290, y: 1650, n: 3, cod: 5},
+      {x: 330, y: 1650, n: 1, cod: 2},
+      {x: 370, y: 1650, n: 5, cod: 1},
+      {x: 410, y: 1650, n: 6, cod: 4},
+      {x: 450, y: 1650, n: 2, cod: 3},
+    ]
 
-    this.bancoPosicao.forEach((banco) => {
-      banco.objeto = this.add.image(0,0 , 'banco')
-      banco.numero = this.add.text(0,0 , banco.n)
+    if (this.personagemLocal.texture.key == 'dan') {
+      this.bancosContainers = []
+      this.spots = []
 
-      banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
-      banco.container.setSize(20, 26)
-      banco.container.numero = banco.n
-      this.physics.add.existing(banco.container)
-      banco.container.body.pushable = false
+      this.bancoPosicao.forEach((banco) => {
+        banco.objeto = this.add.image(0,0 , 'banco')
+        banco.numero = this.add.text(0,0 , banco.n).setMask(this.mascaraLanterna)
+        
+        banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
+        banco.container.setSize(20, 26)
 
-      this.bancosContainers.push(banco.container)
+        banco.container.numero = banco.n
+        banco.container.detector = this.physics.add.image(0, 0, null).setVisible(false).setSize(22, 28)
 
-      this.bancosContainers.forEach((bancosColisao) => {
-        this.physics.add.collider(banco.container.body, bancosColisao.body)
-      })
+        this.physics.add.existing(banco.container)
+        banco.container.body.pushable = false
+        this.bancosContainers.push(banco.container)
 
-      banco.spot = this.physics.add.image(banco.x, banco.y + 200, 'marcacao')
-      banco.spot.numero = banco.cod
-      this.spots.push(banco.spot)
+        this.bancosContainers.forEach((bancosColisao) => {
+          this.physics.add.collider(banco.container.body, bancosColisao.body)
+        })
 
+        this.physics.add.collider(banco.container, this.bordasProtecao)
 
-      this.physics.add.overlap(this.spots, banco.container, () => {
-        console.log(banco.container.numero, this.spots )
-        if (banco.container.numero == banco.spot.numero) {
-          console.log('ok')
-        }
-      })
+        banco.spot = this.physics.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
+        banco.spot.numero = banco.cod
+        this.spots.push(banco.spot)
 
-      this.physics.add.collider(banco.container, this.personagemLocal, () => {
-        banco.container.body.pushable = true
-        banco.container.body.setVelocity(0)
-
-        this.time.delayedCall(150, () => {
-          if (banco.container.body.touching.none) {
-            banco.container.body.pushable = false
-          }
+        this.physics.add.overlap(banco.container.detector, this.personagemLocal)
+        this.physics.add.collider(banco.container, this.personagemLocal, () => {
+          // banco.container.detector.x = banco.container.x
+          // banco.container.detector.y = banco.container.y
+          banco.container.body.pushable = true
+          
+          this.time.delayedCall(200, () => {
+            if (!this.physics.overlap(banco.container.detector, this.personagemLocal)) {
+              banco.container.body.setVelocity(0)
+              banco.container.body.pushable = false
+            }
+          })
         })
       })
-    })
+
+      this.spots.forEach((spot) => {
+        this.bancosContainers.forEach((bancos) => {
+          this.physics.add.overlap(spot, bancos, () => {
+
+            if(!this.physics.overlap(bancos.detector, this.personagemLocal) && !spot.cheio) {
+              spot.cheio = true
+              // bancos.detector.x = spot.x
+              // bancos.detector.y = spot.y
+              bancos.x = spot.x
+              bancos.y = spot.y
+              bancos.body.setVelocity(0)
+              bancos.body.pushable = false
+            }
+            this.time.delayedCall(100, () => {
+              if (!this.physics.overlap(spot, bancos)) {
+                spot.cheio = false
+              }
+            })
+
+          })
+        })
+      })
+    }
+
+    if( this.personagemLocal.texture.key == 'ernesto') {
+      this.bancosContainersEstaticos = []
+
+      this.bancoPosicao.forEach((banco) => {
+        banco.objeto = this.add.image(0,0 , 'banco')
+        banco.numero = this.add.text(0,0 , banco.n).setMask(this.mascaraLanterna)
+
+        banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
+        banco.container.setSize(20, 26)
+        this.physics.add.existing(banco.container)
+        this.physics.add.collider(banco.container, this.personagemLocal)
+        this.physics.add.collider(banco.container, this.bordasProtecao)
+
+        banco.container.body.pushable = false
+        this.bancosContainersEstaticos.push(banco.container)
+
+        banco.spot = this.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
+      })
+    }
 
     this.papelEnigma1 = this.physics.add.image(350, 1750, 'enigma1').setDisplaySize(32, 40)
     this.botaoLer = this.add.image(this.papelEnigma1.x, this.papelEnigma1.y, 'ler').setInteractive()
@@ -1130,6 +1187,15 @@ export default class patio extends Phaser.Scene {
   }
 
   update() {
+
+    if (this.bancosContainers) {
+  this.bancosContainers.forEach(banco => {
+    if (banco.detector) {
+      banco.detector.x = banco.x;
+      banco.detector.y = banco.y;
+    }
+  });
+}
 
     const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
     const force = this.joystick.force
@@ -1430,6 +1496,17 @@ export default class patio extends Phaser.Scene {
           )
         }
 
+        if (this.bancosContainers) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              bancos: this.bancosContainers.map(banco => ({
+                x: banco.x,
+                y: banco.y
+              }))
+            })
+          )
+        }
+
         if (this.flagMorte) {
           this.game.dadosJogo.send(
             JSON.stringify({
@@ -1437,6 +1514,7 @@ export default class patio extends Phaser.Scene {
             })
           )
         }
+
         if (this.flagVenceu) {
           this.game.dadosJogo.send(
             JSON.stringify({
