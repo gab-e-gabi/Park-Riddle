@@ -92,6 +92,7 @@ export default class patio extends Phaser.Scene {
     this.load.audio('som-fantasma', 'assets/audio/somFantasma.mp3')
     this.load.audio('pega-pista', 'assets/audio/pegaPista.mp3')
     this.load.audio('ernesto-machucado', 'assets/audio/ernesto-machucado.mp3')
+    this.load.audio('bancoMovendo', 'assets/audio/bancoMovendo.mp3')
 
     this.input.addPointer()
   }
@@ -126,6 +127,9 @@ export default class patio extends Phaser.Scene {
     })
     this.machucadoSom = this.sound.add('ernesto-machucado', {
       volume: 0.3
+    })
+    this.bancoMovedoSom = this.sound.add('bancoMovendo', {
+      volume: 0.6
     })
     this.tiroSom = this.sound.add('tiro')
     this.pistaSom = this.sound.add('pega-pista')
@@ -940,8 +944,11 @@ export default class patio extends Phaser.Scene {
       .setScrollFactor(0)
       .depth = 100
 
-    // const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
-    const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
+    // const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
+    let flagFade = false
+
     this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.3).setBlendMode(Phaser.BlendModes.ADD)
     this.bordasProtecao = [
       this.physics.add.staticImage(150, 1750, null).setVisible(false).setSize(16, 400),
@@ -949,132 +956,6 @@ export default class patio extends Phaser.Scene {
       this.physics.add.staticImage(355, 1550, null).setVisible(false).setSize(400, 16),
       this.physics.add.staticImage(550, 1750, null).setVisible(false).setSize(16, 400)
     ]
-
-    this.bancoPosicao = [
-      {x: 250, y: 1650, n: 4, cod: 6},
-      {x: 290, y: 1650, n: 3, cod: 5},
-      {x: 330, y: 1650, n: 1, cod: 2},
-      {x: 370, y: 1650, n: 5, cod: 1},
-      {x: 410, y: 1650, n: 6, cod: 4},
-      {x: 450, y: 1650, n: 2, cod: 3},
-    ]
-
-    if (this.personagemLocal.texture.key == 'dan') {
-      this.bancosContainers = []
-      this.spots = []
-
-      this.bancoPosicao.forEach((banco) => {
-        banco.objeto = this.add.image(0,0 , 'banco')
-        banco.numero = this.add.text(0,0 , banco.n).setMask(this.mascaraLanterna)
-        
-        banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
-        banco.container.setSize(20, 26)
-
-        banco.container.numero = banco.n
-        banco.container.detector = this.physics.add.image(0, 0, null).setVisible(false).setSize(22, 28)
-
-        this.physics.add.existing(banco.container)
-        banco.container.body.pushable = false
-        this.bancosContainers.push(banco.container)
-
-        this.bancosContainers.forEach((bancosColisao) => {
-          this.physics.add.collider(banco.container.body, bancosColisao.body)
-        })
-
-        this.physics.add.collider(banco.container, this.bordasProtecao)
-
-        banco.spot = this.physics.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
-        banco.spot.numero = banco.cod
-        this.spots.push(banco.spot)
-
-        this.physics.add.overlap(banco.container.detector, this.personagemLocal)
-        this.physics.add.collider(banco.container, this.personagemLocal, () => {
-          // banco.container.detector.x = banco.container.x
-          // banco.container.detector.y = banco.container.y
-          banco.container.body.pushable = true
-          
-          this.time.delayedCall(200, () => {
-            if (!this.physics.overlap(banco.container.detector, this.personagemLocal)) {
-              banco.container.body.setVelocity(0)
-              banco.container.body.pushable = false
-            }
-          })
-        })
-      })
-
-      this.spots.forEach((spot) => {
-        this.bancosContainers.forEach((bancos) => {
-          this.physics.add.overlap(spot, bancos, () => {
-
-            if(!this.physics.overlap(bancos.detector, this.personagemLocal) && !spot.cheio) {
-              spot.cheio = true
-              // bancos.detector.x = spot.x
-              // bancos.detector.y = spot.y
-              bancos.x = spot.x
-              bancos.y = spot.y
-              bancos.body.setVelocity(0)
-              bancos.body.pushable = false
-            }
-            this.time.delayedCall(100, () => {
-              if (!this.physics.overlap(spot, bancos)) {
-                spot.cheio = false
-              }
-            })
-
-          })
-        })
-      })
-    }
-
-    if( this.personagemLocal.texture.key == 'ernesto') {
-      this.bancosContainersEstaticos = []
-
-      this.bancoPosicao.forEach((banco) => {
-        banco.objeto = this.add.image(0,0 , 'banco')
-        banco.numero = this.add.text(0,0 , banco.n).setMask(this.mascaraLanterna)
-
-        banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
-        banco.container.setSize(20, 26)
-        this.physics.add.existing(banco.container)
-        this.physics.add.collider(banco.container, this.personagemLocal)
-        this.physics.add.collider(banco.container, this.bordasProtecao)
-
-        banco.container.body.pushable = false
-        this.bancosContainersEstaticos.push(banco.container)
-
-        banco.spot = this.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
-      })
-    }
-
-    this.papelEnigma1 = this.physics.add.image(350, 1750, 'enigma1').setDisplaySize(32, 40)
-    this.botaoLer = this.add.image(this.papelEnigma1.x, this.papelEnigma1.y, 'ler').setInteractive()
-    this.botaoLer.setVisible(false)
-    this.botaoLer.depth = 100
-
-    this.physics.add.overlap(this.papelEnigma1, this.areaColeta , () => {
-      this.time.delayedCall(100, () => {
-        this.botaoLer.setVisible(this.physics.overlap(this.papelEnigma1, this.areaColeta))
-      })
-    })
-
-    this.botaoLer.on('pointerdown', () => {
-      this.cameras.main.startFollow(this.papelEnigma1)
-      this.flagLendo = true
-      this.speed = 0
-      this.papelEnigma1.depth = 200
-
-      this.papelEnigma1.setDisplaySize(396, 520).setInteractive().on('pointerdown', () => {
-        this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
-        this.flagLendo = false
-        this.speed = this.velocidade
-        this.papelEnigma1.setDisplaySize(32, 40).setInteractive(false)
-        this.papelEnigma1.depth = 99
-      })
-    })
-
-    const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
-
-    let flagFade = false
 
     this.physics.add.overlap(entradaTendaE, this.personagemLocal, () => {
       this.personagemLocal.setSize(32, 12)
@@ -1134,6 +1015,7 @@ export default class patio extends Phaser.Scene {
     this.physics.add.overlap(saidaTendaE, this.personagemLocal, () => {
       this.personagemLocal.setSize(40, 2)
       this.personagemLocal.setOffset(12, 6)
+      this.mascaraLanterna.invertAlpha = true
 
 
       if (!flagFade) {
@@ -1143,7 +1025,7 @@ export default class patio extends Phaser.Scene {
         this.cameras.main.on('camerafadeoutcomplete', () => {
           this.cameras.main.fadeIn(1200);
 
-          this.personagemLocal.setPosition(288, 400)
+          this.personagemLocal.setPosition(288, 500)
           this.physics.world.setBounds(
             0,
             -16,
@@ -1182,6 +1064,162 @@ export default class patio extends Phaser.Scene {
 
       }
 
+    })
+
+    this.bancoPosicao = [
+      {x: 250, y: 1650, n: 6, cod: 6},
+      {x: 290, y: 1650, n: 5, cod: 5},
+      {x: 330, y: 1650, n: 2, cod: 2},
+      {x: 370, y: 1650, n: 1, cod: 1},
+      {x: 410, y: 1650, n: 4, cod: 4},
+      {x: 450, y: 1650, n: 3, cod: 3},
+    ]
+
+    if (this.personagemLocal.texture.key == 'dan') {
+      this.bancosContainers = []
+      this.spots = []
+      this.resultado = 0
+
+      this.bancoPosicao.forEach((banco) => {
+        banco.objeto = this.add.image(0,0 , 'banco')
+        banco.numero = this.add.text(0,0 , banco.n).setMask(this.mascaraLanterna)
+        
+        banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
+        banco.container.setSize(20, 26)
+
+        banco.container.numero = banco.n
+        banco.container.correto = false
+        banco.container.detector = this.physics.add.image(0, 0, null).setVisible(false).setSize(22, 28)
+
+        this.physics.add.existing(banco.container)
+        banco.container.body.pushable = false
+        banco.container.body.setDrag(500)
+        this.bancosContainers.push(banco.container)
+
+        this.bancosContainers.forEach((bancosColisao) => {
+          this.physics.add.collider(banco.container.body, bancosColisao.body)
+        })
+
+        this.physics.add.collider(banco.container, this.bordasProtecao)
+
+        banco.spot = this.physics.add.image(banco.x, banco.y +200, 'marcacao').setMask(this.mascaraLanterna)
+        banco.spot.numero = banco.cod
+        this.spots.push(banco.spot)
+
+        this.physics.add.overlap(banco.container.detector, this.personagemLocal)
+        this.physics.add.collider(banco.container, this.personagemLocal, () => {
+          banco.container.body.pushable = true
+
+          if (!this.bancoMovedoSom.isPlaying) {
+            this.bancoMovedoSom.play()
+          }
+          
+          this.time.delayedCall(200, () => {
+            if (!this.physics.overlap(banco.container.detector, this.personagemLocal)) {
+              banco.container.body.pushable = false
+            }
+          })
+
+        })
+      })
+
+      this.checaValor = this.physics.add.image(-200, -200)
+      this.spots.forEach((spot) => {
+        spot.podeChecar = true
+
+        this.bancosContainers.forEach((bancos) => {
+
+          this.checaValor.on('checar', () => {
+            if (bancos.correto) {
+              this.resultado += 1
+            } else {
+              this.resultado *= 0
+            }
+
+            if (this.resultado == 6) {
+              this.pistaSom.play()
+            }
+          })
+
+          this.physics.add.overlap(spot, bancos, () => {
+
+            if(spot.podeChecar) {
+              spot.podeChecar = false
+            
+              if (bancos.numero == spot.numero) {
+                bancos.correto = true
+              } else {
+                bancos.correto = false
+              }
+
+              this.checaValor.emit('checar')
+            }
+
+            if(!this.physics.overlap(bancos.detector, this.personagemLocal) && !spot.cheio) {
+              spot.cheio = true
+              bancos.x = spot.x
+              bancos.y = spot.y
+              bancos.body.setVelocity(0)
+              bancos.body.pushable = false
+            }
+            this.time.delayedCall(100, () => {
+              if (!this.physics.overlap(spot, bancos)) {
+                this.resultado = 0
+                spot.cheio = false
+                bancos.correto = false
+                spot.podeChecar = true
+              }
+            })
+
+          })
+        })
+      })
+    }
+
+    if( this.personagemLocal.texture.key == 'ernesto') {
+      this.bancosContainersEstaticos = []
+
+      this.bancoPosicao.forEach((banco) => {
+        banco.objeto = this.add.image(0,0 , 'banco')
+        banco.numero = this.add.text(0,0 , banco.n).setMask(this.mascaraLanterna)
+
+        banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
+        banco.container.setSize(20, 26)
+        this.physics.add.existing(banco.container)
+        this.physics.add.collider(banco.container, this.personagemLocal)
+        this.physics.add.collider(banco.container, this.bordasProtecao)
+
+        banco.container.body.pushable = false
+        this.bancosContainersEstaticos.push(banco.container)
+
+        banco.spot = this.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
+      })
+    }
+
+    this.papelEnigma1 = this.physics.add.image(350, 1750, 'enigma1').setDisplaySize(32, 40)
+    this.botaoLer = this.add.image(this.papelEnigma1.x, this.papelEnigma1.y, 'ler').setInteractive()
+    this.botaoLer.setVisible(false)
+    this.botaoLer.depth = 100
+
+    this.physics.add.overlap(this.papelEnigma1, this.areaColeta , () => {
+      this.time.delayedCall(100, () => {
+        this.botaoLer.setVisible(this.physics.overlap(this.papelEnigma1, this.areaColeta))
+      })
+    })
+
+    this.botaoLer.on('pointerdown', () => {
+      this.cameras.main.startFollow(this.papelEnigma1)
+      this.flagLendo = true
+      this.speed = 0
+      this.papelEnigma1.depth = 200
+
+      this.papelEnigma1.setDisplaySize(396, 520).setInteractive().on('pointerdown', () => {
+        this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
+        this.flagLendo = false
+        this.speed = this.velocidade
+        this.papelEnigma1.setDisplaySize(32, 40).setInteractive(false)
+        this.papelEnigma1.depth = 99
+      })
     })
 
   }
