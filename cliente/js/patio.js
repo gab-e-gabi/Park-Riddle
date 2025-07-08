@@ -70,6 +70,10 @@ export default class patio extends Phaser.Scene {
       frameWidth: 45,
       frameHeight: 12
     })
+    this.load.spritesheet('fantasmaAlvo', 'assets/fantasmasAlvos.png',{
+      frameWidth: 50,
+      frameHeight: 64
+    })
     this.load.image('ponteiro', 'assets/UI/seta.png')
     this.load.image('ler', 'assets/UI/interacaoLer.png')
 
@@ -80,6 +84,7 @@ export default class patio extends Phaser.Scene {
     this.load.image('enigma1', 'assets/enigma1.png')
     this.load.image('marcacao', 'assets/mapa/texturas/objetos/marcacao.png')
     this.load.image('banco', 'assets/mapa/texturas/objetos/banco.png')
+    this.load.image('povTiroAlvo', 'assets/mapa/texturas/objetos/povTiroAlvo.png')
 
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
@@ -262,14 +267,14 @@ export default class patio extends Phaser.Scene {
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
-          if (!this.flagLendo) {
+          if (!this.flagInteracao) {
             this.speed = this.velocidade *2
             this.frameRate = 25
             this.personagemLocal.movimento = 'correndo'
           }
         })
         .on('pointerup', () => {
-          if (!this.flagLendo) {
+          if (!this.flagInteracao) {
             this.speed = this.velocidade
             this.frameRate = 18
             this.personagemLocal.movimento = 'andando'
@@ -373,7 +378,6 @@ export default class patio extends Phaser.Scene {
           console.log('morreu')
           // this.flagMorte = true
         } else {
-          console.log(vidas)
           vidas += 1
           this.vidas.setFrame(vidas)
         }
@@ -446,14 +450,14 @@ export default class patio extends Phaser.Scene {
         .setInteractive()
         .setScrollFactor(0)
         .on('pointerdown', () => {
-          if (!this.flagLendo) {
+          if (!this.flagInteracao) {
             this.speed = this.velocidade * 2
             this.frameRate = 25
             this.personagemLocal.movimento = 'correndo'
           }
         })
         .on('pointerup', () => {
-          if (!this.flagLendo) {
+          if (!this.flagInteracao) {
             this.speed = this.velocidade
             this.frameRate = 18
             this.personagemLocal.movimento = 'andando'
@@ -944,12 +948,12 @@ export default class patio extends Phaser.Scene {
       .setScrollFactor(0)
       .depth = 100
 
+    let flagFade = false
     const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
     // const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
-    let flagFade = false
 
-    this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.3).setBlendMode(Phaser.BlendModes.ADD)
+    this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
     this.bordasProtecao = [
       this.physics.add.staticImage(150, 1750, null).setVisible(false).setSize(16, 400),
       this.physics.add.staticImage(355, 1950, null).setVisible(false).setSize(400, 16),
@@ -1209,22 +1213,272 @@ export default class patio extends Phaser.Scene {
 
     this.botaoLer.on('pointerdown', () => {
       this.cameras.main.startFollow(this.papelEnigma1)
-      this.flagLendo = true
+      this.flagInteracao = true
       this.speed = 0
       this.papelEnigma1.depth = 200
 
       this.papelEnigma1.setDisplaySize(396, 520).setInteractive().on('pointerdown', () => {
         this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
-        this.flagLendo = false
+        this.flagInteracao = false
         this.speed = this.velocidade
         this.papelEnigma1.setDisplaySize(32, 40).setInteractive(false)
         this.papelEnigma1.depth = 99
       })
     })
 
+    this.flagBlur = false
+    // const entradaTendaD = this.physics.add.staticImage(1630, 370).setSize(50, 50)
+    const entradaTendaD = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    const saidaTendaD = this.physics.add.staticImage(1570, 2080).setSize(50, 50)
+    this.add.image(1560, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
+
+    const areaTiro = this.physics.add.image(1570, 1790).setSize(200, 80)
+
+    this.fantAlvoCorreto = this.physics.add.sprite(0, 0, 'fantasmaAlvo', 0).setInteractive()
+    this.fantAlvoCorreto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setActive(false).setVisible(false)
+
+    this.fantAlvoErrado = this.physics.add.sprite(0, 0, 'fantasmaAlvo', 1).setInteractive()
+    this.fantAlvoErrado.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setActive(false).setVisible(false)
+    
+    const povAlvos = this.add.image(1580, 1860, 'povTiroAlvo').setDisplaySize(800, 500)
+    povAlvos.setVisible(false)
+    // povAlvos.depth = 500
+    const povAlvosSair = this.add.text(1580, 2060, 'Clique aqui para sair').setInteractive().setOrigin(.5, .5)
+    povAlvosSair.setActive(false).setVisible(false)
+
+    this.botaoTiro = this.add.image(areaTiro.x, areaTiro.y, 'ler').setInteractive()
+    this.botaoTiro.setVisible(false)
+
+    this.physics.add.overlap(areaTiro, this.areaColeta, () => {
+      this.time.delayedCall(100, () => {
+        this.botaoTiro.setVisible(this.physics.overlap(areaTiro, this.areaColeta))
+      })
+    })
+    this.botaoTiro.on('pointerdown', () => {
+      povAlvos.setVisible(true)
+      povAlvosSair.setActive(true).setVisible(true)
+      this.cameras.main.startFollow(povAlvos)
+      this.flagInteracao = true
+      this.speed = 0
+      this.fantAlvoCorreto.setActive(true).setVisible(true)
+      this.fantAlvoErrado.setActive(true).setVisible(true)
+    })
+
+    povAlvosSair.on('pointerdown', () => {
+      povAlvosSair.setActive(false).setVisible(false)
+      povAlvos.setVisible(false)
+      this.cameras.main.startFollow(this.personagemLocal)
+      this.flagInteracao = false
+      this.speed = this.velocidade
+      this.fantAlvoCorreto.setActive(false).setVisible(false)
+      this.fantAlvoErrado.setActive(false).setVisible(false)
+    })
+
+
+// codigo do tiro ao alvo
+  this.minigameAlvo = this.add.image(-200, -200, null)
+
+  // converte a posição aleatória em coordenadas
+  function ConvertePos(num) {
+    switch (num) {
+      case 0:
+        return {x: 75, y: 50}
+
+      case 1:
+        return {x: 200, y: 50}
+
+      case 2:
+        return {x: 335, y: 50}
+
+      case 3:
+        return {x: 465, y: 50}
+
+      case 4:
+        return {x: 590, y: 50}
+
+      case 5:
+        return {x: 725, y: 50}
+
+      case 6:
+        return {x: 75, y: 180}
+
+      case 7:
+        return {x: 200, y: 180}
+
+      case 8:
+        return {x: 335, y: 180}
+
+      case 9:
+        return {x: 465, y: 180}
+        
+      case 10:
+        return {x: 590, y: 180}
+
+      case 11:
+        return {x: 725, y: 180}
+
+      case 12:
+        return {x: 75, y: 320}
+
+      case 13:
+        return {x: 200, y: 320}
+
+      case 14:
+        return {x: 335, y: 320}
+
+      case 15:
+        return {x: 465, y: 320}
+
+      case 16:
+        return {x: 590, y: 320}
+
+      case 17:
+        return {x: 725, y: 320}
+
+    }
+  }
+    let fantasmaCorretoPos = Math.floor(Math.random() * (18 - 0 + 1));
+    let fantasmaErradoPos = Math.floor(Math.random() * (18 - 0 + 1));
+    var coorFantasma = undefined
+
+
+  // escolhe um numero aleatório para o correto
+  this.minigameAlvo.on('escolheCorreto', () => {
+    fantasmaCorretoPos = Math.floor(Math.random() * (17 - 0 + 1));
+    coorFantasma = ConvertePos(fantasmaCorretoPos)
+
+    // posiciona
+    this.fantAlvoCorreto.setPosition(coorFantasma.x, coorFantasma.y)
+  })
+
+  // escolhe um numero aleatório para o errado
+  this.minigameAlvo.on('escolheErrado', () => {
+    fantasmaErradoPos = Math.floor(Math.random() * (18 - 0 + 1));
+
+    // se igual, rola de novo
+    if (fantasmaCorretoPos == fantasmaErradoPos) {
+      this.minigameAlvo.emit('escolheErrado')
+    } else {
+      coorFantasma = ConvertePos(fantasmaErradoPos)
+      this.fantAlvoErrado.setPosition(coorFantasma.x, coorFantasma.y)
+    }
+  })
+
+    this.fantAlvoCorreto.on('pointerdown', () => {
+      console.log('click')
+      this.minigameAlvo.emit('escolheCorreto')
+    })
+
+  this.minigameAlvo.emit('escolheCorreto')
+  console.log(this.fantAlvoCorreto.x, this.fantAlvoCorreto.y)
+
+    this.physics.add.overlap(entradaTendaD, this.personagemLocal, () => {
+      // this.cameras.main.startFollow(tiro)
+      this.personagemLocal.setSize(32, 12)
+      this.personagemLocal.setOffset(16, 24)
+      this.lanternaRemota.setVisible(false)
+      this.lanternaLocal.setVisible(false)
+
+      if(this.personagemLocal.texture.key == 'ernesto' && !this.flagBlur) {
+        this.cameras.main.postFX.addBlur(1, 2, 2, 1, 0xffffff, 5)
+        this.flagBlur = true
+      }
+
+      if (!flagFade) {
+        this.cameras.main.fadeOut(1000)
+        flagFade = true
+
+        this.cameras.main.on('camerafadeoutcomplete', () => {
+          this.cameras.main.fadeIn(1200);
+
+          this.personagemLocal.setPosition(1560, 2000)
+          this.physics.world.setBounds(
+            0,
+            1450,
+            1920,
+            1280
+          )
+          this.cameras.main.setBounds(
+            1180,
+            1450,
+            260,
+            680
+          )
+
+          this.flagDentro = true
+
+          flagFade = false
+
+          this.fantasmaSom.stop()
+          this.trilha.stop()
+          this.chuvaSom.stop()
+          this.chuvaInteriorSom.play()
+        })
+
+        this.particulaChuva.quantity = 0
+
+      }
+    })
+
+    this.physics.add.overlap(saidaTendaD, this.personagemLocal, () => {
+      this.personagemLocal.setSize(40, 2)
+      this.personagemLocal.setOffset(12, 6)
+      this.lanternaRemota.setVisible(true)
+      this.lanternaLocal.setVisible(true)
+      this.mascaraLanterna.invertAlpha = true
+
+      if(this.personagemLocal.texture.key == 'ernesto') {
+        this.cameras.main.postFX.clear()
+        this.flagBlur = false
+      }
+
+      if (!flagFade) {
+        this.cameras.main.fadeOut(1000)
+        flagFade = true
+
+        this.cameras.main.on('camerafadeoutcomplete', () => {
+          this.cameras.main.fadeIn(1200);
+
+          this.personagemLocal.setPosition(1630, 500)
+          this.physics.world.setBounds(
+            0,
+            -16,
+            1920,
+            1260
+          )
+          this.cameras.main.setBounds(
+            0,
+            0,
+            1920,
+            1280
+          )
+
+          this.flagDentro = false
+
+          flagFade = false
+
+          this.trilha.play()
+          this.chuvaSom.play()
+          this.chuvaInteriorSom.stop()
+        })
+
+        this.particulaChuva.quantity = 50
+
+      }
+
+    })
+
+
+
+
+
+  //   this.input.on('pointerdown', (pointer) => {
+  //     console.log(pointer.x, pointer.y)
+  //   })
   }
 
   update() {
+    // this.minigameAlvo.emit('escolheCorreto')
 
     if (this.bancosContainers) {
   this.bancosContainers.forEach(banco => {
