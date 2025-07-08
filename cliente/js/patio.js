@@ -168,7 +168,7 @@ export default class patio extends Phaser.Scene {
       this.layerSombras = this.tilemapMapa.createLayer('sombras', [this.tilesetArvores,this.tilesetTendas])
       
       this.pistas = [
-        { x: 160, y: 740 },
+      { x: 160, y: 740 },
       { x: 480, y: 1000 },
       { x: 960, y: 1115 },
       { x: 1570, y: 780 },
@@ -631,6 +631,13 @@ export default class patio extends Phaser.Scene {
           this.pistasEncontradas = this.pistasRecebidas
           contador.text = `Pistas: ${this.pistasEncontradas} / 6`
         }
+      }
+
+      if (dados.alvo) {
+        this.fantAlvoCorreto.x = dados.alvo.correto.x
+        this.fantAlvoCorreto.y = dados.alvo.correto.y
+        this.fantAlvoErrado.x = dados.alvo.errado.x
+        this.fantAlvoErrado.y = dados.alvo.errado.y
       }
 
       if (dados.flagMorte) {
@@ -1178,6 +1185,110 @@ export default class patio extends Phaser.Scene {
           })
         })
       })
+
+      this.fantGanhaPonto = this.physics.add.image(0, 0, null)
+      this.fantGanhaPonto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setAlpha(0.00001)
+
+      this.fantPerdePonto = this.physics.add.image(0, 0, null)
+      this.fantPerdePonto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setAlpha(0.00001)
+
+      // codigo do tiro ao alvo
+      this.minigameAlvo = this.add.image(-200, -200, null)
+
+      // converte a posição aleatória em coordenadas
+      function ConvertePos(num) {
+        switch (num) {
+          case 0:
+            return {x: 75, y: 50}
+
+          case 1:
+            return {x: 200, y: 50}
+
+          case 2:
+            return {x: 335, y: 50}
+
+          case 3:
+            return {x: 465, y: 50}
+
+          case 4:
+            return {x: 590, y: 50}
+
+          case 5:
+            return {x: 725, y: 50}
+
+          case 6:
+            return {x: 75, y: 180}
+
+          case 7:
+            return {x: 200, y: 180}
+
+          case 8:
+            return {x: 335, y: 180}
+
+          case 9:
+            return {x: 465, y: 180}
+            
+          case 10:
+            return {x: 590, y: 180}
+
+          case 11:
+            return {x: 725, y: 180}
+
+          case 12:
+            return {x: 75, y: 320}
+
+          case 13:
+            return {x: 200, y: 320}
+
+          case 14:
+            return {x: 335, y: 320}
+
+          case 15:
+            return {x: 465, y: 320}
+
+          case 16:
+            return {x: 590, y: 320}
+
+          case 17:
+            return {x: 725, y: 320}
+
+        }
+      }
+        let ganhaPontoPos = Math.floor(Math.random() * (17 - 0 + 1));
+        let perdePontoPos = Math.floor(Math.random() * (17 - 0 + 1));
+        var coorFantasma = undefined
+
+
+      // escolhe um numero aleatório para o correto
+      this.minigameAlvo.on('escolheCorreto', () => {
+        ganhaPontoPos = Math.floor(Math.random() * (17 - 0 + 1));
+        coorFantasma = ConvertePos(ganhaPontoPos)
+
+        // posiciona
+        this.fantGanhaPonto.setPosition(coorFantasma.x, coorFantasma.y)
+      })
+
+      // escolhe um numero aleatório para o errado
+      this.minigameAlvo.on('escolheErrado', () => {
+        perdePontoPos = Math.floor(Math.random() * (17 - 0 + 1));
+
+        // se igual, rola de novo
+        if (ganhaPontoPos == perdePontoPos) {
+          this.minigameAlvo.emit('escolheErrado')
+        } else {
+          coorFantasma = ConvertePos(perdePontoPos)
+
+          this.fantGanhaPonto.setPosition(coorFantasma.x, coorFantasma.y)
+        }
+
+        
+      })
+      this.minigameAlvo.emit('escolheCorreto')
+
+        this.fantGanhaPonto.on('pointerdown', () => {
+          console.log('click')
+          this.minigameAlvo.emit('escolheCorreto')
+        })
     }
 
     if( this.personagemLocal.texture.key == 'ernesto') {
@@ -1198,6 +1309,12 @@ export default class patio extends Phaser.Scene {
 
         banco.spot = this.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
       })
+
+      this.fantAlvoCorreto = this.add.sprite(0, 0, 'fantasmaAlvo', 1)
+      this.fantAlvoCorreto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500).setVisible(false)
+
+      this.fantAlvoErrado = this.add.sprite(0, 0, 'fantasmaAlvo', 0)
+      this.fantAlvoErrado.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500).setVisible(false)
     }
 
     this.papelEnigma1 = this.physics.add.image(350, 1750, 'enigma1').setDisplaySize(32, 40)
@@ -1230,22 +1347,17 @@ export default class patio extends Phaser.Scene {
     // const entradaTendaD = this.physics.add.staticImage(1630, 370).setSize(50, 50)
     const entradaTendaD = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     const saidaTendaD = this.physics.add.staticImage(1570, 2080).setSize(50, 50)
-    this.add.image(1560, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
 
+    this.add.image(1560, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
     const areaTiro = this.physics.add.image(1570, 1790).setSize(200, 80)
 
-    this.fantAlvoCorreto = this.physics.add.sprite(0, 0, 'fantasmaAlvo', 0).setInteractive()
-    this.fantAlvoCorreto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setActive(false).setVisible(false)
-
-    this.fantAlvoErrado = this.physics.add.sprite(0, 0, 'fantasmaAlvo', 1).setInteractive()
-    this.fantAlvoErrado.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setActive(false).setVisible(false)
-    
     const povAlvos = this.add.image(1580, 1860, 'povTiroAlvo').setDisplaySize(800, 500)
     povAlvos.setVisible(false)
-    // povAlvos.depth = 500
+    povAlvos.depth = 300
     const povAlvosSair = this.add.text(1580, 2060, 'Clique aqui para sair').setInteractive().setOrigin(.5, .5)
-    povAlvosSair.setActive(false).setVisible(false)
-
+    povAlvosSair.setActive(false).setVisible(false)    
+    
+  
     this.botaoTiro = this.add.image(areaTiro.x, areaTiro.y, 'ler').setInteractive()
     this.botaoTiro.setVisible(false)
 
@@ -1260,8 +1372,15 @@ export default class patio extends Phaser.Scene {
       this.cameras.main.startFollow(povAlvos)
       this.flagInteracao = true
       this.speed = 0
-      this.fantAlvoCorreto.setActive(true).setVisible(true)
-      this.fantAlvoErrado.setActive(true).setVisible(true)
+
+      if (this.personagemLocal.texture.key == 'ernesto') {
+        this.fantAlvoCorreto.setVisible(true)
+        this.fantAlvoErrado.setVisible(true)
+      }
+      if (this.personagemLocal.texture.key == 'dan') {
+        this.fantGanhaPonto.setInteractive(true)
+        this.fantPerdePonto.setInteractive(true)
+      }
     })
 
     povAlvosSair.on('pointerdown', () => {
@@ -1270,107 +1389,16 @@ export default class patio extends Phaser.Scene {
       this.cameras.main.startFollow(this.personagemLocal)
       this.flagInteracao = false
       this.speed = this.velocidade
-      this.fantAlvoCorreto.setActive(false).setVisible(false)
-      this.fantAlvoErrado.setActive(false).setVisible(false)
+
+      if (this.personagemLocal.texture.key == 'ernesto') {
+        this.fantAlvoCorreto.setVisible(false)
+        this.fantAlvoErrado.setVisible(false)
+      }
+      if (this.personagemLocal.texture.key == 'dan') {
+        this.fantGanhaPonto.setInteractive(false)
+        this.fantPerdePonto.setInteractive(false)
+      }
     })
-
-
-// codigo do tiro ao alvo
-  this.minigameAlvo = this.add.image(-200, -200, null)
-
-  // converte a posição aleatória em coordenadas
-  function ConvertePos(num) {
-    switch (num) {
-      case 0:
-        return {x: 75, y: 50}
-
-      case 1:
-        return {x: 200, y: 50}
-
-      case 2:
-        return {x: 335, y: 50}
-
-      case 3:
-        return {x: 465, y: 50}
-
-      case 4:
-        return {x: 590, y: 50}
-
-      case 5:
-        return {x: 725, y: 50}
-
-      case 6:
-        return {x: 75, y: 180}
-
-      case 7:
-        return {x: 200, y: 180}
-
-      case 8:
-        return {x: 335, y: 180}
-
-      case 9:
-        return {x: 465, y: 180}
-        
-      case 10:
-        return {x: 590, y: 180}
-
-      case 11:
-        return {x: 725, y: 180}
-
-      case 12:
-        return {x: 75, y: 320}
-
-      case 13:
-        return {x: 200, y: 320}
-
-      case 14:
-        return {x: 335, y: 320}
-
-      case 15:
-        return {x: 465, y: 320}
-
-      case 16:
-        return {x: 590, y: 320}
-
-      case 17:
-        return {x: 725, y: 320}
-
-    }
-  }
-    let fantasmaCorretoPos = Math.floor(Math.random() * (18 - 0 + 1));
-    let fantasmaErradoPos = Math.floor(Math.random() * (18 - 0 + 1));
-    var coorFantasma = undefined
-
-
-  // escolhe um numero aleatório para o correto
-  this.minigameAlvo.on('escolheCorreto', () => {
-    fantasmaCorretoPos = Math.floor(Math.random() * (17 - 0 + 1));
-    coorFantasma = ConvertePos(fantasmaCorretoPos)
-
-    // posiciona
-    this.fantAlvoCorreto.setPosition(coorFantasma.x, coorFantasma.y)
-  })
-
-  // escolhe um numero aleatório para o errado
-  this.minigameAlvo.on('escolheErrado', () => {
-    fantasmaErradoPos = Math.floor(Math.random() * (18 - 0 + 1));
-
-    // se igual, rola de novo
-    if (fantasmaCorretoPos == fantasmaErradoPos) {
-      this.minigameAlvo.emit('escolheErrado')
-    } else {
-      coorFantasma = ConvertePos(fantasmaErradoPos)
-      this.fantAlvoErrado.setPosition(coorFantasma.x, coorFantasma.y)
-    }
-  })
-
-    this.fantAlvoCorreto.on('pointerdown', () => {
-      console.log('click')
-      this.minigameAlvo.emit('escolheCorreto')
-    })
-
-  this.minigameAlvo.emit('escolheCorreto')
-  console.log(this.fantAlvoCorreto.x, this.fantAlvoCorreto.y)
 
     this.physics.add.overlap(entradaTendaD, this.personagemLocal, () => {
       // this.cameras.main.startFollow(tiro)
@@ -1795,6 +1823,23 @@ export default class patio extends Phaser.Scene {
                 x: banco.x,
                 y: banco.y
               }))
+            })
+          )
+        }
+        if (this.fantGanhaPonto && this.fantPerdePonto) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              alvo: {
+                correto:{
+                  x: this.fantGanhaPonto.x,
+                  y: this.fantGanhaPonto.y
+                },
+
+                errado: {
+                  x: this.fantPerdePonto.x,
+                  y: this.fantPerdePonto.y                
+                }
+              }
             })
           )
         }
