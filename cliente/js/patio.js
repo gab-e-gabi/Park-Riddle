@@ -98,6 +98,7 @@ export default class patio extends Phaser.Scene {
     this.load.audio('pega-pista', 'assets/audio/pegaPista.mp3')
     this.load.audio('ernesto-machucado', 'assets/audio/ernesto-machucado.mp3')
     this.load.audio('bancoMovendo', 'assets/audio/bancoMovendo.mp3')
+    this.load.audio('falhaSom', 'assets/audio/falhaSom.mp3')
 
     this.input.addPointer()
   }
@@ -136,8 +137,13 @@ export default class patio extends Phaser.Scene {
     this.bancoMovedoSom = this.sound.add('bancoMovendo', {
       volume: 0.6
     })
+    this.falhaSom = this.sound.add('falhaSom', {
+      volume: 0.3
+    })
+    this.pistaSom = this.sound.add('pega-pista', {
+      volume: 0.5
+    })
     this.tiroSom = this.sound.add('tiro')
-    this.pistaSom = this.sound.add('pega-pista')
     
     this.tilemapMapa = this.make.tilemap({ key: 'mapa' })
     // Da um nome prar cada Tileset
@@ -634,10 +640,21 @@ export default class patio extends Phaser.Scene {
       }
 
       if (dados.alvo) {
+
+        if ((dados.alvo.correto.x != this.fantAlvoCorreto.x) || (dados.alvo.correto.y != this.fantAlvoCorreto.y)) {
+          if (this.minigameAlvo) {
+            console.log('mudou')
+            this.minigameAlvo.emit('mudouPos')
+          }
+        }
         this.fantAlvoCorreto.x = dados.alvo.correto.x
         this.fantAlvoCorreto.y = dados.alvo.correto.y
+        this.fantAlvoCorreto.alpha = dados.alvo.correto.alpha
+
         this.fantAlvoErrado.x = dados.alvo.errado.x
         this.fantAlvoErrado.y = dados.alvo.errado.y
+        this.fantAlvoErrado.alpha = dados.alvo.errado.alpha
+
       }
 
       if (dados.flagMorte) {
@@ -956,6 +973,8 @@ export default class patio extends Phaser.Scene {
       .depth = 100
 
     let flagFade = false
+    this.minigameAlvo = this.add.image(-200, -200, null)
+
     const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
     // const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
@@ -1094,6 +1113,7 @@ export default class patio extends Phaser.Scene {
       this.bancoPosicao.forEach((banco) => {
         banco.objeto = this.add.image(0,0 , 'banco')
         banco.numero = this.add.text(0,0 , banco.n).setMask(this.mascaraLanterna)
+        banco.numero.setVisible(false)
         
         banco.container = this.add.container(banco.x, banco.y, [banco.objeto, banco.numero])
         banco.container.setSize(20, 26)
@@ -1136,6 +1156,7 @@ export default class patio extends Phaser.Scene {
 
       this.checaValor = this.physics.add.image(-200, -200)
       this.spots.forEach((spot) => {
+        spot.setVisible(false)
         spot.podeChecar = true
 
         this.bancosContainers.forEach((bancos) => {
@@ -1186,14 +1207,11 @@ export default class patio extends Phaser.Scene {
         })
       })
 
-      this.fantGanhaPonto = this.physics.add.image(0, 0, null)
-      this.fantGanhaPonto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setAlpha(0.00001)
+      this.fantGanhaPonto = this.physics.add.staticImage(0, 0).setInteractive()
+      this.fantGanhaPonto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300)
 
-      this.fantPerdePonto = this.physics.add.image(0, 0, null)
-      this.fantPerdePonto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300).setAlpha(0.00001)
-
-      // codigo do tiro ao alvo
-      this.minigameAlvo = this.add.image(-200, -200, null)
+      this.fantPerdePonto = this.physics.add.staticImage(0, 0).setInteractive()
+      this.fantPerdePonto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(300)
 
       // converte a posição aleatória em coordenadas
       function ConvertePos(num) {
@@ -1262,9 +1280,9 @@ export default class patio extends Phaser.Scene {
       // escolhe um numero aleatório para o correto
       this.minigameAlvo.on('escolheCorreto', () => {
         ganhaPontoPos = Math.floor(Math.random() * (17 - 0 + 1));
-        coorFantasma = ConvertePos(ganhaPontoPos)
-
+        
         // posiciona
+        coorFantasma = ConvertePos(ganhaPontoPos)
         this.fantGanhaPonto.setPosition(coorFantasma.x, coorFantasma.y)
       })
 
@@ -1276,19 +1294,96 @@ export default class patio extends Phaser.Scene {
         if (ganhaPontoPos == perdePontoPos) {
           this.minigameAlvo.emit('escolheErrado')
         } else {
-          coorFantasma = ConvertePos(perdePontoPos)
 
-          this.fantGanhaPonto.setPosition(coorFantasma.x, coorFantasma.y)
+          coorFantasma = ConvertePos(perdePontoPos)
+          this.fantPerdePonto.setPosition(coorFantasma.x, coorFantasma.y)
+        }
+      })
+
+      this.minigameAlvo.emit('escolheCorreto')
+      this.minigameAlvo.emit('escolheErrado')
+      this.pontosTiroAlvo = 0
+
+      this.fantGanhaPonto.on('pointerdown', () => {
+        this.pistaSom.play()
+        this.pontosTiroAlvo += 1
+        this.povAlvosContador.text = 'Pontos: '+this.pontosTiroAlvo
+        this.minigameAlvo.emit('mudouPos')
+      })
+
+      this.fantPerdePonto.on('pointerdown', () => {
+        if (!this.falhaSom.isPlaying) {
+          this.falhaSom.play()
         }
 
-        
-      })
-      this.minigameAlvo.emit('escolheCorreto')
+        this.pontosTiroAlvo = 0
+        this.povAlvosContador.text = 'Pontos: '+this.pontosTiroAlvo
+        this.flagErro = true
 
-        this.fantGanhaPonto.on('pointerdown', () => {
-          console.log('click')
-          this.minigameAlvo.emit('escolheCorreto')
+        this.time.delayedCall(1500, () => {
+          if (this.flagErro) {
+            this.minigameAlvo.emit('mudouPos')
+            this.flagErro = false
+          }
         })
+
+      })
+
+      this.fadeInTween = this.tweens.add({
+        targets: [this.fantGanhaPonto, this.fantPerdePonto],
+        alpha: {from: 0, to: 1},
+        duration: 1000,
+        ease: 'Cubic',
+        yoyo: false,
+        repeat: 0,
+        persist: true,
+      });
+
+      this.fadeOutTween = this.tweens.add({
+        targets: [this.fantGanhaPonto, this.fantPerdePonto],
+        alpha: {from: 1, to: 0},
+        duration: 200,
+        ease: 'Ease',
+        yoyo: false,
+        repeat: 0,
+        persist: true,
+        onComplete: () => {
+          this.minigameAlvo.emit('escolheCorreto')
+          this.minigameAlvo.emit('escolheErrado')
+          if (this.pontosTiroAlvo < 10) {
+            this.time.delayedCall(300, () => {
+              this.fadeInTween.play()
+            })
+          } else {this.minigameAlvo.emit('ganhouAlvo')}
+        }
+      });
+
+      this.fantGanhaPonto.setVisible(false)
+      this.fantPerdePonto.setVisible(false)
+
+      this.minigameAlvo.on('mudouPos', () => {
+        this.fadeOutTween.play()
+      })
+
+      this.minigameAlvo.on('ganhouAlvo', () => {
+        povAlvosSair.setActive(false).setVisible(false)
+        povAlvos.setVisible(false)
+        this.cameras.main.startFollow(this.personagemLocal)
+        this.flagInteracao = false
+        this.speed = this.velocidade
+        this.pontosTiroAlvo = 0
+        this.povAlvosContador.text = 'Pontos: '+this.pontosTiroAlvo
+
+        if (this.personagemLocal.texture.key == 'ernesto') {
+          this.fantAlvoCorreto.setVisible(false)
+          this.fantAlvoErrado.setVisible(false)
+        }
+        if (this.personagemLocal.texture.key == 'dan') {
+          this.fantGanhaPonto.setVisible(false)
+          this.fantPerdePonto.setVisible(false)
+          this.povAlvosContador.setVisible(false)
+        }
+      })
     }
 
     if( this.personagemLocal.texture.key == 'ernesto') {
@@ -1310,11 +1405,14 @@ export default class patio extends Phaser.Scene {
         banco.spot = this.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
       })
 
-      this.fantAlvoCorreto = this.add.sprite(0, 0, 'fantasmaAlvo', 1)
-      this.fantAlvoCorreto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500).setVisible(false)
+      this.fantAlvoCorreto = this.add.sprite(0, 0, 'fantasmaAlvo', 0)
+      this.fantAlvoCorreto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500)
 
-      this.fantAlvoErrado = this.add.sprite(0, 0, 'fantasmaAlvo', 0)
-      this.fantAlvoErrado.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500).setVisible(false)
+      this.fantAlvoErrado = this.add.sprite(0, 0, 'fantasmaAlvo', 1)
+      this.fantAlvoErrado.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500)
+
+      this.fantAlvoCorreto.setVisible(false)
+      this.fantAlvoErrado.setVisible(false)
     }
 
     this.papelEnigma1 = this.physics.add.image(350, 1750, 'enigma1').setDisplaySize(32, 40)
@@ -1352,12 +1450,14 @@ export default class patio extends Phaser.Scene {
     const areaTiro = this.physics.add.image(1570, 1790).setSize(200, 80)
 
     const povAlvos = this.add.image(1580, 1860, 'povTiroAlvo').setDisplaySize(800, 500)
-    povAlvos.setVisible(false)
-    povAlvos.depth = 300
+    povAlvos.setVisible(false).depth = 300
+
     const povAlvosSair = this.add.text(1580, 2060, 'Clique aqui para sair').setInteractive().setOrigin(.5, .5)
-    povAlvosSair.setActive(false).setVisible(false)    
-    
-  
+    povAlvosSair.setActive(false).setVisible(false).depth = 300
+
+    this.povAlvosContador = this.add.text(1380, 2060, `Pontos: ${this.pontosTiroAlvo}`, {fontFamily: 'Arial',  fontSize: 24, color: '#fff000',stroke: '#000000', strokeThickness: 2})
+    this.povAlvosContador.setOrigin(.5, .5).setDepth(300).setVisible(false)
+
     this.botaoTiro = this.add.image(areaTiro.x, areaTiro.y, 'ler').setInteractive()
     this.botaoTiro.setVisible(false)
 
@@ -1378,8 +1478,9 @@ export default class patio extends Phaser.Scene {
         this.fantAlvoErrado.setVisible(true)
       }
       if (this.personagemLocal.texture.key == 'dan') {
-        this.fantGanhaPonto.setInteractive(true)
-        this.fantPerdePonto.setInteractive(true)
+        this.fantGanhaPonto.setVisible(true)
+        this.fantPerdePonto.setVisible(true)
+        this.povAlvosContador.setVisible(true)
       }
     })
 
@@ -1389,14 +1490,17 @@ export default class patio extends Phaser.Scene {
       this.cameras.main.startFollow(this.personagemLocal)
       this.flagInteracao = false
       this.speed = this.velocidade
+      this.pontosTiroAlvo = 0
+      this.povAlvosContador.text = 'Pontos: '+this.pontosTiroAlvo
 
       if (this.personagemLocal.texture.key == 'ernesto') {
         this.fantAlvoCorreto.setVisible(false)
         this.fantAlvoErrado.setVisible(false)
       }
       if (this.personagemLocal.texture.key == 'dan') {
-        this.fantGanhaPonto.setInteractive(false)
-        this.fantPerdePonto.setInteractive(false)
+        this.fantGanhaPonto.setVisible(false)
+        this.fantPerdePonto.setVisible(false)
+        this.povAlvosContador.setVisible(false)
       }
     })
 
@@ -1404,11 +1508,12 @@ export default class patio extends Phaser.Scene {
       // this.cameras.main.startFollow(tiro)
       this.personagemLocal.setSize(32, 12)
       this.personagemLocal.setOffset(16, 24)
-      this.lanternaRemota.setVisible(false)
-      this.lanternaLocal.setVisible(false)
+      this.lanternaRemota.setAlpha(0.0001)
+      this.lanternaLocal.setAlpha(0.0001)
 
       if(this.personagemLocal.texture.key == 'ernesto' && !this.flagBlur) {
-        this.cameras.main.postFX.addBlur(1, 2, 2, 1, 0xffffff, 5)
+        this.cameras.main.postFX.addBlur(1, 2, 1, 1, 0xffffff, 1)
+        this.cameras.main.postFX.addBarrel(1.2)
         this.flagBlur = true
       }
 
@@ -1451,8 +1556,8 @@ export default class patio extends Phaser.Scene {
     this.physics.add.overlap(saidaTendaD, this.personagemLocal, () => {
       this.personagemLocal.setSize(40, 2)
       this.personagemLocal.setOffset(12, 6)
-      this.lanternaRemota.setVisible(true)
-      this.lanternaLocal.setVisible(true)
+      this.lanternaRemota.setAlpha(1)
+      this.lanternaLocal.setAlpha(1)
       this.mascaraLanterna.invertAlpha = true
 
       if(this.personagemLocal.texture.key == 'ernesto') {
@@ -1495,18 +1600,9 @@ export default class patio extends Phaser.Scene {
       }
 
     })
-
-
-
-
-
-  //   this.input.on('pointerdown', (pointer) => {
-  //     console.log(pointer.x, pointer.y)
-  //   })
   }
 
   update() {
-    // this.minigameAlvo.emit('escolheCorreto')
 
     if (this.bancosContainers) {
   this.bancosContainers.forEach(banco => {
@@ -1832,12 +1928,14 @@ export default class patio extends Phaser.Scene {
               alvo: {
                 correto:{
                   x: this.fantGanhaPonto.x,
-                  y: this.fantGanhaPonto.y
+                  y: this.fantGanhaPonto.y,
+                  alpha: this.fantGanhaPonto.alpha
                 },
 
                 errado: {
                   x: this.fantPerdePonto.x,
-                  y: this.fantPerdePonto.y                
+                  y: this.fantPerdePonto.y,
+                  alpha: this.fantPerdePonto.alpha
                 }
               }
             })
