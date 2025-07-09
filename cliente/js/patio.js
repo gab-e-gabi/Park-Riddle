@@ -195,8 +195,8 @@ export default class patio extends Phaser.Scene {
         this.pistaSom.play(),
         this.pistasEncontradas += 1,
         contador.text = `Pistas: ${this.pistasEncontradas} / 6`
-        if (this.pistasEncontradas == 1) {
-          this.flagVenceu = true
+        if (this.pistasEncontradas == 6) {
+          // this.flagVenceu = true
         }
       }, null, this)
     })
@@ -543,7 +543,7 @@ export default class patio extends Phaser.Scene {
       this.fantasma.visivel = false
       this.fantasma.atacando = false
 
-      this.time.delayedCall(1000, () => { //Primeiro fantasma >>>>> 60s
+      this.time.delayedCall(40000, () => { //Primeiro fantasma >>>>> 40s
         this.fantasma.setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
         this.fantasmaAngulo = 0
         this.fantasmaDistancia = 150
@@ -564,7 +564,7 @@ export default class patio extends Phaser.Scene {
         this.fantasma.setFrame(0)
         this.fantasma.visivel = false
         
-        this.time.delayedCall(3000, () => { //tempo de spawn dos fantasmas >>>> 30s
+        this.time.delayedCall(20000, () => { //tempo de spawn dos fantasmas >>>> 20s
           this.fantasma.setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
           this.fantasmaAngulo = 0
           this.fantasmaDistancia = 150
@@ -1097,12 +1097,12 @@ export default class patio extends Phaser.Scene {
     })
 
     this.bancoPosicao = [
-      {x: 250, y: 1650, n: 6, cod: 6},
-      {x: 290, y: 1650, n: 5, cod: 5},
+      {x: 250, y: 1650, n: 3, cod: 6},
+      {x: 290, y: 1650, n: 4, cod: 5},
       {x: 330, y: 1650, n: 2, cod: 2},
-      {x: 370, y: 1650, n: 1, cod: 1},
-      {x: 410, y: 1650, n: 4, cod: 4},
-      {x: 450, y: 1650, n: 3, cod: 3},
+      {x: 370, y: 1650, n: 5, cod: 1},
+      {x: 410, y: 1650, n: 1, cod: 4},
+      {x: 450, y: 1650, n: 6, cod: 3},
     ]
 
     if (this.personagemLocal.texture.key == 'dan') {
@@ -1442,8 +1442,8 @@ export default class patio extends Phaser.Scene {
     })
 
     this.flagBlur = false
-    // const entradaTendaD = this.physics.add.staticImage(1630, 370).setSize(50, 50)
-    const entradaTendaD = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    const entradaTendaD = this.physics.add.staticImage(1630, 370).setSize(50, 50)
+    // const entradaTendaD = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
     const saidaTendaD = this.physics.add.staticImage(1570, 2080).setSize(50, 50)
 
     this.add.image(1560, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
