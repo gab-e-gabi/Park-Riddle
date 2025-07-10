@@ -9,29 +9,19 @@ export default class patio extends Phaser.Scene {
     this.personagemLocalAcao = false
     this.flagDentro = false
     this.velocidade = undefined
+    this.ultimoAngulo = -1.5
+    this.emCutscene = false
   }
 
   init() { }
 
   preload() {
 
-    this.load.image('lanterna', 'assets/luz.png')
-    this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
-    this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
-
+    // Principais
     this.load.spritesheet('ernesto', 'assets/ernesto.png', {
       frameWidth: 64,
       frameHeight: 64
     })
-    this.load.spritesheet('fumaca', 'assets/fumaca.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    })
-    this.load.spritesheet('lupa', 'assets/UI/lupa.png', {
-      frameWidth: 32,
-      frameHeight: 32
-    })
-
     this.load.spritesheet('dan', 'assets/dan.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -42,14 +32,26 @@ export default class patio extends Phaser.Scene {
       frameHeight: 64
     })
 
+    // FX
     this.load.image('mascaraPersonagem', 'assets/mascaraPlayer.png')
     this.load.image('mascaraLanterna', 'assets/mascaraLanterna.png')
-
-    this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
+    this.load.image('lanterna', 'assets/luz.png')
+    this.load.image('particula-chuva', 'assets/mapa/texturas/chuva.png')
+    this.textures.generate('bullet', { data: ['1'], pixelWidth: 1, pixelHeight: 1 });
+    this.load.spritesheet('fumaca', 'assets/fumaca.png', {
       frameWidth: 32,
       frameHeight: 32
     })
 
+    // UI
+    this.load.image('ponteiro', 'assets/UI/seta.png')
+    this.load.image('ler', 'assets/UI/interacaoLer.png')
+    this.load.image('danFala', 'assets/UI/danFala.png')
+    this.load.image('ernestoFala', 'assets/UI/ernestoFala.png')
+    this.load.spritesheet('tela-cheia', 'assets/UI/tela-cheia.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    })
     this.load.spritesheet('tiro', 'assets/UI/shootUI.png', {
       frameWidth: 64,
       frameHeight: 64
@@ -70,13 +72,12 @@ export default class patio extends Phaser.Scene {
       frameWidth: 45,
       frameHeight: 12
     })
-    this.load.spritesheet('fantasmaAlvo', 'assets/fantasmasAlvos.png',{
-      frameWidth: 50,
-      frameHeight: 64
+    this.load.spritesheet('lupa', 'assets/UI/lupa.png', {
+      frameWidth: 32,
+      frameHeight: 32
     })
-    this.load.image('ponteiro', 'assets/UI/seta.png')
-    this.load.image('ler', 'assets/UI/interacaoLer.png')
 
+    // Mapa
     this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa-patio.json')
     this.load.image('chao', 'assets/mapa/texturas/chao/chao.png')
     this.load.image('arvores', 'assets/mapa/texturas/objetos/arvores.png')
@@ -85,9 +86,17 @@ export default class patio extends Phaser.Scene {
     this.load.image('marcacao', 'assets/mapa/texturas/objetos/marcacao.png')
     this.load.image('banco', 'assets/mapa/texturas/objetos/banco.png')
     this.load.image('povTiroAlvo', 'assets/mapa/texturas/objetos/povTiroAlvo.png')
+    this.load.spritesheet('fantasmaAlvo', 'assets/fantasmasAlvos.png',{
+      frameWidth: 50,
+      frameHeight: 64
+    })
 
+
+    // Plugins
     this.load.plugin('rexvirtualjoystickplugin', './js/rexvirtualjoystickplugin.min.js', true)
 
+
+    // Audio
     this.load.audio("trilha-sonora", 'assets/audio/trilha-sonora.mp3')
     this.load.audio('chuva', 'assets/audio/chuva.mp3')
     this.load.audio('chuvaInterior', 'assets/audio/chuvaInterior.mp3')
@@ -196,7 +205,10 @@ export default class patio extends Phaser.Scene {
         this.pistasEncontradas += 1,
         contador.text = `Pistas: ${this.pistasEncontradas} / 6`
         if (this.pistasEncontradas == 6) {
-          // this.flagVenceu = true
+          entradaTendaE.body.enable = true
+          entradaTendaD.body.enable = true
+
+          this.AbrindoTendas()
         }
       }, null, this)
     })
@@ -272,6 +284,7 @@ export default class patio extends Phaser.Scene {
       this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0)
         .setInteractive()
         .setScrollFactor(0)
+      this.botaoCorrida
         .on('pointerdown', () => {
           if (!this.flagInteracao) {
             this.speed = this.velocidade *2
@@ -381,8 +394,7 @@ export default class patio extends Phaser.Scene {
       this.vidas.on('dano', () => {
         this.machucadoSom.play()
         if (vidas == 2) {
-          console.log('morreu')
-          // this.flagMorte = true
+          this.flagMorte = true
         } else {
           vidas += 1
           this.vidas.setFrame(vidas)
@@ -455,6 +467,7 @@ export default class patio extends Phaser.Scene {
       this.botaoCorrida = this.add.sprite(700, 400, 'corrida', 0, )
         .setInteractive()
         .setScrollFactor(0)
+      this.botaoCorrida
         .on('pointerdown', () => {
           if (!this.flagInteracao) {
             this.speed = this.velocidade * 2
@@ -543,12 +556,14 @@ export default class patio extends Phaser.Scene {
       this.fantasma.visivel = false
       this.fantasma.atacando = false
 
-      this.time.delayedCall(40000, () => { //Primeiro fantasma >>>>> 40s
-        this.fantasma.setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
-        this.fantasmaAngulo = 0
-        this.fantasmaDistancia = 150
-        this.fantasma.visivel = true
-        this.fantasma.atacando = true
+      this.fantasma.on('comecou', () => {
+        this.time.delayedCall(30000, () => { //Primeiro fantasma >>>>> 30s
+          this.fantasma.setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
+          this.fantasmaAngulo = 0
+          this.fantasmaDistancia = 150
+          this.fantasma.visivel = true
+          this.fantasma.atacando = true
+        })
       })
 
       this.physics.add.overlap(this.fantasma, this.particulaAcaoLocal, () => {
@@ -564,7 +579,7 @@ export default class patio extends Phaser.Scene {
         this.fantasma.setFrame(0)
         this.fantasma.visivel = false
         
-        this.time.delayedCall(20000, () => { //tempo de spawn dos fantasmas >>>> 20s
+        this.time.delayedCall(15000, () => { //tempo de spawn dos fantasmas >>>> 15s
           this.fantasma.setPosition(this.personagemRemoto.x, this.personagemRemoto.y - 100)
           this.fantasmaAngulo = 0
           this.fantasmaDistancia = 150
@@ -643,7 +658,6 @@ export default class patio extends Phaser.Scene {
 
         if ((dados.alvo.correto.x != this.fantAlvoCorreto.x) || (dados.alvo.correto.y != this.fantAlvoCorreto.y)) {
           if (this.minigameAlvo) {
-            console.log('mudou')
             this.minigameAlvo.emit('mudouPos')
           }
         }
@@ -931,10 +945,10 @@ export default class patio extends Phaser.Scene {
     this.noite.setBlendMode(Phaser.BlendModes.MULTIPLY)
     this.noite.depth = 99
 
-    //chuva
-    this.particulaChuva = this.add.particles(0, -128, 'particula-chuva', {
-      x: { min: this.personagemLocal.x - 1200, max: this.personagemLocal.x + 1200},
-      quantity: 50, // mais gotas
+    // //chuva
+    this.particulaChuva = this.add.particles(0, 0, 'particula-chuva', {
+      x: { min: this.personagemLocal.x - 1500, max: this.personagemLocal.x + 500},
+      quantity: 20, // mais gotas
       lifespan: 2000,
       speedY: { min: 900, max: 2200 }, // mais rápido
       speedX: { min: -120, max: 120 }, // vento lateral
@@ -944,7 +958,7 @@ export default class patio extends Phaser.Scene {
       alpha: { min: 0.7, max: 1 }, // mais opacas
       blendMode: 'ADD' // mais brilho
     })
-      // .setScrollFactor(0)
+      .setScrollFactor(0)
       this.particulaChuva.depth = 99
 
     this.ponteiro = this.physics.add.image(this.personagemRemoto.x, this.personagemRemoto.y, 'ponteiro').setDisplaySize(80, 64)
@@ -960,7 +974,8 @@ export default class patio extends Phaser.Scene {
     this.joystick.base.depth = 200
     this.joystick.thumb.depth = 200
 
-    this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive().on('pointerdown', () => {
+    this.telaCheia = this.add.sprite(778, 20, "tela-cheia", 0).setInteractive()
+    this.telaCheia.on('pointerdown', () => {
       if (this.scale.isFullscreen) {
         this.scale.stopFullscreen();
         this.telaCheia.setFrame(0);
@@ -976,7 +991,7 @@ export default class patio extends Phaser.Scene {
     this.minigameAlvo = this.add.image(-200, -200, null)
 
     const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
-    // const entradaTendaE = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    entradaTendaE.body.enable = false
     const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
 
     this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
@@ -1443,7 +1458,7 @@ export default class patio extends Phaser.Scene {
 
     this.flagBlur = false
     const entradaTendaD = this.physics.add.staticImage(1630, 370).setSize(50, 50)
-    // const entradaTendaD = this.physics.add.staticImage(this.personagemRemoto.x, this.personagemLocal.y).setSize(50, 50)
+    entradaTendaD.body.enable = false
     const saidaTendaD = this.physics.add.staticImage(1570, 2080).setSize(50, 50)
 
     this.add.image(1560, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
@@ -1600,20 +1615,120 @@ export default class patio extends Phaser.Scene {
       }
 
     })
+    this.EntrandoParque()
+
   }
 
-  update() {
+    TextoFala (fala, falante, chainFunc)
+  {
+
+      this.joystick.setEnable(false)
+      this.joystick.thumb.setVisible(false)
+      this.joystick.base.setVisible(false)
+      this.botaoAcao.setVisible(false)
+      this.botaoCorrida.setVisible(false)
+      this.speed = 0
+
+      var bubbleWidth = 632;
+      var bubbleHeight = 100;
+      var bkg = this.add.image(0, 450, `${falante}Fala`).setOrigin(0, 1).setScrollFactor(0).setDisplaySize(800, 128)
+      var bubble = this.add.graphics({ x: 140, y: 336 }).setScrollFactor(0);
+
+      //  Bubble color
+      bubble.fillStyle(0x012201, 1);
+
+      //  Bubble outline line style
+      bubble.lineStyle(4, 0x000100, 1);
+
+      //  Bubble shape and outline
+      bubble.strokeRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+      bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+
+      var content = this.add.text(0, 0, fala, { fontFamily: 'Arial', fontSize: 20, color: '#bbbbbb', align: 'center', wordWrap: { width: bubbleWidth - 40 } });
+      content.setScrollFactor(0);
+
+      var b = content.getBounds();
+
+      content.setPosition(bubble.x + (bubbleWidth / 2) - (b.width / 2), bubble.y + (bubbleHeight / 2) - (b.height / 2));
+
+      bkg.setInteractive().on('pointerdown', () => {
+        content.destroy()
+        bubble.destroy()
+        bkg.destroy()
+
+        if (typeof chainFunc === 'function') {chainFunc()}
+        else {
+          this.joystick.setEnable(true)
+          this.joystick.thumb.setVisible(true)
+          this.joystick.base.setVisible(true)
+          this.botaoAcao.setVisible(true)
+          this.botaoCorrida.setVisible(true)
+          this.speed = this.velocidade
+        }
+      })
+  }
+
+    EntrandoParque () {
+      const d = 'dan'
+      const e = 'ernesto'
+    this.emCutscene = true
+
+    this.TextoFala('Finalmente chegamos, bem isolado esse lugar, essa chuva também não ajudou.', d, () =>
+    this.TextoFala('Vamos terminar isso logo, por onde começamos?', d, () => 
+    this.TextoFala('Se acalme, jovem. Não podemos ir com pressa, vamos acabar perdendo algo.', e, () => 
+    this.TextoFala('Vamos dar uma boa olhada nos arredores primeiramente', e, () => {
+
+      if (this.personagemLocal.texture.key == e) {
+        const fant = this.add.sprite(this.personagemLocal.x, this.personagemLocal.y - 200, 'fantasma', 0)
+        fant.setAlpha(0)
+        this.fantasmaSom.play()
+
+        const fadeIn = this.tweens.add({
+          targets: fant,
+          alpha: {from: 0, to: 1},
+          duration: 1000,
+          ease: 'Ease',
+          yoyo: true,
+          repeat: 0,
+          onComplete: () => {
+              fant.destroy()
+          }
+        });
+          fadeIn.play()
+        }
+    this.TextoFala('Viu isso?', e, () => 
+    this.TextoFala('O que?! Onde atiro?!', d, () =>
+    this.TextoFala('HaHaHaHa. Se acalme jovem.', e, () =>
+    this.TextoFala('Esse caso vai ser mais intersante do que eu esperava...', e, () =>
+    this.TextoFala('Ahnn.. Espero que isso seja uma coisa boa. Não esquece que fui designado para sua segurança, onde precisar que eu atire, eu atiro', d, () => {
+
+      if (this.personagemLocal.texture.key == 'dan') this.fantasma.emit('comecou')
+
+    this.TextoFala('HaHaHa. Certo, agora vamos procurar pistas. A fumaça do meu cachimbo deve nos ajudar a encontrar pistas (🔎)', e
+    )}
+    )))))
+    }))))
+
+  }
+
+    AbrindoTendas() {
+
+  }
+
+  update(time, delta) {
+    // Normaliza delta para 60 FPS (16.666 ms)
+    const norm = delta / 16.666;
 
     if (this.bancosContainers) {
-  this.bancosContainers.forEach(banco => {
-    if (banco.detector) {
-      banco.detector.x = banco.x;
-      banco.detector.y = banco.y;
+      this.bancosContainers.forEach(banco => {
+        if (banco.detector) {
+          banco.detector.x = banco.x;
+          banco.detector.y = banco.y;
+        }
+      });
     }
-  });
-}
 
-    const angle = Phaser.Math.DegToRad(this.joystick.angle) // Converte o ângulo para radianos
+    const angle = Phaser.Math.DegToRad(this.joystick.angle)
     const force = this.joystick.force
 
     // Acha o aungulo mais próximo da direção do joystick
@@ -1630,106 +1745,95 @@ export default class patio extends Phaser.Scene {
       this.ultimoAngulo = angle
     }
 
+    // Stamina recupera usando delta
     if ((this.personagemLocal.movimento == 'andando' && this.personagemLocal.stamina != 650)) {
-      this.personagemLocal.stamina += 1
+      this.personagemLocal.stamina += 1 * norm;
+      if (this.personagemLocal.stamina > 650) this.personagemLocal.stamina = 650;
       this.barraStamina.radius = this.personagemLocal.stamina / 50
 
     } else if (this.personagemLocal.stamina == 650) {
       this.personagemLocal.cansado = false
       this.barraStamina.setFillStyle(0x309a06)
       this.barraStamina.setAlpha(0)
-      // this.barraStaminaFundo.setAlpha(0)
       this.barraStaminaMeio.setAlpha(1)
       this.barraStaminaMeio.setFillStyle(0x309a06)
 
       if (this.barraStaminaFundo.radius >= this.barraStaminaMeio.radius + 1) {
-        this.barraStaminaFundo.radius -= 0.4
+        this.barraStaminaFundo.radius -= 0.4 * norm;
       }
     }
 
     this.lanternaRemota.setPosition(this.personagemRemoto.x, this.personagemRemoto.y + 15)
     this.lanternaRemota.setRotation(this.angleRemoto)
-
     this.lanternaLocal.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
     this.lanternaLocal.setRotation(this.ultimoAngulo)
 
-      let pathFinder = Phaser.Math.Angle.Between(this.ponteiro.x, this.ponteiro.y, this.personagemRemoto.x, this.personagemRemoto.y)
+    let pathFinder = Phaser.Math.Angle.Between(this.ponteiro.x, this.ponteiro.y, this.personagemRemoto.x, this.personagemRemoto.y)
+    this.ponteiro.setRotation(pathFinder)
+    const indicadorX = Math.round(Math.cos(pathFinder) * 120)
+    const indicadorY = Math.round(Math.sin(pathFinder) * 120)
+    const dist = Phaser.Math.Distance.Between(
+      this.ponteiro.x, this.ponteiro.y,
+      this.personagemRemoto.x, this.personagemRemoto.y
+    )
+    const modDistancia = (dist / 30)
+    this.ponteiro.setDisplaySize(80 - modDistancia, 64 - modDistancia)
+    if (dist < 10) {
+      this.ponteiro.setVelocity(0, 0);
+    } else {
+      this.ponteiro.setVelocity(indicadorX, indicadorY)
+    }
 
-      this.ponteiro.setRotation(pathFinder)
-
-      const indicadorX = Math.round(Math.cos(pathFinder) * 120)
-      const indicadorY = Math.round(Math.sin(pathFinder) * 120)
-
-      const dist = Phaser.Math.Distance.Between(
-        this.ponteiro.x, this.ponteiro.y,
-        this.personagemRemoto.x, this.personagemRemoto.y
-      )
-
-      const modDistancia = (dist / 30)
-      this.ponteiro.setDisplaySize(80 - modDistancia, 64 - modDistancia)
-
-      if (dist < 10) {
-        this.ponteiro.setVelocity(0, 0);
-      } else {
-        this.ponteiro.setVelocity(indicadorX, indicadorY)
-      }
-      
-      const cam = this.cameras.main;
-      const left = cam.worldView.left;
-      const top = cam.worldView.top;
-      const right = cam.worldView.right;
-      const bottom = cam.worldView.bottom;
-      
-      const remotoNaTela =
+    const cam = this.cameras.main;
+    const left = cam.worldView.left;
+    const top = cam.worldView.top;
+    const right = cam.worldView.right;
+    const bottom = cam.worldView.bottom;
+    const remotoNaTela =
       this.personagemRemoto.x >= left &&
       this.personagemRemoto.x <= right &&
       this.personagemRemoto.y >= top &&
       this.personagemRemoto.y <= bottom;
-      
-      if (!remotoNaTela && !this.flagDentro && !this.personagemRemoto.estaDentro) {
-        this.ponteiro.setVisible(true)
+
+    if (!remotoNaTela && !this.flagDentro && !this.personagemRemoto.estaDentro) {
+      this.ponteiro.setVisible(true)
         .setActive(true)
-      } else {
-        this.ponteiro.setVisible(false)
+    } else {
+      this.ponteiro.setVisible(false)
         .setActive(false)
-      }
-      this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
-      this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
+    }
+    this.ponteiro.y = Phaser.Math.Clamp(this.ponteiro.y, top + 50, bottom - 50);
+    this.ponteiro.x = Phaser.Math.Clamp(this.ponteiro.x, left + 50, right - 50);
 
+    // Fantasma girando (usar delta)
     if (this.personagemLocal.texture.key == 'dan' && this.fantasma.atacando) {
-      
       Phaser.Math.RotateAroundDistance(this.fantasma, this.personagemRemoto.x, this.personagemRemoto.y, this.fantasmaAngulo, this.fantasmaDistancia);
-      this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00003);
-      this.fantasmaDistancia -= 0.1
-
+      this.fantasmaAngulo = Phaser.Math.Angle.Wrap(this.fantasmaAngulo + 0.00003 * norm);
+      this.fantasmaDistancia -= 0.2 * norm;
       if (this.fantasmaDistancia < 5) {
         this.fantasma.atacando = false
         this.fantasma.emit('invisivel')
       }
     }
 
-      if (this.personagemLocal.texture.key == 'ernesto') {
-
+    if (this.personagemLocal.texture.key == 'ernesto') {
       const agora = this.time.now;
       const distancia = Phaser.Math.Distance.BetweenPoints(this.personagemLocal, this.fantasmaRemoto);
-
       if (this.fantasmaRemoto.visible &&
-        distancia < 10 && // tolerância de colisão
+        distancia < 10 &&
         !this.invulneravel
       ) {
         this.vidas.emit('dano');
         this.invulneravel = true;
         this.tempoUltimoDano = agora;
       }
-
       if (this.invulneravel && agora - this.tempoUltimoDano > this.tempoInvulnerabilidade) {
         this.invulneravel = false;
-}
-
-        if (this.fantasmaRemoto.visible && !this.fantasmaSom.isPlaying && !this.flagDentro) {
-          this.fantasmaSom.play()
-          }
       }
+      if (this.fantasmaRemoto.visible && !this.fantasmaSom.isPlaying && !this.flagDentro) {
+        this.fantasmaSom.play()
+      }
+    }
 
     if (((this.threshold < force) && (force <= 1000)) && (this.personagemLocalAcao != true)) {
 
@@ -1738,13 +1842,14 @@ export default class patio extends Phaser.Scene {
 
       if (this.personagemLocal.cansado == false) {
         if (this.personagemLocal.movimento == 'correndo' && this.personagemLocal.stamina > 150) {
-          this.personagemLocal.stamina -= 1
+          this.personagemLocal.stamina -= 1 * norm;
+          if (this.personagemLocal.stamina < 150) this.personagemLocal.stamina = 150;
           this.barraStamina.setAlpha(1)
           this.barraStaminaFundo.setAlpha(1)
           this.barraStaminaMeio.setAlpha(1)
           this.barraStaminaMeio.setFillStyle(0x000000)
           this.barraStamina.radius = this.personagemLocal.stamina / 50
-          this.barraStaminaFundo.radius = this.personagemLocal.stamina / 50 + 2
+          this.barraStaminaFundo.radius = this.personagemLocal.stamina / 50 +  2
         }
         else if (this.personagemLocal.stamina == 150) {
           this.personagemLocal.movimento = 'andando'
@@ -1756,11 +1861,11 @@ export default class patio extends Phaser.Scene {
           this.speed = this.velocidade
         }
       }
-
       this.personagemLocal.setVelocity(velocityX, velocityY)
       this.cameras.main.followOffset.setTo(- velocityX, - velocityY)
+
       this.areaColeta.setPosition(this.personagemLocal.x, this.personagemLocal.y)
-      
+
       this.imagemMascaraPersonagem.setPosition(this.personagemLocal.x, this.personagemLocal.y)
       this.imagemMascaraLanterna.setPosition(this.personagemLocal.x, this.personagemLocal.y + 15)
       this.imagemMascaraLanterna.setRotation(this.ultimoAngulo)
@@ -1769,12 +1874,11 @@ export default class patio extends Phaser.Scene {
       this.barraStaminaFundo.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
       this.barraStaminaMeio.setPosition(this.personagemLocal.x - ((Math.cos(angle) * 30)), this.personagemLocal.y + (Math.abs(Math.cos(angle) * 30)) - 70)
 
-      //Altera pitch dos passos
       let Modulado = Math.floor(Math.random() * (2200 - 0 + 1));
       this.passosSom.setDetune(Modulado)
       this.passosMadeiraSom.setDetune(Modulado)
-
       this.frameAtual = this.personagemLocal.anims.currentFrame.index;
+
       const pesNoChao = [4, 10]
       if (pesNoChao.includes(this.frameAtual) && this.personagemLocalAcao == false) {
         if (!this.flagDentro) {
@@ -1784,10 +1888,7 @@ export default class patio extends Phaser.Scene {
         }
       }
 
-
-      //Animações somente para o Dan
       if (this.personagemLocal.texture.key == 'dan' && this.personagemLocal.movimento == 'correndo') {
-
         switch (this.direcao) {
           case 0:
             this.personagemLocal.anims.play('dan-correndo-direita', true)
@@ -1827,7 +1928,6 @@ export default class patio extends Phaser.Scene {
             break
         }
       } else {
-        // Animação do personagem conforme a direção do movimento
         switch (this.direcao) {
           case 0:
             this.personagemLocal.anims.play('personagem-andando-direita', true)
@@ -1867,15 +1967,12 @@ export default class patio extends Phaser.Scene {
             break
         }
       }
-
     } else {
-      // Se a força do joystick for baixa, o personagem para
       if (this.personagemLocalAcao != true) {
         this.personagemLocal.setVelocity(0)
         this.personagemLocal.anims.play(`personagem-parado-${this.direcaoAtual}`, true)
       }
     }
-
     try {
       if (this.game.dadosJogo.readyState === "open") {
         if (this.personagemLocal && this.pistas) {
@@ -1931,7 +2028,6 @@ export default class patio extends Phaser.Scene {
                   y: this.fantGanhaPonto.y,
                   alpha: this.fantGanhaPonto.alpha
                 },
-
                 errado: {
                   x: this.fantPerdePonto.x,
                   y: this.fantPerdePonto.y,
@@ -1961,7 +2057,6 @@ export default class patio extends Phaser.Scene {
     } catch (error) {
       console.error(error);
     }
-    
     if (this.flagMorte == true) {
       this.sound.stopAll()
       this.scene.stop()
