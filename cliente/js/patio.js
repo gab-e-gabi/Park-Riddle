@@ -1802,7 +1802,7 @@ export default class patio extends Phaser.Scene {
     this.TextoFala('Viu isso?', e, () => 
     this.TextoFala('O que?! Onde atiro?!', d, () =>
     this.TextoFala('HaHaHaHa. Se acalme jovem.', e, () =>
-    this.TextoFala('Esse caso vai ser mais intersante do que eu esperava...', e, () =>
+    this.TextoFala('Esse caso vai ser mais interessante do que eu esperava...', e, () =>
     this.TextoFala('Ahnn.. Espero que isso seja uma coisa boa. Não esquece que fui designado para sua segurança, onde precisar que eu atire, eu atiro', d, () => {
 
       if (this.personagemLocal.texture.key == 'dan') this.fantasma.emit('comecou')
