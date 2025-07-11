@@ -11,6 +11,13 @@ export default class patio extends Phaser.Scene {
     this.velocidade = undefined
     this.ultimoAngulo = -1.5
     this.emCutscene = false
+    this.flagTendaAberta = false
+    this.entrouTendaE = false
+    this.entrouTendaD = false
+      // this.personagemLocal.dentroTendaE = false
+      // this.personagemLocal.dentroTendaD = false
+      // this.personagemRemoto.dentroTendaE = false
+      // this.personagemRemoto.dentroTendaD = false
   }
 
   init() { }
@@ -204,11 +211,9 @@ export default class patio extends Phaser.Scene {
         this.pistaSom.play(),
         this.pistasEncontradas += 1,
         contador.text = `Pistas: ${this.pistasEncontradas} / 6`
-        if (this.pistasEncontradas == 6) {
-          entradaTendaE.body.enable = true
-          entradaTendaD.body.enable = true
 
-          this.AbrindoTendas()
+        if (this.pistasEncontradas == 6) {
+          this.flagPegouPistas = true
         }
       }, null, this)
     })
@@ -609,6 +614,8 @@ export default class patio extends Phaser.Scene {
         this.personagemRemoto.y = dados.personagem.y;
         this.personagemRemoto.setFrame(dados.personagem.frame);
         this.personagemRemoto.estaDentro = dados.personagem.estaDentro
+        this.personagemRemoto.dentroTendaE = dados.personagem.dentroTendaE
+        this.personagemRemoto.dentroTendaD = dados.personagem.dentroTendaD
         this.angleRemoto = dados.personagem.lanterna
       }
 
@@ -674,8 +681,8 @@ export default class patio extends Phaser.Scene {
       if (dados.flagMorte) {
         this.flagMorte = dados.flagMorte
       }
-      if (dados.flagVenceu) {
-        this.flagVenceu = dados.flagVenceu
+      if (dados.flagPegouPistas) {
+        this.flagPegouPistas = dados.flagPegouPistas
       }
     };
 
@@ -990,11 +997,13 @@ export default class patio extends Phaser.Scene {
     let flagFade = false
     this.minigameAlvo = this.add.image(-200, -200, null)
 
-    const entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
-    entradaTendaE.body.enable = false
-    const saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
+    this.entradaTendaE = this.physics.add.staticImage(288, 370).setSize(50, 50)
+    this.entradaTendaE.body.enable = false
+
+    this.saidaTendaE = this.physics.add.staticImage(350, 2080).setSize(50, 50)
 
     this.add.image(355, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
+
     this.bordasProtecao = [
       this.physics.add.staticImage(150, 1750, null).setVisible(false).setSize(16, 400),
       this.physics.add.staticImage(355, 1950, null).setVisible(false).setSize(400, 16),
@@ -1002,7 +1011,7 @@ export default class patio extends Phaser.Scene {
       this.physics.add.staticImage(550, 1750, null).setVisible(false).setSize(16, 400)
     ]
 
-    this.physics.add.overlap(entradaTendaE, this.personagemLocal, () => {
+    this.physics.add.overlap(this.entradaTendaE, this.personagemLocal, () => {
       this.personagemLocal.setSize(32, 12)
       this.personagemLocal.setOffset(16, 24)
       this.mascaraLanterna.invertAlpha = false
@@ -1013,8 +1022,10 @@ export default class patio extends Phaser.Scene {
         this.cameras.main.fadeOut(1000)
         flagFade = true
 
-        this.cameras.main.on('camerafadeoutcomplete', () => {
+        this.cameras.main.once('camerafadeoutcomplete', () => {
           this.cameras.main.fadeIn(1200);
+
+          this.personagemLocal.dentroTendaE = true
 
           this.personagemLocal.setPosition(355, 2000)
           this.physics.world.setBounds(
@@ -1057,9 +1068,10 @@ export default class patio extends Phaser.Scene {
       }
     })
 
-    this.physics.add.overlap(saidaTendaE, this.personagemLocal, () => {
+    this.physics.add.overlap(this.saidaTendaE, this.personagemLocal, () => {
       this.personagemLocal.setSize(40, 2)
       this.personagemLocal.setOffset(12, 6)
+      this.personagemLocal.dentroTendaE = false
       this.mascaraLanterna.invertAlpha = true
 
 
@@ -1067,7 +1079,7 @@ export default class patio extends Phaser.Scene {
         this.cameras.main.fadeOut(1000)
         flagFade = true
 
-        this.cameras.main.on('camerafadeoutcomplete', () => {
+        this.cameras.main.once('camerafadeoutcomplete', () => {
           this.cameras.main.fadeIn(1200);
 
           this.personagemLocal.setPosition(288, 500)
@@ -1457,9 +1469,10 @@ export default class patio extends Phaser.Scene {
     })
 
     this.flagBlur = false
-    const entradaTendaD = this.physics.add.staticImage(1630, 370).setSize(50, 50)
-    entradaTendaD.body.enable = false
-    const saidaTendaD = this.physics.add.staticImage(1570, 2080).setSize(50, 50)
+    this.entradaTendaD = this.physics.add.staticImage(1630, 370).setSize(50, 50)
+    this.entradaTendaD.body.enable = false
+
+    this.saidaTendaD = this.physics.add.staticImage(1570, 2080).setSize(50, 50)
 
     this.add.image(1560, 1750, 'mascaraPersonagem').setDisplaySize(800, 800).setTint(0xfffabe).setAlpha(0.2).setBlendMode(Phaser.BlendModes.ADD)
     const areaTiro = this.physics.add.image(1570, 1790).setSize(200, 80)
@@ -1519,25 +1532,29 @@ export default class patio extends Phaser.Scene {
       }
     })
 
-    this.physics.add.overlap(entradaTendaD, this.personagemLocal, () => {
-      // this.cameras.main.startFollow(tiro)
+    this.physics.add.overlap(this.entradaTendaD, this.personagemLocal, () => {
       this.personagemLocal.setSize(32, 12)
       this.personagemLocal.setOffset(16, 24)
-      this.lanternaRemota.setAlpha(0.0001)
-      this.lanternaLocal.setAlpha(0.0001)
 
-      if(this.personagemLocal.texture.key == 'ernesto' && !this.flagBlur) {
-        this.cameras.main.postFX.addBlur(1, 2, 1, 1, 0xffffff, 1)
-        this.cameras.main.postFX.addBarrel(1.2)
-        this.flagBlur = true
-      }
 
       if (!flagFade) {
         this.cameras.main.fadeOut(1000)
         flagFade = true
 
-        this.cameras.main.on('camerafadeoutcomplete', () => {
+        this.cameras.main.once('camerafadeoutcomplete', () => {
           this.cameras.main.fadeIn(1200);
+          
+          this.lanternaRemota.setAlpha(0.0001)
+          this.lanternaLocal.setAlpha(0.0001)
+
+          if(this.personagemLocal.texture.key == 'ernesto' && !this.flagBlur && this.entrouTendaD) {
+            console.log('emb')
+            this.cameras.main.postFX.addBlur(1, 2, 1, 1, 0xffffff, 1)
+            this.cameras.main.postFX.addBarrel(1.2)
+            this.flagBlur = true
+          }
+
+          this.personagemLocal.dentroTendaD = true
 
           this.personagemLocal.setPosition(1560, 2000)
           this.physics.world.setBounds(
@@ -1568,24 +1585,28 @@ export default class patio extends Phaser.Scene {
       }
     })
 
-    this.physics.add.overlap(saidaTendaD, this.personagemLocal, () => {
+    this.physics.add.overlap(this.saidaTendaD, this.personagemLocal, () => {
       this.personagemLocal.setSize(40, 2)
       this.personagemLocal.setOffset(12, 6)
-      this.lanternaRemota.setAlpha(1)
-      this.lanternaLocal.setAlpha(1)
-      this.mascaraLanterna.invertAlpha = true
+      this.personagemLocal.dentroTendaD = false
 
-      if(this.personagemLocal.texture.key == 'ernesto') {
-        this.cameras.main.postFX.clear()
-        this.flagBlur = false
-      }
 
       if (!flagFade) {
         this.cameras.main.fadeOut(1000)
         flagFade = true
 
-        this.cameras.main.on('camerafadeoutcomplete', () => {
+        this.cameras.main.once('camerafadeoutcomplete', () => {
           this.cameras.main.fadeIn(1200);
+          
+          this.lanternaRemota.setAlpha(1)
+          this.lanternaLocal.setAlpha(1)
+          this.mascaraLanterna.invertAlpha = true
+          
+
+          if(this.personagemLocal.texture.key == 'ernesto') {
+            this.cameras.main.postFX.clear()
+            this.flagBlur = false
+          }
 
           this.personagemLocal.setPosition(1630, 500)
           this.physics.world.setBounds(
@@ -1617,6 +1638,13 @@ export default class patio extends Phaser.Scene {
     })
     this.EntrandoParque()
 
+    this.entradaTendaE.on('triggerDialogoTendaE', () => {
+      this.EntrandoTendaE()
+    })
+    this.entradaTendaD.on('triggerDialogoTendaD', () => {
+      this.EntrandoTendaD()
+    })
+
   }
 
     TextoFala (fala, falante, chainFunc)
@@ -1631,8 +1659,8 @@ export default class patio extends Phaser.Scene {
 
       var bubbleWidth = 632;
       var bubbleHeight = 100;
-      var bkg = this.add.image(0, 450, `${falante}Fala`).setOrigin(0, 1).setScrollFactor(0).setDisplaySize(800, 128)
-      var bubble = this.add.graphics({ x: 140, y: 336 }).setScrollFactor(0);
+      var bkg = this.add.image(0, 450, `${falante}Fala`).setOrigin(0, 1).setScrollFactor(0).setDisplaySize(800, 128).setDepth(300)
+      var bubble = this.add.graphics({ x: 140, y: 336 }).setScrollFactor(0).setDepth(301)
 
       //  Bubble color
       bubble.fillStyle(0x012201, 1);
@@ -1645,7 +1673,7 @@ export default class patio extends Phaser.Scene {
       bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
 
       var content = this.add.text(0, 0, fala, { fontFamily: 'Arial', fontSize: 20, color: '#bbbbbb', align: 'center', wordWrap: { width: bubbleWidth - 40 } });
-      content.setScrollFactor(0);
+      content.setScrollFactor(0).setDepth(302)
 
       var b = content.getBounds();
 
@@ -1703,6 +1731,7 @@ export default class patio extends Phaser.Scene {
     this.TextoFala('Ahnn.. Espero que isso seja uma coisa boa. Não esquece que fui designado para sua segurança, onde precisar que eu atire, eu atiro', d, () => {
 
       if (this.personagemLocal.texture.key == 'dan') this.fantasma.emit('comecou')
+      this.emCutscene = false
 
     this.TextoFala('HaHaHa. Certo, agora vamos procurar pistas. A fumaça do meu cachimbo deve nos ajudar a encontrar pistas (🔎)', e
     )}
@@ -1712,10 +1741,82 @@ export default class patio extends Phaser.Scene {
   }
 
     AbrindoTendas() {
+      const d = 'dan'
+      const e = 'ernesto'
+      this.emCutscene = true
+      this.flagPegouPistas = false
 
+      this.cameras.main.fadeOut(1000)
+
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+
+        if (this.emCutscene) {
+
+          this.cameras.main.fadeIn(1000)
+          
+          this.entradaTendaD.body.enable = true
+          this.entradaTendaE.body.enable = true
+          
+          if (this.personagemLocal.texture.key == 'ernesto') {
+            this.personagemLocal.setPosition(936, 700)
+            this.ultimoAngulo = 0
+            this.direcaoAtual = 'direita'
+            
+          }
+
+          if (this.personagemLocal.texture.key == 'dan') {
+            this.personagemLocal.setPosition(1000, 700)
+            this.ultimoAngulo = 3
+            this.direcaoAtual = 'esquerda'
+          }
+          
+          this.TextoFala('Terminamos?', d, () => 
+            this.TextoFala('Receio que não, jovem', e, () => 
+              this.TextoFala('Não encontrei o suficiente para determinar o paradeiro desses desaparecidos, vamos olhar aquelas tendas', e, () =>{
+                this.emCutscene = false
+                this.TextoFala('OK!', d)
+              })))
+            }
+      })
+  }
+
+  EntrandoTendaE() {
+      const d = 'dan'
+      const e = 'ernesto'
+      this.emCutscene = true
+      this.entrouTendaE = true
+      
+      this.TextoFala('Hmmm, não me parece que tenha muito pra ver por aqui', d, () => 
+      this.TextoFala('Sem pressa', e, () => 
+      this.TextoFala('Eu trouxe minha lanterna UV, vamos dar uma olhada mais de perto', e, () => 
+      this.TextoFala('Lanterna UV?', d, () => {
+      this.emCutscene = false
+      this.TextoFala('Sim, com ela vou poder ver possiveis marcas ocultas a olho nu', e)
+      }))))
+  }
+  
+  EntrandoTendaD() {
+    const d = 'dan'
+    const e = 'ernesto'
+    this.emCutscene = true
+    this.entrouTendaD = true
+
+    this.TextoFala('Hmmm... Está bem úmido aqui..', e,  () => 
+    this.TextoFala('Como sabe? Algum equipamento de investigação??', d, () => 
+    this.TextoFala('Não..', e, () => 
+    this.TextoFala('Meus óculos....', e,  () => 
+    this.TextoFala('Embaçaram....', e,  () => {
+      if (this.personagemLocal.texture.key == 'ernesto') {
+        this.cameras.main.postFX.addBlur(1, 2, 1, 1, 0xffffff, 1)
+        this.cameras.main.postFX.addBarrel(1.2)
+      }
+      this.TextoFala('ah-', d)
+    })))))
   }
 
   update(time, delta) {
+
+    console.log('local: '+this.personagemLocal.dentroTendaD, 'remoto: '+this.personagemRemoto.dentroTendaD)
     // Normaliza delta para 60 FPS (16.666 ms)
     const norm = delta / 16.666;
 
@@ -1983,7 +2084,9 @@ export default class patio extends Phaser.Scene {
                 y: this.personagemLocal.y,
                 frame: this.personagemLocal.frame.name,
                 lanterna: this.ultimoAngulo,
-                estaDentro: this.flagDentro
+                estaDentro: this.flagDentro,
+                dentroTendaE: this.personagemLocal.dentroTendaE,
+                dentroTendaD:  this.personagemLocal.dentroTendaD
               },
               particula: {
                 x: this.particulaAcaoLocal.x,
@@ -2046,10 +2149,10 @@ export default class patio extends Phaser.Scene {
           )
         }
 
-        if (this.flagVenceu) {
+        if (this.flagPegouPistas) {
           this.game.dadosJogo.send(
             JSON.stringify({
-              flagVenceu: this.flagVenceu
+              flagPegouPistas: this.flagPegouPistas
             })
           )
         }
@@ -2062,10 +2165,18 @@ export default class patio extends Phaser.Scene {
       this.scene.stop()
       this.scene.start('GameOver')
     }
-    if (this.flagVenceu == true) {
-      this.sound.stopAll()
-      this.scene.stop()
-      this.scene.start('Win')
+    if (this.flagPegouPistas && !this.flagTendaAberta) {
+        this.AbrindoTendas()
+        this.flagTendaAberta = true
+    }
+
+    if (this.personagemLocal.dentroTendaE && this.personagemRemoto.dentroTendaE && !this.entrouTendaE) {
+      this.entradaTendaE.emit('triggerDialogoTendaE')
+      this.entrouTendaE = true
+    }
+    if (this.personagemLocal.dentroTendaD && this.personagemRemoto.dentroTendaD && !this.entrouTendaD) {
+      this.entradaTendaD.emit('triggerDialogoTendaD')
+      this.entrouTendaD = true
     }
   }
 }
