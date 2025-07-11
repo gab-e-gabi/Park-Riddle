@@ -14,10 +14,6 @@ export default class patio extends Phaser.Scene {
     this.flagTendaAberta = false
     this.entrouTendaE = false
     this.entrouTendaD = false
-      // this.personagemLocal.dentroTendaE = false
-      // this.personagemLocal.dentroTendaD = false
-      // this.personagemRemoto.dentroTendaE = false
-      // this.personagemRemoto.dentroTendaD = false
   }
 
   init() { }
@@ -93,9 +89,15 @@ export default class patio extends Phaser.Scene {
     this.load.image('marcacao', 'assets/mapa/texturas/objetos/marcacao.png')
     this.load.image('banco', 'assets/mapa/texturas/objetos/banco.png')
     this.load.image('povTiroAlvo', 'assets/mapa/texturas/objetos/povTiroAlvo.png')
+    this.load.image('chaveAzul', 'assets/chaveAzul.png')
+    this.load.image('chaveVermelha', 'assets/chaveVermelha.png')
     this.load.spritesheet('fantasmaAlvo', 'assets/fantasmasAlvos.png',{
       frameWidth: 50,
       frameHeight: 64
+    })
+    this.load.spritesheet('portao', 'assets/mapa/texturas/objetos/portao.png',{
+      frameWidth: 128,
+      frameHeight: 128
     })
 
 
@@ -171,6 +173,14 @@ export default class patio extends Phaser.Scene {
     //Diz qual imagem esta em qual camada
     this.layerChao = this.tilemapMapa.createLayer('chao', [this.tilesetChao])
     this.layerCaminho = this.tilemapMapa.createLayer('caminho', [this.tilesetChao])
+
+    this.portao = this.physics.add.sprite(960, 64, 'portao')
+    this.anims.create({
+      key: 'portao-abrindo',
+      frames: this.anims.generateFrameNumbers('portao', { start: 0, end: 26 }),
+      frameRate: 12,
+      repeat: 0
+    })
     
     this.lanternaLocal = this.add.image(0, 0, 'lanterna')
     this.lanternaLocal
@@ -265,6 +275,7 @@ export default class patio extends Phaser.Scene {
       });
 
       this.personagemLocal = this.physics.add.sprite(936, 1248, 'ernesto')
+      // this.personagemLocal = this.physics.add.sprite(1570, 1800, 'ernesto')
       this.personagemRemoto = this.add.sprite(1000, 1248, 'dan')
       this.velocidade = 75
       this.speed = this.velocidade
@@ -593,8 +604,6 @@ export default class patio extends Phaser.Scene {
           })
         })
 
-    // this.physics.add.image(355, 2000)
-
     } else {
       window.alert("Sala cheia!")
       this.scene.stop()
@@ -678,8 +687,32 @@ export default class patio extends Phaser.Scene {
 
       }
 
+      if (dados.chaveAzul) {
+        if (dados.chaveAzul.pega) {
+          this.pistaSom.play()
+          this.chaveAzul.pega = true
+          this.chaveAzul.visible = false
+        } else {
+          this.chaveAzul.visible = dados.chaveAzul.visible
+          this.chaveAzul.body.enable = dados.chaveAzul.fisica
+        }
+      }
+      if (dados.chaveVermelha) {
+        if (dados.chaveVermelha.pega) {
+          this.pistaSom.play()
+          this.chaveVermelha.pega = true
+          this.chaveVermelha.visible = false
+        } else {
+          this.chaveVermelha.visible = dados.chaveVermelha.visible
+          this.chaveVermelha.body.enable = dados.chaveVermelha.fisica
+        }
+      }
+
       if (dados.flagMorte) {
         this.flagMorte = dados.flagMorte
+      }
+      if (dados.flagFinal) {
+        this.flagFinal = dados.flagFinal
       }
       if (dados.flagPegouPistas) {
         this.flagPegouPistas = dados.flagPegouPistas
@@ -721,6 +754,42 @@ export default class patio extends Phaser.Scene {
     this.personagemLocal.setSize(40, 2)
     this.personagemLocal.setOffset(12, 6)
     this.personagemLocal.setCollideWorldBounds(true)
+
+    
+    this.chaveAzul = this.physics.add.image(1570, 1950, 'chaveAzul')
+    this.chaveAzul.setVisible(false)
+    this.chaveAzul.body.enable = false
+
+    this.physics.add.overlap(this.chaveAzul, this.personagemLocal, () => {
+      this.chaveAzul.pega = true
+      this.chaveAzul.visible = false
+      this.chaveAzul.body.enable = false
+    })
+
+    this.chaveVermelha = this.physics.add.image(355, 1950, 'chaveVermelha')
+    this.chaveVermelha.setVisible(false)
+    this.chaveVermelha.body.enable = false
+
+    this.physics.add.overlap(this.chaveVermelha, this.personagemLocal, () => {
+      this.chaveVermelha.pega = true
+      this.chaveVermelha.visible = false
+      this.chaveVermelha.body.enable = false
+    })
+
+    this.portao.body.pushable = false
+    this.physics.add.collider(this.personagemLocal, this.portao, () => {
+      if (this.chaveAzul.pega && this.chaveVermelha.pega) {
+        this.portao.disableBody()
+        this.portao.anims.play('portao-abrindo', true)
+        this.flagFinal = true
+
+        if (this.personagemLocal.texture.key == 'ernesto') this.personagemLocal.setPosition(936, 96)
+        if (this.personagemLocal.texture.key == 'dan') this.personagemLocal.setPosition(1000, 96)
+      } else {
+        this.TextoFala('Trancado...', this.personagemLocal.texture.key)
+      }
+    })
+
 
     this.layerObjetos.setCollisionByProperty({ collides: true })
     this.layerTendas.setCollisionByProperty({ collides: true })
@@ -1124,12 +1193,12 @@ export default class patio extends Phaser.Scene {
     })
 
     this.bancoPosicao = [
-      {x: 250, y: 1650, n: 3, cod: 6},
-      {x: 290, y: 1650, n: 4, cod: 5},
-      {x: 330, y: 1650, n: 2, cod: 2},
-      {x: 370, y: 1650, n: 5, cod: 1},
+      {x: 250, y: 1650, n: 4, cod: 6},
+      {x: 290, y: 1650, n: 2, cod: 5},
+      {x: 330, y: 1650, n: 6, cod: 2},
+      {x: 370, y: 1650, n: 3, cod: 1},
       {x: 410, y: 1650, n: 1, cod: 4},
-      {x: 450, y: 1650, n: 6, cod: 3},
+      {x: 450, y: 1650, n: 5, cod: 3},
     ]
 
     if (this.personagemLocal.texture.key == 'dan') {
@@ -1196,6 +1265,9 @@ export default class patio extends Phaser.Scene {
             }
 
             if (this.resultado == 6) {
+              this.chaveVermelha.setVisible(true)
+              this.chaveVermelha.body.enable = true
+
               this.pistaSom.play()
             }
           })
@@ -1395,7 +1467,7 @@ export default class patio extends Phaser.Scene {
       this.minigameAlvo.on('ganhouAlvo', () => {
         povAlvosSair.setActive(false).setVisible(false)
         povAlvos.setVisible(false)
-        this.cameras.main.startFollow(this.personagemLocal)
+        this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
         this.flagInteracao = false
         this.speed = this.velocidade
         this.pontosTiroAlvo = 0
@@ -1410,6 +1482,10 @@ export default class patio extends Phaser.Scene {
           this.fantPerdePonto.setVisible(false)
           this.povAlvosContador.setVisible(false)
         }
+
+        this.chaveAzul.setVisible(true)
+        this.chaveAzul.body.enable = true
+
       })
     }
 
@@ -1432,10 +1508,10 @@ export default class patio extends Phaser.Scene {
         banco.spot = this.add.image(banco.x, banco.y + 200, 'marcacao').setMask(this.mascaraLanterna)
       })
 
-      this.fantAlvoCorreto = this.add.sprite(0, 0, 'fantasmaAlvo', 0)
+      this.fantAlvoCorreto = this.add.sprite(0, 0, 'fantasmaAlvo', 1)
       this.fantAlvoCorreto.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500)
 
-      this.fantAlvoErrado = this.add.sprite(0, 0, 'fantasmaAlvo', 1)
+      this.fantAlvoErrado = this.add.sprite(0, 0, 'fantasmaAlvo', 0)
       this.fantAlvoErrado.setScrollFactor(0).setDisplaySize(96, 128).setDepth(500)
 
       this.fantAlvoCorreto.setVisible(false)
@@ -1515,7 +1591,7 @@ export default class patio extends Phaser.Scene {
     povAlvosSair.on('pointerdown', () => {
       povAlvosSair.setActive(false).setVisible(false)
       povAlvos.setVisible(false)
-      this.cameras.main.startFollow(this.personagemLocal)
+      this.cameras.main.startFollow(this.personagemLocal, true, 0.05, 0.05)
       this.flagInteracao = false
       this.speed = this.velocidade
       this.pontosTiroAlvo = 0
@@ -1548,7 +1624,6 @@ export default class patio extends Phaser.Scene {
           this.lanternaLocal.setAlpha(0.0001)
 
           if(this.personagemLocal.texture.key == 'ernesto' && !this.flagBlur && this.entrouTendaD) {
-            console.log('emb')
             this.cameras.main.postFX.addBlur(1, 2, 1, 1, 0xffffff, 1)
             this.cameras.main.postFX.addBarrel(1.2)
             this.flagBlur = true
@@ -1801,6 +1876,12 @@ export default class patio extends Phaser.Scene {
     this.emCutscene = true
     this.entrouTendaD = true
 
+    this.TextoFala('Hmm, tiro ao alvo', e, () =>
+    this.TextoFala('Já que estamos aqui, que tal mostrar sua pontaria?', e, () =>
+    this.TextoFala('Ahm.. Não vejo nenhum alvo', d, () =>
+    this.TextoFala('Ah sim, o paranormal, eu te guio', e, () =>
+    this.TextoFala('?..', d, () =>
+    this.TextoFala('Presumo que tenhamos que acertar os malvados', e, () =>
     this.TextoFala('Hmmm... Está bem úmido aqui..', e,  () => 
     this.TextoFala('Como sabe? Algum equipamento de investigação??', d, () => 
     this.TextoFala('Não..', e, () => 
@@ -1811,12 +1892,37 @@ export default class patio extends Phaser.Scene {
         this.cameras.main.postFX.addBarrel(1.2)
       }
       this.TextoFala('ah-', d)
-    })))))
+    })))))))))))
+  }
+
+  AbrindoPortao() {
+    const d = 'dan'
+    const e = 'ernesto'
+    this.emCutscene = true
+    this.entrouTendaD = true
+
+    this.TextoFala('O que será que tem la dentro?', d, () =>
+    this.TextoFala('Tipo, o que tá rolando aqui exatamente?', d, () =>
+    this.TextoFala('HaHaHa. Está aprendenddo rápido jovem, este é o espírito de investigação', e, () => 
+    this.TextoFala('...', d, () =>
+    this.TextoFala('Vamos la, é um ótimo primeiro caso para você', e, () =>
+    this.TextoFala('Vai ser.. um...', e, () =>
+    this.TextoFala('Enigma do Parque?..', d, () => {
+      this.cameras.main.fadeOut(1000)
+      
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        this.sound.stopAll()
+        this.scene.stop()
+        this.scene.start('Win')
+      })
+    }
+  )))))))
   }
 
   update(time, delta) {
 
-    console.log('local: '+this.personagemLocal.dentroTendaD, 'remoto: '+this.personagemRemoto.dentroTendaD)
+
+    console.log(this.personagemLocal.texture.key,this.chaveAzul.pega, this.chaveVermelha.pega)
     // Normaliza delta para 60 FPS (16.666 ms)
     const norm = delta / 16.666;
 
@@ -2149,10 +2255,41 @@ export default class patio extends Phaser.Scene {
           )
         }
 
+        if (this.flagFinal) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              flagFinal: this.flagFinal
+            })
+          )
+        }
+
         if (this.flagPegouPistas) {
           this.game.dadosJogo.send(
             JSON.stringify({
               flagPegouPistas: this.flagPegouPistas
+            })
+          )
+        }
+
+        if (this.chaveAzul.visible) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              chaveAzul: {
+                visible: this.chaveAzul.visible,
+                pega: this.chaveAzul.pega,
+                fisica: this.chaveAzul.body.enable
+              }
+            })
+          )
+        }
+        if (this.chaveVermelha) {
+          this.game.dadosJogo.send(
+            JSON.stringify({
+              chaveVermelha: {
+                visible: this.chaveVermelha.visible,
+                pega: this.chaveVermelha.pega,
+                fisica: this.chaveVermelha.body.enable
+              }
             })
           )
         }
@@ -2164,6 +2301,10 @@ export default class patio extends Phaser.Scene {
       this.sound.stopAll()
       this.scene.stop()
       this.scene.start('GameOver')
+    }
+    if (this.flagFinal && !this.flagPortaoAberto) {
+      this.AbrindoPortao()
+      this.flagPortaoAberto = true
     }
     if (this.flagPegouPistas && !this.flagTendaAberta) {
         this.AbrindoTendas()
