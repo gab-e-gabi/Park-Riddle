@@ -2282,7 +2282,7 @@ export default class patio extends Phaser.Scene {
             })
           )
         }
-        if (this.chaveVermelha) {
+        if (this.chaveVermelha.visible) {
           this.game.dadosJogo.send(
             JSON.stringify({
               chaveVermelha: {
